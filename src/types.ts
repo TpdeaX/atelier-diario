@@ -2,6 +2,7 @@ export type ModuleId =
   | 'home'
   | 'reader'
   | 'calligraphy'
+  | 'studio'
   | 'typing'
   | 'language'
   | 'mindset'
@@ -11,6 +12,7 @@ export type ModuleId =
 export type HabitKey =
   | 'read'
   | 'calligraphy'
+  | 'studio'
   | 'typing'
   | 'language'
   | 'mindset'
@@ -88,3 +90,59 @@ export interface VocabPair {
   example: string;
   replaces?: string;
 }
+
+export type BoardTool = 'pen' | 'highlighter' | 'rect' | 'circle' | 'arrow' | 'text' | 'eraser';
+
+export type PaperStyle = 'dotted' | 'grid' | 'lined' | 'blank' | 'pdf';
+
+export interface BoardStrokeElement {
+  id: string;
+  type: 'stroke';
+  tool: 'pen' | 'highlighter';
+  points: [number, number][]; // normalized 0..1000 x 0..1350
+  color: string;
+  width: number;
+  alpha: number;
+}
+
+export interface BoardShapeElement {
+  id: string;
+  type: 'rect' | 'circle' | 'arrow';
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  color: string;
+  width: number;
+}
+
+export interface BoardTextElement {
+  id: string;
+  type: 'text';
+  x: number;
+  y: number;
+  text: string;
+  color: string;
+  fontSize: number;
+}
+
+export type BoardElement = BoardStrokeElement | BoardShapeElement | BoardTextElement;
+
+export interface NotebookDoc {
+  id: string;
+  title: string;
+  kind: 'notebook' | 'pdf';
+  paper: PaperStyle;
+  pageCount: number;
+  pages: Record<number, BoardElement[]>;
+  pdfStoragePath?: string;
+  updatedAt: number;
+}
+
+export interface CloudSyncConfig {
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+  spaceCode: string;
+  autoSync: boolean;
+}
+

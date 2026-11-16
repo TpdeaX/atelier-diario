@@ -9,11 +9,13 @@ import { LanguageView } from './views/LanguageView';
 import { MindsetView } from './views/MindsetView';
 import { ReaderView } from './views/ReaderView';
 import { SingingView } from './views/SingingView';
+import { StudioView } from './views/StudioView';
 import { TypingView } from './views/TypingView';
 
 const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[] = [
   { id: 'home', label: 'Inicio', icon: Icons.home },
   { id: 'reader', label: 'Lectura', icon: Icons.book },
+  { id: 'studio', label: 'Cuaderno/PDF', icon: Icons.tablet },
   { id: 'calligraphy', label: 'Caligrafía', icon: Icons.pen },
   { id: 'typing', label: 'Escritura', icon: Icons.keyboard },
   { id: 'language', label: 'Léxico', icon: Icons.spell },
@@ -25,6 +27,7 @@ const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[]
 const root = document.getElementById('app')!;
 const homeView = new HomeView();
 const readerView = new ReaderView();
+const studioView = new StudioView();
 const calligraphyView = new CalligraphyView();
 const typingView = new TypingView();
 const languageView = new LanguageView();
@@ -37,6 +40,7 @@ let currentModule: ModuleId = 'home';
 const VALID_ROUTES = new Set<ModuleId>([
   'home',
   'reader',
+  'studio',
   'calligraphy',
   'typing',
   'language',
@@ -63,6 +67,9 @@ function navigate(next: ModuleId): void {
   }
   if (currentModule === 'typing' && next !== 'typing') {
     typingView.unmount();
+  }
+  if (currentModule === 'studio' && next !== 'studio') {
+    studioView.unmount();
   }
   currentModule = next;
   if (window.location.hash !== `#${next}`) {
@@ -130,6 +137,9 @@ function renderApp(): void {
       break;
     case 'reader':
       readerView.render(mainEl);
+      break;
+    case 'studio':
+      void studioView.render(mainEl);
       break;
     case 'calligraphy':
       calligraphyView.render(mainEl);

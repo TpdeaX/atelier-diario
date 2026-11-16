@@ -40,4 +40,24 @@ export const Icons = {
     svgWrap('<rect x="6" y="2" width="12" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>', s),
   monitor: (s = 16) =>
     svgWrap('<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>', s),
+  tablet: (s = 20) =>
+    svgWrap('<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>', s),
+  highlighter: (s = 16) =>
+    svgWrap('<path d="M9 11l-6 6v3h9l3-3"/><path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/>', s),
+  square: (s = 16) => svgWrap('<rect x="4" y="4" width="16" height="16" rx="1"/>', s),
+  circle: (s = 16) => svgWrap('<circle cx="12" cy="12" r="8"/>', s),
+  arrowUpRight: (s = 16) =>
+    svgWrap('<line x1="5" y1="19" x2="19" y2="5"/><polyline points="10 5 19 5 19 14"/>', s),
+  typeText: (s = 16) =>
+    svgWrap('<polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>', s),
+  eraser: (s = 16) =>
+    svgWrap('<path d="M20 20H7L3 16c-.6-.6-.6-1.5 0-2.1l9.9-9.9c.6-.6 1.5-.6 2.1 0l5 5c.6.6.6 1.5 0 2.1L11 20"/>', s),
+  cloud: (s = 16) =>
+    svgWrap('<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>', s),
+  download: (s = 16) =>
+    svgWrap('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>', s),
+  upload: (s = 16) =>
+    svgWrap('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>', s),
+  plus: (s = 16) =>
+    svgWrap('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', s),
 };

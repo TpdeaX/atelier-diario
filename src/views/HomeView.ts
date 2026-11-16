@@ -12,6 +12,7 @@ import { HabitKey, ModuleId } from '../types';
 
 const HABIT_LABELS: { key: HabitKey; label: string; target: ModuleId }[] = [
   { key: 'read', label: 'Lectura online', target: 'reader' },
+  { key: 'studio', label: 'Cuaderno y PDF', target: 'studio' },
   { key: 'calligraphy', label: 'Caligrafía', target: 'calligraphy' },
   { key: 'typing', label: 'Escritura rápida', target: 'typing' },
   { key: 'language', label: 'Ortografía y léxico', target: 'language' },
@@ -57,7 +58,7 @@ export class HomeView {
 
           <aside class="al-habits-card">
             <div class="al-card-head">
-              <h2>Tu ritmo de hoy (${doneCount}/7)</h2>
+              <h2>Tu ritmo de hoy (${doneCount}/8)</h2>
               <span class="al-streak-badge">${profile.dailyStreak === 1 ? '1 día seguido' : `${profile.dailyStreak} días seguidos`}</span>
             </div>
             <div class="al-habits-list">${habitChips}</div>
@@ -123,6 +124,10 @@ export class HomeView {
             <button type="button" class="al-studio-tile" data-nav="reader">
               <span class="al-studio-icon">${Icons.book(20)}</span>
               <div><h3>Biblioteca y Lector</h3><p>Libros completos de Wikisource, Open Library y diccionario al tacto.</p></div>
+            </button>
+            <button type="button" class="al-studio-tile" data-nav="studio">
+              <span class="al-studio-icon">${Icons.tablet(20)}</span>
+              <div><h3>Cuaderno y Editor PDF</h3><p>Subraya libros PDF, dibuja diagramas tipo tablet y sincroniza en vivo.</p></div>
             </button>
             <button type="button" class="al-studio-tile" data-nav="calligraphy">
               <span class="al-studio-icon">${Icons.pen(20)}</span>

@@ -19,6 +19,7 @@ function emptyHabits(): Record<HabitKey, boolean> {
   return {
     read: false,
     calligraphy: false,
+    studio: false,
     typing: false,
     language: false,
     mindset: false,
