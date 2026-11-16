@@ -43,6 +43,17 @@ create policy "atelier_pdfs_write" on storage.objects for insert with check (buc
 drop policy if exists "atelier_pdfs_update" on storage.objects;
 create policy "atelier_pdfs_update" on storage.objects for update using (bucket_id = 'atelier-pdfs');`;
 
+/** Accepts the API URL, a dashboard URL, or a bare project ref and returns https://<ref>.supabase.co */
+export function normalizeSupabaseUrl(input: string): string {
+  const raw = input.trim().replace(/\/+$/, '');
+  const dash = raw.match(/supabase\.com\/dashboard\/project\/([a-z0-9]{15,})/i);
+  if (dash) return `https://${dash[1].toLowerCase()}.supabase.co`;
+  if (/^[a-z0-9]{15,}$/i.test(raw)) return `https://${raw.toLowerCase()}.supabase.co`;
+  const api = raw.match(/^(https:\/\/[a-z0-9-]+\.supabase\.co)/i);
+  if (api) return api[1].toLowerCase();
+  return raw;
+}
+
 interface RemoteRow {
   space_code: string;
   id: string;
@@ -73,7 +84,7 @@ class CloudSyncService {
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<CloudSyncConfig>;
         return {
-          supabaseUrl: parsed.supabaseUrl ?? '',
+          supabaseUrl: normalizeSupabaseUrl(parsed.supabaseUrl ?? ''),
           supabaseAnonKey: parsed.supabaseAnonKey ?? '',
           spaceCode: parsed.spaceCode || 'mi-espacio',
           autoSync: parsed.autoSync ?? true,
@@ -104,7 +115,7 @@ class CloudSyncService {
 
   public saveConfig(next: CloudSyncConfig): void {
     this.config = {
-      supabaseUrl: next.supabaseUrl.trim().replace(/\/+$/, ''),
+      supabaseUrl: normalizeSupabaseUrl(next.supabaseUrl),
       supabaseAnonKey: next.supabaseAnonKey.trim(),
       spaceCode: next.spaceCode.trim().toLowerCase() || 'mi-espacio',
       autoSync: next.autoSync,
@@ -140,6 +151,15 @@ class CloudSyncService {
       .eq('space_code', this.config.spaceCode)
       .limit(1);
     if (error) {
+      if (/failed to fetch/i.test(error.message)) {
+        return {
+          ok: false,
+          message: `No se pudo contactar ${this.config.supabaseUrl}. Usa la URL de API (https://TU-ID.supabase.co), no la del panel.`,
+        };
+      }
+      if (/atelier_documents|schema cache|does not exist/i.test(error.message)) {
+        return { ok: false, message: 'Falta la tabla: pega «Copiar SQL de Supabase» en SQL Editor y pulsa Run.' };
+      }
       return { ok: false, message: `Error de tabla o permisos: ${error.message}` };
     }
     return { ok: true, message: `Conectado en vivo al espacio «${this.config.spaceCode}».` };
