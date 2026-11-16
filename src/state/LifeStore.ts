@@ -1,4 +1,12 @@
-import { BookBookmark, HabitKey, LifeProfile, ReframeEntry, SavedWord, ThemeMode } from '../types';
+import {
+  BookBookmark,
+  DeviceProfile,
+  HabitKey,
+  LifeProfile,
+  ReframeEntry,
+  SavedWord,
+  ThemeMode,
+} from '../types';
 
 const STORAGE_KEY = 'atelier_diario_profile_v1';
 
@@ -11,6 +19,7 @@ function emptyHabits(): Record<HabitKey, boolean> {
   return {
     read: false,
     calligraphy: false,
+    typing: false,
     language: false,
     mindset: false,
     singing: false,
@@ -21,6 +30,7 @@ function emptyHabits(): Record<HabitKey, boolean> {
 function defaultProfile(): LifeProfile {
   return {
     theme: 'day',
+    deviceMode: 'auto',
     readerFontSize: 18,
     dailyStreak: 0,
     lastActiveDay: '',
@@ -35,6 +45,8 @@ function defaultProfile(): LifeProfile {
       calligraphySheets: 0,
       calmSessions: 0,
       singingBestCents: null,
+      bestWpmPc: 0,
+      bestWpmMobile: 0,
     },
   };
 }
@@ -103,6 +115,23 @@ class LifeStore {
 
   public setTheme(theme: ThemeMode): void {
     this.profile.theme = theme;
+    this.save();
+  }
+
+  public setDeviceMode(deviceMode: DeviceProfile): void {
+    this.profile.deviceMode = deviceMode;
+    this.save();
+  }
+
+  public recordTyping(mode: 'pc' | 'mobile', wpm: number): void {
+    const cleanWpm = Math.max(0, Math.round(wpm));
+    if (mode === 'pc' && cleanWpm > this.profile.stats.bestWpmPc) {
+      this.profile.stats.bestWpmPc = cleanWpm;
+    }
+    if (mode === 'mobile' && cleanWpm > this.profile.stats.bestWpmMobile) {
+      this.profile.stats.bestWpmMobile = cleanWpm;
+    }
+    this.markHabit('typing');
     this.save();
   }
 

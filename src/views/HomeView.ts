@@ -13,6 +13,7 @@ import { HabitKey, ModuleId } from '../types';
 const HABIT_LABELS: { key: HabitKey; label: string; target: ModuleId }[] = [
   { key: 'read', label: 'Lectura online', target: 'reader' },
   { key: 'calligraphy', label: 'Caligrafía', target: 'calligraphy' },
+  { key: 'typing', label: 'Escritura rápida', target: 'typing' },
   { key: 'language', label: 'Ortografía y léxico', target: 'language' },
   { key: 'mindset', label: 'Frases e ideas', target: 'mindset' },
   { key: 'singing', label: 'Práctica de canto', target: 'singing' },
@@ -56,13 +57,13 @@ export class HomeView {
 
           <aside class="al-habits-card">
             <div class="al-card-head">
-              <h2>Tu ritmo de hoy (${doneCount}/6)</h2>
+              <h2>Tu ritmo de hoy (${doneCount}/7)</h2>
               <span class="al-streak-badge">${profile.dailyStreak === 1 ? '1 día seguido' : `${profile.dailyStreak} días seguidos`}</span>
             </div>
             <div class="al-habits-list">${habitChips}</div>
             <div class="al-mini-metrics">
               <div><span>Ortografía</span><strong>${profile.stats.orthographyCorrect}/${profile.stats.orthographyTotal}</strong></div>
-              <div><span>Palabras</span><strong>${profile.savedWords.length}</strong></div>
+              <div><span>Tipeo PC / Móvil</span><strong>${profile.stats.bestWpmPc} / ${profile.stats.bestWpmMobile}</strong></div>
               <div><span>Calma</span><strong>${profile.stats.calmSessions}</strong></div>
             </div>
           </aside>
@@ -126,6 +127,10 @@ export class HomeView {
             <button type="button" class="al-studio-tile" data-nav="calligraphy">
               <span class="al-studio-icon">${Icons.pen(20)}</span>
               <div><h3>Taller de Caligrafía</h3><p>Pautas guiadas, trazos, cursiva e imprenta sobre lienzo sensible.</p></div>
+            </button>
+            <button type="button" class="al-studio-tile" data-nav="typing">
+              <span class="al-studio-icon">${Icons.keyboard(20)}</span>
+              <div><h3>Escritura Rápida</h3><p>Modo PC (mecanografía y dedos guía) o Celular (pulgares y sprint 30s).</p></div>
             </button>
             <button type="button" class="al-studio-tile" data-nav="language">
               <span class="al-studio-icon">${Icons.spell(20)}</span>

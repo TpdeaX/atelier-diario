@@ -9,11 +9,13 @@ import { LanguageView } from './views/LanguageView';
 import { MindsetView } from './views/MindsetView';
 import { ReaderView } from './views/ReaderView';
 import { SingingView } from './views/SingingView';
+import { TypingView } from './views/TypingView';
 
 const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[] = [
   { id: 'home', label: 'Inicio', icon: Icons.home },
   { id: 'reader', label: 'Lectura', icon: Icons.book },
   { id: 'calligraphy', label: 'Caligrafía', icon: Icons.pen },
+  { id: 'typing', label: 'Escritura', icon: Icons.keyboard },
   { id: 'language', label: 'Léxico', icon: Icons.spell },
   { id: 'mindset', label: 'Criterio', icon: Icons.bulb },
   { id: 'singing', label: 'Canto', icon: Icons.mic },
@@ -24,6 +26,7 @@ const root = document.getElementById('app')!;
 const homeView = new HomeView();
 const readerView = new ReaderView();
 const calligraphyView = new CalligraphyView();
+const typingView = new TypingView();
 const languageView = new LanguageView();
 const mindsetView = new MindsetView();
 const singingView = new SingingView();
@@ -31,7 +34,16 @@ const calmView = new CalmView();
 
 let currentModule: ModuleId = 'home';
 
-const VALID_ROUTES = new Set<ModuleId>(['home', 'reader', 'calligraphy', 'language', 'mindset', 'singing', 'calm']);
+const VALID_ROUTES = new Set<ModuleId>([
+  'home',
+  'reader',
+  'calligraphy',
+  'typing',
+  'language',
+  'mindset',
+  'singing',
+  'calm',
+]);
 const initialHash = window.location.hash.replace('#', '') as ModuleId;
 if (VALID_ROUTES.has(initialHash)) {
   currentModule = initialHash;
@@ -49,17 +61,14 @@ function navigate(next: ModuleId): void {
   if (currentModule === 'calm' && next !== 'calm') {
     calmView.unmount();
   }
+  if (currentModule === 'typing' && next !== 'typing') {
+    typingView.unmount();
+  }
   currentModule = next;
   if (window.location.hash !== `#${next}`) {
     history.replaceState(null, '', next === 'home' ? './' : `#${next}`);
   }
   renderApp();
-
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => {
-    void navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
-}
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -108,12 +117,6 @@ function renderApp(): void {
       // Ignore storage failures
     }
     renderApp();
-
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => {
-    void navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
-}
   });
 
   root.querySelectorAll<HTMLButtonElement>('[data-route]').forEach((btn) => {
@@ -130,6 +133,9 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
       break;
     case 'calligraphy':
       calligraphyView.render(mainEl);
+      break;
+    case 'typing':
+      typingView.render(mainEl);
       break;
     case 'language':
       languageView.render(mainEl);

@@ -104,6 +104,10 @@ button {
   flex-shrink: 0;
 }
 
+.is-hidden {
+  display: none !important;
+}
+
 /* ==================== SHELL & TOPBAR ==================== */
 
 .al-shell {
@@ -664,6 +668,97 @@ button {
 
 .al-btn {
   text-decoration: none;
+}
+
+/* ==================== TYPING SPEED STUDIO ==================== */
+
+.al-typing-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.al-typing-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.al-typing-stats > div {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--bg-soft);
+}
+
+.al-typing-stats span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.al-typing-stats strong {
+  font-family: var(--font-mono);
+  font-size: 1.08rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.al-typing-prompt {
+  padding: 18px;
+  border-radius: 10px;
+  background: var(--bg-soft);
+  font-family: var(--font-reader);
+  font-size: clamp(1.1rem, 2.2vw, 1.38rem);
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+}
+
+.al-ch {
+  color: var(--ink-muted);
+}
+
+.al-ch.is-ok {
+  color: var(--accent-primary);
+}
+
+.al-ch.is-err {
+  color: var(--accent-danger);
+  background: rgba(185, 28, 28, 0.14);
+  border-radius: 2px;
+}
+
+.al-ch.is-curr {
+  color: var(--ink-primary);
+  border-bottom: 2px solid var(--accent-primary);
+}
+
+.al-typing-input-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.al-typing-input {
+  flex: 1;
+  min-width: 220px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-strong);
+  font-size: 1.05rem;
+}
+
+.al-typing-input:focus {
+  border-color: var(--accent-primary);
+  outline: none;
+}
+
+.al-finger-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 /* ==================== READER VIEW ==================== */

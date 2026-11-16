@@ -2,14 +2,24 @@ export type ModuleId =
   | 'home'
   | 'reader'
   | 'calligraphy'
+  | 'typing'
   | 'language'
   | 'mindset'
   | 'singing'
   | 'calm';
 
-export type HabitKey = 'read' | 'calligraphy' | 'language' | 'mindset' | 'singing' | 'calm';
+export type HabitKey =
+  | 'read'
+  | 'calligraphy'
+  | 'typing'
+  | 'language'
+  | 'mindset'
+  | 'singing'
+  | 'calm';
 
 export type ThemeMode = 'day' | 'night';
+
+export type DeviceProfile = 'auto' | 'pc' | 'mobile';
 
 export interface SavedWord {
   word: string;
@@ -34,6 +44,7 @@ export interface BookBookmark {
 
 export interface LifeProfile {
   theme: ThemeMode;
+  deviceMode: DeviceProfile;
   readerFontSize: number;
   dailyStreak: number;
   lastActiveDay: string;
@@ -48,6 +59,8 @@ export interface LifeProfile {
     calligraphySheets: number;
     calmSessions: number;
     singingBestCents: number | null;
+    bestWpmPc: number;
+    bestWpmMobile: number;
   };
 }
 
