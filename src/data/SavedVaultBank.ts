@@ -19,12 +19,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dfx3DUIOACq",
     "index": 2,
     "url": "https://www.instagram.com/p/Dfx3DUIOACq/",
-    "title": "Buen domingo",
-    "summary": "Buen domingo . .",
-    "category": "otros",
+    "title": "El experimento del lucio y las barreras del pasado",
+    "summary": "El lucio deja de atacar aunque retiren el vidrio por el dolor previo. Enseña a no dejar que fracasos pasados o el miedo a caer frenen tus intentos futuros y a levantarte otra vez.",
+    "category": "mentalidad",
     "tags": [
-      "instagram",
-      "alessandro"
+      "resiliencia",
+      "miedo",
+      "mentalidad"
     ]
   },
   {
@@ -80,12 +81,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dfso_uRig6D",
     "index": 7,
     "url": "https://www.instagram.com/p/Dfso_uRig6D/",
-    "title": "Clip casual en habitación: 'ya no sé ni para'",
-    "summary": "Joven hablando sentado en su cama con el texto 'ya no sé ni para'; fotograma introductorio sin información accionable suficiente.",
-    "category": "otros",
+    "title": "Ignora las críticas y enfócate en tu propósito",
+    "summary": "Reflexión motivacional usando la historia de Zero Two: si te juzgan o te ven raro, no dejes que los comentarios ajenos definan quién eres ni te desvíen de tu enfoque.",
+    "category": "mentalidad",
     "tags": [
-      "monologo",
-      "cotidiano"
+      "criticas",
+      "autenticidad",
+      "enfoque"
     ]
   },
   {
@@ -153,12 +155,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DfsgsHZPgl7",
     "index": 13,
     "url": "https://www.instagram.com/p/DfsgsHZPgl7/",
-    "title": "Animación de arroz cayendo en olla humeante",
-    "summary": "Ilustración cenital animada vertiendo arroz en una olla con el texto 'olla humeante', recurso visual o de receta paso a paso.",
-    "category": "otros",
+    "title": "Confucio y la lección de no juzgar por las apariencias",
+    "summary": "Parábola de Confucio y Yan Hui con la olla de arroz: lo que parece egoísmo puede ocultar consideración. Recuerda que ver un instante de alguien no basta para inventar su historia.",
+    "category": "mentalidad",
     "tags": [
-      "cocina",
-      "animacion"
+      "prejuicios",
+      "empatia",
+      "confucio"
     ]
   },
   {
@@ -333,12 +336,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DflbA_osgtT",
     "index": 28,
     "url": "https://www.instagram.com/p/DflbA_osgtT/",
-    "title": "Monólogo breve sobre el término 'arruinar'",
-    "summary": "Fotograma de charla directa a cámara con micrófono de mano y el subtítulo 'arruinar'; el cuadro aislado no revela el tema completo.",
-    "category": "otros",
+    "title": "El costo de vivir buscando la aprobación de los demás",
+    "summary": "Explica cómo buscar aprobación constante te hace moldear opiniones, conducta y sueños hasta vivir una vida ajena. Invita a elegir ser fiel a ti mismo sin necesitar consenso.",
+    "category": "mentalidad",
     "tags": [
-      "opinion",
-      "clip"
+      "aprobacion",
+      "autenticidad",
+      "autoestima"
     ]
   },
   {
@@ -933,12 +937,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DfYjaPAukyQ",
     "index": 78,
     "url": "https://www.instagram.com/p/DfYjaPAukyQ/",
-    "title": "Saludos con aura: gestos corporales al saludar a distancia",
-    "summary": "Tres formas de saludar con mano, puño y gesto discreto al caminar en la calle para proyectar seguridad y presencia.",
-    "category": "otros",
+    "title": "Cuatro gestos para saludar a distancia con seguridad",
+    "summary": "Muestra cuatro secuencias de lenguaje corporal con mano, puño y pulgar para saludar de lejos en la calle proyectando presencia, seguridad y carisma.",
+    "category": "oratoria",
     "tags": [
-      "presencia",
-      "saludos"
+      "lenguaje corporal",
+      "saludo",
+      "presencia"
     ]
   },
   {
@@ -1137,12 +1142,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DfW_sIyxq2b",
     "index": 95,
     "url": "https://www.instagram.com/p/DfW_sIyxq2b/",
-    "title": "Comunidad de recursos y podcast",
-    "summary": "Accede a comunidades de aprendizaje y podcasts especializados para profundizar en tu formación.",
-    "category": "otros",
+    "title": "Doce tipos de personas que conviene evitar para crecer",
+    "summary": "Enumera 12 perfiles tóxicos que frenan tu progreso: quienes culpan al sistema, normalizan la mediocridad, no respetan tu tiempo o te culpan por poner límites.",
+    "category": "mentalidad",
     "tags": [
-      "comunidad",
-      "podcast"
+      "limites",
+      "entorno",
+      "crecimiento"
     ]
   },
   {
@@ -1269,12 +1275,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DevLC3EOFk1",
     "index": 106,
     "url": "https://www.instagram.com/p/DevLC3EOFk1/",
-    "title": "Errores comunes de etiqueta con el celular y la postura",
-    "summary": "Comparativa visual de etiqueta masculina: evita usar el teléfono al caminar o meter las manos al bolsillo al vestir traje; mantén postura limpia.",
-    "category": "otros",
+    "title": "Tres reglas de etiqueta sobre deudas, invitados y favores",
+    "summary": "Compara malos y buenos modales en tres situaciones: paga tus deudas antes de que te cobren, incluye siempre a quien invitaste y agradece los favores sin abusar.",
+    "category": "carrera",
     "tags": [
       "etiqueta",
-      "imagen"
+      "modales",
+      "respeto"
     ]
   },
   {
@@ -2025,12 +2032,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Depj_aqRt9z",
     "index": 169,
     "url": "https://www.instagram.com/p/Depj_aqRt9z/",
-    "title": "Clip casual / POV personal de Sebastian Muller",
-    "summary": "Video estilo POV o trend breve grabado en cámara frontal sin explicación textual completa en pantalla ni descripción.",
-    "category": "ocio",
+    "title": "Dejar el orgullo y los juegos de desinterés al querer",
+    "summary": "Monólogo sobre el cansancio de fingir desinterés para no aburrir al otro; invita a dejar el orgullo, expresar afecto de frente y construir relaciones sin juegos.",
+    "category": "bienestar",
     "tags": [
-      "pov",
-      "lifestyle"
+      "relaciones",
+      "orgullo",
+      "vulnerabilidad"
     ]
   },
   {
@@ -2193,12 +2201,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dekxa7SCbL9",
     "index": 183,
     "url": "https://www.instagram.com/p/Dekxa7SCbL9/",
-    "title": "La forma #1 de construir seguridad personal",
-    "summary": "La seguridad no llega antes de actuar, sino después. Empieza aun con miedo: al dar el primer paso y sostenerlo en el tiempo, el temor baja y la confianza crece.",
+    "title": "Construir seguridad acumulando evidencia mediante la acción",
+    "summary": "Explica que la confianza no precede a la acción, sino que nace de acumular evidencia al intentarlo, equivocarse y comprobar que sobrevives al fallo.",
     "category": "mentalidad",
     "tags": [
+      "seguridad",
       "confianza",
-      "acción"
+      "accion"
     ]
   },
   {
@@ -2685,12 +2694,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeTF4iox0gx",
     "index": 224,
     "url": "https://www.instagram.com/p/DeTF4iox0gx/",
-    "title": "SOLO 6 P*TOS MESES",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Siete hábitos de disciplina para cambiar tu vida en seis meses",
+    "summary": "Propone desaparecer seis meses y sostener siete hábitos concretos: entrenar, comer sano, generar ingresos, evitar dramas, asumir riesgos, hablar menos y actuar más.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "disciplina",
+      "habitos",
+      "enfoque"
     ]
   },
   {
@@ -2745,48 +2755,52 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DX4jqjTt4up",
     "index": 229,
     "url": "https://www.instagram.com/p/DX4jqjTt4up/",
-    "title": "¿Conoces a alguien así o te identificaste? Es hora de mejorar precio",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Cuatro errores frecuentes al comunicarte y cómo corregirlos",
+    "summary": "Detalla cuatro fallos que arruinan una conversación: interrumpir, dar detalles de más, escuchar solo para responder sin preguntar y ponerse a la defensiva ante ideas distintas.",
+    "category": "oratoria",
     "tags": [
-      "otros",
-      "habitos"
+      "comunicacion",
+      "escucha",
+      "conversacion"
     ]
   },
   {
     "id": "ig-DeR_hODMLDP",
     "index": 230,
     "url": "https://www.instagram.com/p/DeR_hODMLDP/",
-    "title": "Sigue a @sammysenses si eres terapeuta y quieres ganar más sin aumen",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Ocho replanteamientos para superar el miedo y pasar a la acción",
+    "summary": "Rebate ocho miedos habituales (al qué dirán, a equivocarse, a no estar listo o a decidir mal) con frases breves que recuerdan que nadie te juzga tanto y que empezar es la única forma de prepararse.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "miedo",
+      "mentalidad",
+      "accion"
     ]
   },
   {
     "id": "ig-Dd4W64UMnqE",
     "index": 231,
     "url": "https://www.instagram.com/p/Dd4W64UMnqE/",
-    "title": "Otros y desarrollo efectivo",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Profecía autocumplida: diferencia entre confianza real y soberbia",
+    "summary": "Usa los casos de Mourinho y Kanye West para explicar la profecía autocumplida: creer con convicción cambia cómo te preparas y actúas cada día, a diferencia de la arrogancia vacía sin respaldo.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "confianza",
+      "mentalidad",
+      "preparacion"
     ]
   },
   {
     "id": "ig-DeSgov0vuNt",
     "index": 232,
     "url": "https://www.instagram.com/p/DeSgov0vuNt/",
-    "title": "Facto sobre los buitres",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Lealtad entre amigos y límites frente a la traición afectiva",
+    "summary": "Reflexión directa sobre la falta de códigos en la amistad: meterse con alguien que le importa a un amigo rompe la confianza y ninguna excusa como el alcohol o minimizar el vínculo justifica la deslealtad.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "amistad",
+      "lealtad",
+      "valores"
     ]
   },
   {
@@ -2817,12 +2831,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdDNsFBRH0_",
     "index": 235,
     "url": "https://www.instagram.com/p/DdDNsFBRH0_/",
-    "title": "conoces a Houdini?",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "La historia de Houdini y los límites que existen solo en tu mente",
+    "summary": "Narra la anécdota de Houdini atrapado en una celda sin llave para mostrar cómo las creencias limitantes nos bloquean más que los obstáculos reales, reforzado con la cita de Henry Ford sobre la convicción.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "creencias",
+      "houdini",
+      "mentalidad"
     ]
   },
   {
@@ -2842,24 +2857,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeJ0I8GRJn2",
     "index": 237,
     "url": "https://www.instagram.com/p/DeJ0I8GRJn2/",
-    "title": "5 Ways to Look More Confident",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Cinco claves de lenguaje corporal para proyectar más seguridad",
+    "summary": "Demostración visual de cinco ajustes de lenguaje no verbal para transmitir confianza al instante: sostener el contacto visual, erguir la postura, liberar las manos, gesticular con soltura y sonreír.",
+    "category": "oratoria",
     "tags": [
-      "otros",
-      "habitos"
+      "lenguaje corporal",
+      "oratoria",
+      "seguridad"
     ]
   },
   {
     "id": "ig-DeKmvFpp2Nh",
     "index": 238,
     "url": "https://www.instagram.com/p/DeKmvFpp2Nh/",
-    "title": "Comenta “ARAÑA” y te la mando",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Prompt Spider: inyecta contexto completo a tus prompts de IA",
+    "summary": "Herramienta para Claude e IA que recorre e interconecta los archivos de tu proyecto, sumando su contexto a cada prompt para lograr respuestas precisas y ahorrar miles de tokens.",
+    "category": "tech",
     "tags": [
-      "otros",
-      "habitos"
+      "ia",
+      "prompts",
+      "contexto"
     ]
   },
   {
@@ -2916,12 +2933,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeF-tsrSFi8",
     "index": 243,
     "url": "https://www.instagram.com/p/DeF-tsrSFi8/",
-    "title": "Cuida tu entorno siempre",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Cuatro perfiles tóxicos de los que debes alejarte por tu entorno",
+    "summary": "Señala cuatro actitudes a evitar en tu círculo: chismosos, quienes maltratan a trabajadores, quejosos crónicos sin soluciones y quienes ridiculizan a otros por intentar mejorar.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "entorno",
+      "relaciones",
+      "mentalidad"
     ]
   },
   {
@@ -2952,12 +2970,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcCg1uAAV_4",
     "index": 246,
     "url": "https://www.instagram.com/p/DcCg1uAAV_4/",
-    "title": "Por qué ser solo 'buen tipo' no basta al ligar",
-    "summary": "Reflexión sobre atracción y citas: la amabilidad sin seguridad ni intención clara no genera interés genuino; evita actuar desde la necesidad.",
-    "category": "otros",
+    "title": "Las 3D del coqueteo: por qué ser solo buen tipo no genera atracción",
+    "summary": "Explica por qué la amabilidad sola lleva a la friendzone y propone coquetear con el método 3D: diferenciarte mostrando intención, actuar con desapego sin necesidad y divertirte.",
+    "category": "mentalidad",
     "tags": [
-      "citas",
-      "atracción"
+      "atraccion",
+      "coqueteo",
+      "desapego"
     ]
   },
   {
@@ -3013,12 +3032,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dd91VqaloP_",
     "index": 251,
     "url": "https://www.instagram.com/p/Dd91VqaloP_/",
-    "title": "Sensitive content overlay",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
+    "title": "Publicación de Instagram restringida por audiencia",
+    "summary": "No fue posible descargar el video ni extraer metadatos porque Instagram restringe la visibilidad de esta publicación para ciertas audiencias.",
     "category": "otros",
     "tags": [
-      "otros",
-      "habitos"
+      "instagram",
+      "restringido"
     ]
   },
   {
@@ -3049,24 +3068,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dd2lpnBNrPz",
     "index": 254,
     "url": "https://www.instagram.com/p/Dd2lpnBNrPz/",
-    "title": "con cual vas a empezar? 🫵",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Cuatro ejercicios emocionales para cerrar el año con más calma",
+    "summary": "Propone cuatro prácticas de bienestar emocional en tono cercano: perdonarse al fallar, dar el primer paso, validar todo sentimiento cuidando la respuesta y aceptar la imperfección.",
+    "category": "bienestar",
     "tags": [
-      "otros",
-      "habitos"
+      "bienestar",
+      "autocompasion",
+      "emociones"
     ]
   },
   {
     "id": "ig-Dd9HEzcPiHu",
     "index": 255,
     "url": "https://www.instagram.com/p/Dd9HEzcPiHu/",
-    "title": "Facto sobre reconocer y no cambiar",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "La trampa de reconocer tus defectos sin cambiar nada",
+    "summary": "Advierte que confesar tus errores da un alivio falso que reemplaza la acción real: saber explicar tus defectos no es avanzar; toca dejar de repetir conductas que ya identificaste.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "autocritica",
+      "habitos",
+      "cambio"
     ]
   },
   {
@@ -3170,12 +3191,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Ddr-9j1KUJn",
     "index": 264,
     "url": "https://www.instagram.com/p/Ddr-9j1KUJn/",
-    "title": "Otros y desarrollo efectivo",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Reto de agilidad mental: resuelve esta suma en 15 segundos",
+    "summary": "Propone un ejercicio cronometrado de cálculo mental sin calculadora para medir tu concentración frente al desgaste de las redes y sugiere entrenar con juegos rápidos en Matiks.",
+    "category": "estudio",
     "tags": [
-      "otros",
-      "habitos"
+      "calculo-mental",
+      "concentracion",
+      "agilidad"
     ]
   },
   {
@@ -3194,12 +3216,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dd3cMQJIk1n",
     "index": 266,
     "url": "https://www.instagram.com/p/Dd3cMQJIk1n/",
-    "title": "Porqué? Eso no deberia ser un problema",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Señal de alerta: cuando poner un límite te convierte en la mala",
+    "summary": "Explica una bandera roja clave en vínculos: si al poner un límite la otra persona te culpa o tilda de exagerada, reflexiona por qué tu autocuidado le resulta un problema.",
+    "category": "bienestar",
     "tags": [
-      "otros",
-      "habitos"
+      "limites",
+      "relaciones",
+      "autocuidado"
     ]
   },
   {
@@ -3218,12 +3241,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dd4ITElshwb",
     "index": 268,
     "url": "https://www.instagram.com/p/Dd4ITElshwb/",
-    "title": "Seguime @francopisso",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Cómo evaluar si alguien te ama por sus acciones",
+    "summary": "Reflexión directa para evaluar la calidad de tus vínculos: pregúntate si te sentirías amado únicamente por las acciones de la otra persona en caso de que no pudiera decirte nada.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "relaciones",
+      "acciones",
+      "criterio"
     ]
   },
   {
@@ -3254,12 +3278,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dd2RUg0tce3",
     "index": 271,
     "url": "https://www.instagram.com/p/Dd2RUg0tce3/",
-    "title": "Otros y desarrollo efectivo",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Cómo ganar un debate cuestionando definiciones clave",
+    "summary": "Explica cómo exponer argumentos débiles sin discutir de más: pide definir los conceptos o datos exactos que afirma el otro, como qué es un químico o cuánta agua usa la IA, para detectar opiniones repetidas.",
+    "category": "oratoria",
     "tags": [
-      "otros",
-      "habitos"
+      "debate",
+      "argumentacion",
+      "preguntas"
     ]
   },
   {
@@ -3350,12 +3375,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdzkmhOoHye",
     "index": 279,
     "url": "https://www.instagram.com/p/DdzkmhOoHye/",
-    "title": "Que sea menos incómodo",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Cinco niveles para iniciar una conversación sin incomodidad",
+    "summary": "Muestra cinco formas de romper el hielo al saludar, pasando de un simple hola a combinar saludo, contexto del momento, un toque de personalidad y una pregunta abierta como pedir recomendación de café.",
+    "category": "oratoria",
     "tags": [
-      "otros",
-      "habitos"
+      "conversacion",
+      "comunicacion",
+      "social"
     ]
   },
   {
@@ -3470,24 +3496,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Ddtr7TbBn4A",
     "index": 289,
     "url": "https://www.instagram.com/p/Ddtr7TbBn4A/",
-    "title": "TOP personas que más detesto: las que minimizan los logros de los de",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Juegos finitos vs infinitos: competir contigo sin compararte",
+    "summary": "Critica a quienes minimizan logros ajenos comparando cifras y explica la idea de Simon Sinek sobre juegos finitos e infinitos: correr o avanzar para permanecer y superarte a ti mismo, no para ganar a otros.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "mentalidad",
+      "superacion",
+      "comparacion"
     ]
   },
   {
     "id": "ig-DdukSToATG_",
     "index": 290,
     "url": "https://www.instagram.com/p/DdukSToATG_/",
-    "title": "Ya sos suficiente, no lo olvides. Valés mucho",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Por qué los logros externos no llenan el vacío personal",
+    "summary": "Explica que ningún logro externo reemplaza la relación contigo mismo: si buscas validación en metas o dinero, el vacío vuelve al bajar la emoción; tu valor se construye en cómo te hablas y tratas a diario.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "autoestima",
+      "logros",
+      "mentalidad"
     ]
   },
   {
@@ -3580,13 +3608,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdpaAWiMwmD",
     "index": 298,
     "url": "https://www.instagram.com/p/DdpaAWiMwmD/",
-    "title": "Técnica vocal: cantar agudos sin forzar la voz",
-    "summary": "Desactiva el reflejo de empuje buscando primero resonancia frontal nasal y oral, y trasládala luego a la letra para lograr agudos con proyección sin tensión.",
-    "category": "otros",
+    "title": "Técnica vocal: tres pasos para cantar agudos sin forzar",
+    "summary": "Muestra un ejercicio en tres pasos para evitar el reflejo de empuje en notas agudas: activa resonancia frontal con un gesto manual, haz una escala descendente y traslada esa sensación a la letra.",
+    "category": "oratoria",
     "tags": [
       "canto",
-      "tecnica-vocal",
-      "resonancia"
+      "tecnica vocal",
+      "voz"
     ]
   },
   {
@@ -3771,12 +3799,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdDKghAMxOG",
     "index": 313,
     "url": "https://www.instagram.com/p/DdDKghAMxOG/",
-    "title": "Preguntas directas para aclarar interés en una cita o plan",
-    "summary": "Evita malentendidos preguntando con claridad si la otra persona tiene pareja o si realmente le interesa el plan que propones.",
-    "category": "otros",
+    "title": "Preguntas directas de tres segundos para evitar malentendidos",
+    "summary": "Explica por qué hacer una pregunta directa a tiempo —como saber si alguien tiene pareja o si de verdad le interesa un plan— dura tres segundos y te ahorra ilusiones y momentos mucho más incómodos.",
+    "category": "oratoria",
     "tags": [
-      "relaciones",
       "comunicacion",
+      "asertividad",
       "citas"
     ]
   },
@@ -3834,12 +3862,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbNFWQYOSG0",
     "index": 318,
     "url": "https://www.instagram.com/p/DbNFWQYOSG0/",
-    "title": "Siempre hay un detalle 👀",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Cómo iniciar charla usando detalles visuales de la otra persona",
+    "summary": "Enseña a romper el hielo al conocer gente evitando preguntas genéricas: fíjate en un detalle visible —una gorra, mochila o comida— para abrir tema, encontrar gustos en común y ganar soltura social.",
+    "category": "oratoria",
     "tags": [
-      "otros",
-      "habitos"
+      "conversacion",
+      "habilidades sociales",
+      "carisma"
     ]
   },
   {
@@ -3870,12 +3899,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdiaWw0sqm-",
     "index": 321,
     "url": "https://www.instagram.com/p/DdiaWw0sqm-/",
-    "title": "Calladito te ves… 🤨",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Hablar menos para que tus palabras tengan mayor peso",
+    "summary": "Explica por qué hablar demasiado reduce el valor percibido de tus ideas y cómo intervenir solo cuando aportas algo concreto genera atención total en un grupo.",
+    "category": "oratoria",
     "tags": [
-      "otros",
-      "habitos"
+      "comunicacion",
+      "presencia",
+      "escucha"
     ]
   },
   {
@@ -3907,12 +3937,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdfBT90o-y0",
     "index": 324,
     "url": "https://www.instagram.com/p/DdfBT90o-y0/",
-    "title": "Amable y valiente",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Gestos cotidianos que distinguen los buenos modales",
+    "summary": "Comparación visual entre actitudes consideradas y descorteses en público: ceder el paso al sentarse, manejar la cuenta con discreción y abrir espacio en conversaciones grupales.",
+    "category": "mentalidad",
     "tags": [
-      "otros",
-      "habitos"
+      "modales",
+      "cortesia",
+      "respeto"
     ]
   },
   {
@@ -4005,12 +4036,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdY_TEqt2KM",
     "index": 332,
     "url": "https://www.instagram.com/p/DdY_TEqt2KM/",
-    "title": "Comment ‘BODY’ If you want to learn more such hacks",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Cómo dar un apretón de manos firme y sin errores",
+    "summary": "Muestra errores comunes al saludar y enseña dos reglas clave de lenguaje corporal: mantener contacto visual y unir la base entre pulgar e índice con firmeza.",
+    "category": "carrera",
     "tags": [
-      "otros",
-      "habitos"
+      "lenguaje corporal",
+      "saludo",
+      "presencia"
     ]
   },
   {
@@ -4066,12 +4098,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DamnQHGP8Np",
     "index": 337,
     "url": "https://www.instagram.com/p/DamnQHGP8Np/",
-    "title": "Otros y desarrollo efectivo",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Tutorial de rodada en parkour para evitar lesiones al caer",
+    "summary": "Enseña a disipar el impacto rodando sobre el hombro con barbilla al pecho, evitando cuello y columna, mediante una progresión desde agachado hasta trote sin apoyar rodillas.",
+    "category": "bienestar",
     "tags": [
-      "otros",
-      "habitos"
+      "parkour",
+      "rodada",
+      "prevencion"
     ]
   },
   {
@@ -4091,12 +4124,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Ddauvr0Mvkc",
     "index": 339,
     "url": "https://www.instagram.com/p/Ddauvr0Mvkc/",
-    "title": "El “sarcasmo” solo es una excusa 🙄",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "otros",
+    "title": "Cómo usar el sarcasmo sin sonar grosero ni generar roces",
+    "summary": "Explica por qué el sarcasmo falla cuando el otro no capta el tono y propone evitarlo en entornos formales o usar emojis y stickers por mensaje para dar contexto.",
+    "category": "oratoria",
     "tags": [
-      "otros",
-      "habitos"
+      "sarcasmo",
+      "comunicacion",
+      "tono"
     ]
   },
   {
@@ -4128,12 +4162,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdaDr-KxQpl",
     "index": 342,
     "url": "https://www.instagram.com/p/DdaDr-KxQpl/",
-    "title": "Siempre es sencillo castigarse, pero reconocerse… parece casi imp",
-    "summary": "Siempre es sencillo castigarse, pero reconocerse… parece casi imposible.",
-    "category": "otros",
+    "title": "Reconocer tu esfuerzo diario en lugar de solo reprocharte",
+    "summary": "Reflexión sobre cómo el exceso de autocrítica oculta los avances reales e invita a celebrar tus logros y esfuerzo diario con la misma intensidad con que te exiges.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "autocompasion",
+      "mentalidad",
+      "progreso"
     ]
   },
   {
@@ -4202,12 +4237,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbBsENfsHAl",
     "index": 348,
     "url": "https://www.instagram.com/p/DbBsENfsHAl/",
-    "title": "¿Cuántos comentarios tiene este video? #logica #autorreferencial",
-    "summary": "¿Cuántos comentarios tiene este video?",
-    "category": "tech",
+    "title": "Cómo resolver acertijos de lógica autorreferencial paso a paso",
+    "summary": "Demuestra cómo resolver cuestionarios autorreferenciales probando hipótesis y descartando contradicciones lógicas en preguntas interdependientes sobre sus propias respuestas.",
+    "category": "estudio",
     "tags": [
-      "tech",
-      "desarrollo"
+      "logica",
+      "razonamiento",
+      "acertijos"
     ]
   },
   {
@@ -4250,36 +4286,39 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdR_XpIxnSn",
     "index": 352,
     "url": "https://www.instagram.com/p/DdR_XpIxnSn/",
-    "title": "Just simply, don’t quit",
-    "summary": "Just simply, don’t quit",
-    "category": "otros",
+    "title": "No rendirse y asumir riesgos para alcanzar tus metas",
+    "summary": "Mensaje breve sobre perseverancia que recuerda que quienes ganan no abandonan, e impulsa a asumir riesgos grandes y aprovechar al máximo cada oportunidad.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "perseverancia",
+      "riesgo",
+      "motivacion"
     ]
   },
   {
     "id": "ig-DdSKNB6h1Fb",
     "index": 353,
     "url": "https://www.instagram.com/p/DdSKNB6h1Fb/",
-    "title": "Todos lo hacemos no? 😭 #parati #viral #humor #comedia #fyp",
-    "summary": "Todos lo hacemos no? 😭",
+    "title": "Top 5 costumbres masculinas contadas con humor y desamor",
+    "summary": "Recopilación humorística de cinco hábitos cotidianos en hombres, como patear piedritas o jugar Minecraft Hardcore, mezclados con metáforas nostálgicas sobre relaciones pasadas.",
     "category": "ocio",
     "tags": [
-      "growth",
-      "ocio"
+      "humor",
+      "entretenimiento",
+      "relaciones"
     ]
   },
   {
     "id": "ig-DcFFjKLpwXk",
     "index": 354,
     "url": "https://www.instagram.com/p/DcFFjKLpwXk/",
-    "title": "🔖 Guarda este reel y sígueme para elevar tu imagen sin complicarte",
-    "summary": "🔖 Guarda este reel y sígueme para elevar tu imagen sin complicarte",
-    "category": "estudio",
+    "title": "Truco para ocultar los cordones de tus tenis con estilo",
+    "summary": "Muestra paso a paso cómo pasar las puntas de los cordones por debajo de los ojales y hacer el lazo detrás de la lengüeta para lograr un acabado limpio y estilizado.",
+    "category": "bienestar",
     "tags": [
-      "aprendizaje",
-      "foco"
+      "estilo",
+      "calzado",
+      "imagen"
     ]
   },
   {
@@ -4298,12 +4337,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdPyu6lkb-l",
     "index": 356,
     "url": "https://www.instagram.com/p/DdPyu6lkb-l/",
-    "title": "🚨✅its not a big deal✅🚨Mejora tu PRONUNCIACION en INGLÉS🚨 #pro",
-    "summary": "🚨 it's not a big deal 🚨Mejora tu PRONUNCIACION en INGLÉS🚨",
+    "title": "Cómo pronunciar con fluidez \"It's not a big deal\" en inglés",
+    "summary": "Desglosa la unión de palabras en \"It's not a big deal\", explicando cómo enlazar \"not a\" suavizando la T hacia un sonido parecido a la R suave para sonar más natural.",
     "category": "estudio",
     "tags": [
-      "aprendizaje",
-      "foco"
+      "ingles",
+      "pronunciacion",
+      "speaking"
     ]
   },
   {
@@ -4359,48 +4399,52 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dbri6v7MHAO",
     "index": 361,
     "url": "https://www.instagram.com/p/Dbri6v7MHAO/",
-    "title": "4 tipos de “amigo” que ¡DEBES EVITAR! Pt1 #amistad #amigos #refle",
-    "summary": "4 tipos de “amigo” que ¡DEBES EVITAR! Pt1 ón",
+    "title": "Cuatro tipos de amistades tóxicas que conviene evitar",
+    "summary": "Describe cuatro perfiles de falsos amigos: el parásito que solo busca desahogarse, el que humilla disfrazado de broma, el ancla que frena tu progreso y el que critica a todos.",
     "category": "mentalidad",
     "tags": [
-      "habitos",
-      "mentalidad"
+      "amistad",
+      "limites",
+      "relaciones"
     ]
   },
   {
     "id": "ig-Db6FLYVESDD",
     "index": 362,
     "url": "https://www.instagram.com/p/Db6FLYVESDD/",
-    "title": "Comenta JURADO y dejame ayudarte a cambiar tu vida y tu comunic",
-    "summary": "Comenta JURADO y dejame ayudarte a cambiar tu vida y tu comunic",
+    "title": "Cómo corregir un error en público sin pedir disculpas",
+    "summary": "Enseña tres frases para rectificar datos frente a una audiencia sin pedir perdón ni mostrarte inseguro: corregir con serenidad, justificar por rigor y reformular como líder.",
     "category": "oratoria",
     "tags": [
-      "comunicacion",
-      "voz"
+      "oratoria",
+      "liderazgo",
+      "comunicacion"
     ]
   },
   {
     "id": "ig-Davy0AfM9WN",
     "index": 363,
     "url": "https://www.instagram.com/p/Davy0AfM9WN/",
-    "title": "✅ Comenta “CIERRE” si eres closer, coach, infoproductor o vendes",
-    "summary": "✅ Comenta “CIERRE” si eres closer, coach, infoproductor o vendes",
+    "title": "Tres pasos para responder cuando te corrigen y mantener autoridad",
+    "summary": "Explica cómo neutralizar a quien busca restarte autoridad al corregirte: validar y redirigir sin reaccionar, preguntar cómo llegó a su conclusión y convertirlo en aliado.",
     "category": "oratoria",
     "tags": [
-      "comunicacion",
-      "voz"
+      "persuasion",
+      "autoridad",
+      "negociacion"
     ]
   },
   {
     "id": "ig-DdPeimPuodW",
     "index": 364,
     "url": "https://www.instagram.com/p/DdPeimPuodW/",
-    "title": "Comenta “MARCA” y te paso un eBook para crecer tu marca personal",
-    "summary": "Comenta “MARCA” y te paso un eBook para crecer tu marca personal",
-    "category": "oratoria",
+    "title": "Quince hábitos cotidianos que dañan tu imagen profesional",
+    "summary": "Lista quince conductas que restan profesionalismo en el trabajo, como llegar tarde, responder solo \"ok\", interrumpir, no quitarse los auriculares, ir sin prepararse o no asumir errores.",
+    "category": "carrera",
     "tags": [
-      "comunicacion",
-      "voz"
+      "profesionalismo",
+      "carrera",
+      "etiqueta"
     ]
   },
   {
@@ -4419,12 +4463,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DctlvFoIHrE",
     "index": 366,
     "url": "https://www.instagram.com/p/DctlvFoIHrE/",
-    "title": "¿Consigues darte cuenta? 👀",
-    "summary": "¿Consigues darte cuenta? 👀",
-    "category": "otros",
+    "title": "Doce señales para leer el carácter y las intenciones de la gente",
+    "summary": "Presenta doce contrastes para interpretar actitudes cotidianas, diferenciando conductas como la amabilidad excesiva, la crítica ajena o prometer en exceso frente a la nobleza y la prudencia.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "psicologia",
+      "caracter",
+      "relaciones"
     ]
   },
   {
@@ -4443,24 +4488,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DaBfFqxADWt",
     "index": 368,
     "url": "https://www.instagram.com/p/DaBfFqxADWt/",
-    "title": "Sígueme en @juradonegocios 👈🏼 para mejorar tu comunicación y or",
-    "summary": "Sígueme en @juradonegocios 👈🏼 para mejorar tu comunicación y or",
-    "category": "oratoria",
+    "title": "10 errores que pueden arruinar tu vida en tus 20s",
+    "summary": "Bernardo Jurado enumera diez trampas comunes: evitar riesgos, aprender sin ejecutar, vivir de apariencias, descuidar tu salud, no desarrollar habilidades valiosas y posponer decisiones clave.",
+    "category": "mentalidad",
     "tags": [
-      "comunicacion",
-      "voz"
+      "habitos",
+      "veintes",
+      "mentalidad"
     ]
   },
   {
     "id": "ig-DdPRGurMzrP",
     "index": 369,
     "url": "https://www.instagram.com/p/DdPRGurMzrP/",
-    "title": "sabías este truco?",
-    "summary": "sabías este truco?",
-    "category": "otros",
+    "title": "Cómo dejar de vivir desconfiando por miedo a la traición",
+    "summary": "Reflexión sobre no convertir vínculos sanos en investigaciones por miedo a futuras traiciones; recomienda confiar mientras haya motivos y retirar esa confianza solo si dejan de merecerla.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "confianza",
+      "relaciones",
+      "psicologia"
     ]
   },
   {
@@ -4479,24 +4526,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdQd_znClDr",
     "index": 371,
     "url": "https://www.instagram.com/p/DdQd_znClDr/",
-    "title": "Adiós diseños y textos basura de IA Claude 😬",
-    "summary": "Adiós diseños y textos basura de IA Claude 😬",
+    "title": "Skills y herramientas para mejorar diseños y textos en Claude",
+    "summary": "Presenta recursos para evitar resultados genéricos de Claude: Impeccable, UI UX Pro Max, Taste Skill y DESIGN.md en diseño; Frontend Slides en presentaciones; Humanizer y Stop the Slop en texto.",
     "category": "tech",
     "tags": [
-      "tech",
-      "desarrollo"
+      "claude",
+      "diseno",
+      "ia"
     ]
   },
   {
     "id": "ig-DdN3nn9Owy2",
     "index": 372,
     "url": "https://www.instagram.com/p/DdN3nn9Owy2/",
-    "title": "Paso a paso se logrará #reflexion #palabras#fyp #paratii #contenido",
-    "summary": "Paso a paso se logrará",
+    "title": "Cómo cambiar tu vida en 4 pasos tras una ruptura",
+    "summary": "Propone cuatro pilares con tono irónico y emotivo: hacer ejercicio, comer sano, convertir el dolor de un corazón roto en impulso para madrugar y crecer cada día, y mantenerse bien hidratado.",
     "category": "mentalidad",
     "tags": [
+      "superacion",
       "habitos",
-      "mentalidad"
+      "resiliencia"
     ]
   },
   {
@@ -4529,24 +4578,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdOo-X2Mn6P",
     "index": 375,
     "url": "https://www.instagram.com/p/DdOo-X2Mn6P/",
-    "title": "Comenta acá abajo si todavía esperas a la indicada 😅",
-    "summary": "Comenta acá abajo si todavía esperas a la indicada 😅",
-    "category": "otros",
+    "title": "Entrenar por autoestima y descubrir que la soledad sigue ahí",
+    "summary": "Reflexión honesta sobre empezar a entrenar por baja autoestima esperando conseguir pareja, lograr el cambio físico y notar que la soledad persiste, animando a seguir adelante pese a todo.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "autoestima",
+      "gimnasio",
+      "soledad"
     ]
   },
   {
     "id": "ig-DdFJ3hpBojT",
     "index": 376,
     "url": "https://www.instagram.com/p/DdFJ3hpBojT/",
-    "title": "Cómo saber si una persona es tonta",
-    "summary": "Cómo saber si una persona es tonta. Las personas con bao coeficiente intelectual tienen todas.",
-    "category": "otros",
+    "title": "Tres señales de bajo pensamiento crítico al argumentar",
+    "summary": "Explica tres fallas lógicas comunes al debatir: confundir excepciones con reglas generales, juzgar el mensaje según quién lo dice y no poder razonar sobre escenarios hipotéticos.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "pensamiento critico",
+      "logica",
+      "debate"
     ]
   },
   {
@@ -4566,12 +4617,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbGPYMuqz7y",
     "index": 378,
     "url": "https://www.instagram.com/p/DbGPYMuqz7y/",
-    "title": "El verdadero diferencial está en el critério",
-    "summary": "El verdadero diferencial está en el critério.",
+    "title": "El verdadero diferencial está en el criterio",
+    "summary": "Apunte guardado en tecnología sobre la importancia del criterio como factor diferenciador; el video original no pudo recuperarse desde Instagram.",
     "category": "tech",
     "tags": [
-      "tech",
-      "desarrollo"
+      "criterio",
+      "tecnologia"
     ]
   },
   {
@@ -4638,12 +4689,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Db4awEbucLW",
     "index": 384,
     "url": "https://www.instagram.com/p/Db4awEbucLW/",
-    "title": "Casi nunca es broma",
-    "summary": "Casi nunca es broma.",
-    "category": "otros",
+    "title": "Tres respuestas con clase cuando te dicen que era broma",
+    "summary": "Comparte tres frases asertivas para frenar insultos disfrazados de chiste: pedir que sea más gracioso, mostrar sorpresa para que explique la broma o señalar que sonó a problema y hacer pausa.",
+    "category": "oratoria",
     "tags": [
-      "growth",
-      "otros"
+      "asertividad",
+      "oratoria",
+      "limites"
     ]
   },
   {
@@ -4686,36 +4738,39 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdNPC-8Nu8H",
     "index": 388,
     "url": "https://www.instagram.com/p/DdNPC-8Nu8H/",
-    "title": "Comenta “guía” y te ayudaré a mejorar tus hábitos ✅",
-    "summary": "Comenta “guía” y te ayudaré a mejorar tus hábitos",
-    "category": "mentalidad",
+    "title": "Cuatro hábitos diarios para salir del estancamiento",
+    "summary": "Propone cuatro acciones simples: cumplir una microtarea al despertar, salir diez minutos de casa, ducharse y vestirse sin planes, y preparar la noche previa algo que facilite tu mañana.",
+    "category": "bienestar",
     "tags": [
       "habitos",
-      "mentalidad"
+      "bienestar",
+      "rutina"
     ]
   },
   {
     "id": "ig-DciFKG4MQZl",
     "index": 389,
     "url": "https://www.instagram.com/p/DciFKG4MQZl/",
-    "title": "3 pasos para ganarte su confianza ⏰",
-    "summary": "3 pasos para ganarte su confianza ⏰",
-    "category": "tech",
+    "title": "Tres pasos para generar confianza en los primeros minutos",
+    "summary": "Explica cómo romper el hielo rápido: comparte un detalle personal breve para abrir confianza, haz preguntas abiertas que inviten a contar historias y destaca algo en común con un yo también.",
+    "category": "oratoria",
     "tags": [
-      "tech",
-      "desarrollo"
+      "comunicacion",
+      "confianza",
+      "conversacion"
     ]
   },
   {
     "id": "ig-Daogt_JN4I5",
     "index": 390,
     "url": "https://www.instagram.com/p/Daogt_JN4I5/",
-    "title": "TQM preguntonas 🫶🏼✨ #amorpropio #amorproprio #relationships #re",
-    "summary": "TQM preguntonas 🫶🏼",
+    "title": "Cómo responder con humor absurdo a personas muy preguntonas",
+    "summary": "Muestra con humor cómo frenar a quien hace preguntas indiscretas sin contar nada: responde con datos absurdos y seriedad total, aguantando la risa para devolverle la incomodidad.",
     "category": "oratoria",
     "tags": [
       "comunicacion",
-      "voz"
+      "humor",
+      "limites"
     ]
   },
   {
@@ -4734,120 +4789,130 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdMPT8LM36S",
     "index": 392,
     "url": "https://www.instagram.com/p/DdMPT8LM36S/",
-    "title": "En el momento que te vuelves sincero tu vida cambia por completo",
-    "summary": "En el momento que te vuelves sincero tu vida cambia por completo",
-    "category": "tech",
+    "title": "Ser honesto con tus intenciones en lugar de fingir amistad",
+    "summary": "Reflexión sobre las relaciones y el ligue: sostiene que fingir ser amigo de una mujer ocultando interés romántico o sexual es menos honesto que expresar tus intenciones de frente desde el inicio.",
+    "category": "mentalidad",
     "tags": [
-      "tech",
-      "desarrollo"
+      "relaciones",
+      "sinceridad",
+      "mentalidad"
     ]
   },
   {
     "id": "ig-Da89NyfxAVd",
     "index": 393,
     "url": "https://www.instagram.com/p/Da89NyfxAVd/",
-    "title": "Nadie piensa tanto en ti como tú mismo 🧐 Darte cuenta de esto e",
-    "summary": "Nadie piensa tanto en ti como tú mismo 🧐 Darte cuenta de esto e integrarlo en tu vida, hace que las opiniones externas dejen de importarte tanto y empiezas a ser dirigido, por lo que realmente siempre has querido hacer",
-    "category": "otros",
+    "title": "Superar la ansiedad social entendiendo que nadie te observa tanto",
+    "summary": "Explica el efecto foco desde una cafetería: la gente olvida en minutos lo que haces porque no eres protagonista en su mente. Invita a ignorar el qué dirán y atreverte a publicar o actuar.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "ansiedad",
+      "mentalidad",
+      "autoconfianza"
     ]
   },
   {
     "id": "ig-DcKR5aRAm4Y",
     "index": 394,
     "url": "https://www.instagram.com/p/DcKR5aRAm4Y/",
-    "title": "Comenta JURADO y dejame ayudarte a cambiar tu vida y tu comunic",
-    "summary": "Comenta JURADO y dejame ayudarte a cambiar tu vida y tu comunic",
+    "title": "Cinco respuestas asertivas ante preguntas trampa o incómodas",
+    "summary": "Da respuestas diplomáticas y firmes para cinco preguntas invasivas sobre ingresos, chismes laborales, vivienda, empleo y posesiones, evitando caer en provocaciones y proyectando criterio.",
     "category": "oratoria",
     "tags": [
-      "comunicacion",
-      "voz"
+      "oratoria",
+      "asertividad",
+      "comunicacion"
     ]
   },
   {
     "id": "ig-DdNHNJDxaXZ",
     "index": 395,
     "url": "https://www.instagram.com/p/DdNHNJDxaXZ/",
-    "title": "En este mes podemos ser parte del cambio y salvar más vidas, sept",
-    "summary": "En este mes podemos ser parte del cambio y salvar más vidas, septiembre amarillo 💛 🎗️",
-    "category": "otros",
+    "title": "El impacto de las burlas y el valor del respeto en salud mental",
+    "summary": "Reflexión por septiembre amarillo sobre cómo las críticas o bromas por el físico, trabajo o estilo de vida generan inseguridades duraderas. Llama a ser respetuoso porque desconocemos la lucha interna de cada persona.",
+    "category": "bienestar",
     "tags": [
-      "growth",
-      "otros"
+      "saludmental",
+      "empatia",
+      "respeto"
     ]
   },
   {
     "id": "ig-DdMsTEPk5Zt",
     "index": 396,
     "url": "https://www.instagram.com/p/DdMsTEPk5Zt/",
-    "title": "Comenta JURADO y déjame ayudarte a cambiar tu vida y tu comunic",
-    "summary": "Comenta JURADO y déjame ayudarte a cambiar tu vida y tu comunic",
-    "category": "oratoria",
+    "title": "Límites claros y el valor de cuidar a la persona indicada",
+    "summary": "Advierte que quien tiene amor propio y límites claros no regresa tras una ruptura definitiva. Invita a cuidar los detalles y valorar el vínculo a tiempo, antes de lamentar la pérdida irreversible.",
+    "category": "mentalidad",
     "tags": [
-      "comunicacion",
-      "voz"
+      "limites",
+      "relaciones",
+      "amorpropio"
     ]
   },
   {
     "id": "ig-DdMXma8j2qg",
     "index": 397,
     "url": "https://www.instagram.com/p/DdMXma8j2qg/",
-    "title": "Comenta JURADO y déjame ayudarte a cambiar tu vida y tu comunic",
-    "summary": "Comenta JURADO y déjame ayudarte a cambiar tu vida y tu comunic",
+    "title": "Tres frases que nunca debes decir para cuidar tu palabra",
+    "summary": "Bernardo Jurado explica por qué evitar decir \"lo juro por Dios\", \"te odio\" y \"no valgo nada\", invitando a que tu palabra tenga peso propio, evites el rencor y cuides cómo hablas de ti.",
     "category": "oratoria",
     "tags": [
       "comunicacion",
-      "voz"
+      "palabras",
+      "integridad"
     ]
   },
   {
     "id": "ig-DdMtU46xeVG",
     "index": 398,
     "url": "https://www.instagram.com/p/DdMtU46xeVG/",
-    "title": "@diegosainzes 7 frases de la infancia que ahora duelen",
-    "summary": "@diegosainzes 7 frases de la infancia que ahora duelen",
-    "category": "tech",
+    "title": "Siete frases de dibujos animados con lecciones de vida",
+    "summary": "Recopilación de siete citas de Cars, Hora de Aventuras, Buscando a Nemo, Kung Fu Panda, El Rey León, Doraemon y Gumball sobre resiliencia, esfuerzo diario, presente y aprender del pasado.",
+    "category": "mentalidad",
     "tags": [
-      "tech",
-      "desarrollo"
+      "frases",
+      "nostalgia",
+      "resiliencia"
     ]
   },
   {
     "id": "ig-DdMqf1Lg5eN",
     "index": 399,
     "url": "https://www.instagram.com/p/DdMqf1Lg5eN/",
-    "title": "O le das luz a tu sombra, o la reforzás para olvidarla por años",
-    "summary": "O le das luz a tu sombra, o la reforzás para olvidarla por años.",
-    "category": "otros",
+    "title": "Audita las áreas que evitas para mejorar tu calidad de vida",
+    "summary": "Explica que el cerebro oculta descuidos cotidianos por incomodidad y propone auditar físico, entrenamiento, vestimenta y orden del cuarto o escritorio para dejar el celular y corregirlos hoy.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "habitos",
+      "autodisciplina",
+      "orden"
     ]
   },
   {
     "id": "ig-DdKlinGBVqk",
     "index": 400,
     "url": "https://www.instagram.com/p/DdKlinGBVqk/",
-    "title": "Puedes decir estas 10 palabras? Mejora tu dicción 👊🏼 #juandelma",
-    "summary": "Puedes decir estas 10 palabras? Mejora tu dicción 👊🏼",
+    "title": "Diez palabras difíciles para entrenar y medir tu dicción",
+    "summary": "Reto práctico de vocalización con diez palabras complejas —como otorrinolaringólogo, esternocleidomastoideo y parangaricutirimícuaro— para ejercitar la articulación y hablar sin trabarse.",
     "category": "oratoria",
     "tags": [
-      "comunicacion",
-      "voz"
+      "diccion",
+      "vocalizacion",
+      "oratoria"
     ]
   },
   {
     "id": "ig-DaJNct6FEaT",
     "index": 401,
     "url": "https://www.instagram.com/p/DaJNct6FEaT/",
-    "title": "Sígueme en @juradonegocios 👈🏼 para mejorar tu comunicación y or",
-    "summary": "Sígueme en @juradonegocios 👈🏼 para mejorar tu comunicación y or",
-    "category": "oratoria",
+    "title": "Método del manicomio para sacar máxima nota en exámenes",
+    "summary": "Explica una técnica de estudio intensiva: cargar tus apuntes en una app de resúmenes y cuestionarios, y obligarte a responder 20 preguntas correctas seguidas reiniciando desde cero si fallas una.",
+    "category": "estudio",
     "tags": [
-      "comunicacion",
-      "voz"
+      "estudio",
+      "examenes",
+      "cuestionarios"
     ]
   },
   {
@@ -4891,24 +4956,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdKQ5SCIo-m",
     "index": 405,
     "url": "https://www.instagram.com/p/DdKQ5SCIo-m/",
-    "title": "Regla obligatoria a cumplir #parati #fyp #viral #explore #reels",
-    "summary": "Regla obligatoria a cumplir",
-    "category": "tech",
+    "title": "La regla de los 5 segundos antes de comentar sobre otros",
+    "summary": "Propone no señalar defectos o cambios físicos que una persona no pueda corregir en cinco segundos, como un grano o pérdida de peso, a diferencia de comida en los dientes o una legaña, para evitar generar inseguridad.",
+    "category": "mentalidad",
     "tags": [
-      "tech",
-      "desarrollo"
+      "empatia",
+      "comunicacion",
+      "respeto"
     ]
   },
   {
     "id": "ig-DdILGVfI3hL",
     "index": 406,
     "url": "https://www.instagram.com/p/DdILGVfI3hL/",
-    "title": "Mucho cuidado figura 🧐 #motivacion #conciencia #parati",
-    "summary": "Mucho cuidado figura 🧐",
+    "title": "Cuatro hábitos que arruinan tu paz mental sin darte cuenta",
+    "summary": "Señala cuatro hábitos que destruyen tu calma: obsesionarte con si leyeron tu mensaje, dejar que otros arruinen tu día, desvelarte en TikTok y seguir en lugares que te drenan por miedo a empezar de nuevo.",
     "category": "mentalidad",
     "tags": [
-      "habitos",
-      "mentalidad"
+      "paz mental",
+      "dependencia",
+      "limites"
     ]
   },
   {
@@ -4951,36 +5018,39 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdIStZyOPjB",
     "index": 410,
     "url": "https://www.instagram.com/p/DdIStZyOPjB/",
-    "title": "Un toque clásico",
-    "summary": "Un toque clásico.",
-    "category": "otros",
+    "title": "Siete cambios de frases para hablar con más elegancia y clase",
+    "summary": "Propone siete reemplazos para hablar con más elegancia: cambiar \"¿Mande?\" por \"¿Perdón?\", \"¿Qué?\" por \"¿Cómo dices?\", \"Dame\" por \"¿Me podrías dar...?\", \"Quiero\" por \"Me gustaría\" y \"Está feo\" por \"No me encanta\".",
+    "category": "oratoria",
     "tags": [
-      "growth",
-      "otros"
+      "oratoria",
+      "etiqueta",
+      "vocabulario"
     ]
   },
   {
     "id": "ig-DdGlNU8MeMm",
     "index": 411,
     "url": "https://www.instagram.com/p/DdGlNU8MeMm/",
-    "title": "Миниатюра Случай в ресторане @seaforest",
-    "summary": "Миниатюра \"Случай в ресторане\" @seaforest.restaurant Профиль артиста, подпишитесь @mjdance_show_aarhipova P.S. при съёмки видео не один человек не пострадал Все трюки выполнены профессионалами, не пытайтесь повторить.",
-    "category": "otros",
+    "title": "Sketch humorístico de baile sobre un incidente en restaurante",
+    "summary": "Escena cómica y acrobática ambientada en un restaurante por un grupo artístico, con aviso humorístico de acrobacias profesionales.",
+    "category": "ocio",
     "tags": [
-      "growth",
-      "otros"
+      "humor",
+      "sketch",
+      "baile"
     ]
   },
   {
     "id": "ig-DdEjcYxhaJi",
     "index": 412,
     "url": "https://www.instagram.com/p/DdEjcYxhaJi/",
-    "title": "Comenta Yo y te envío el resumen completo 🤝",
-    "summary": "Comenta Yo y te envío el resumen completo 🤝",
-    "category": "estudio",
+    "title": "3 claves para proyectar autoridad y seguridad al hablar",
+    "summary": "Explica cómo transmitir presencia y autoridad al comunicarte: habla más lento, sostén el contacto visual y evita dar explicaciones de más.",
+    "category": "oratoria",
     "tags": [
-      "aprendizaje",
-      "foco"
+      "oratoria",
+      "autoridad",
+      "comunicacion"
     ]
   },
   {
@@ -5035,25 +5105,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdCqN79KJtF",
     "index": 417,
     "url": "https://www.instagram.com/p/DdCqN79KJtF/",
-    "title": "Tu #algoritmo en redes sociales te pude convencer que tienes la r",
-    "summary": "Tu en redes sociales te pude convencer que tienes la razón. Y puede que te afecte más de lo que crees.",
-    "category": "tech",
+    "title": "Cómo el algoritmo refuerza tu sesgo de confirmación",
+    "summary": "Un psicólogo explica cómo las redes amplifican emociones negativas mediante el sesgo de confirmación y aconseja pausar antes de decidir.",
+    "category": "bienestar",
     "tags": [
-      "tech",
-      "desarrollo"
+      "psicologia",
+      "algoritmo",
+      "sesgo"
     ]
   },
   {
     "id": "ig-DdCRH1OTVEG",
     "index": 418,
     "url": "https://www.instagram.com/p/DdCRH1OTVEG/",
-    "title": "Técnica vocal rápida: cómo reducir el peso vocal",
-    "summary": "Demostración práctica de entrenamiento vocal enfocada en disminuir el peso vocal para lograr una voz más ligera y femenina.",
-    "category": "otros",
+    "title": "Técnica rápida de entrenamiento vocal para suavizar la voz",
+    "summary": "Demostración práctica en tres pasos para lograr una voz más ligera: reducir el peso vocal con el truco del bostezo, ajustar resonadores y variar la entonación.",
+    "category": "oratoria",
     "tags": [
-      "voz",
-      "tecnica-vocal",
-      "entrenamiento"
+      "tecnica vocal",
+      "resonadores",
+      "entonacion"
     ]
   },
   {
@@ -5072,24 +5143,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdAlI5jOAyh",
     "index": 420,
     "url": "https://www.instagram.com/p/DdAlI5jOAyh/",
-    "title": "Cómo Hablarle A Tu Crush en la Escuela 📚✅ • • • • • #escuela #cr",
-    "summary": "Cómo Hablarle A Tu Crush en la Escuela • • • • •",
+    "title": "Pasos para iniciar conversación con alguien que te gusta",
+    "summary": "Guía práctica para acercarte con naturalidad: usa contacto visual breve, busca un momento a solas, haz un cumplido respetuoso y acepta un no con madurez.",
     "category": "mentalidad",
     "tags": [
-      "habitos",
-      "mentalidad"
+      "habilidades sociales",
+      "conversacion",
+      "confianza"
     ]
   },
   {
     "id": "ig-DdAAd1epJ7R",
     "index": 421,
     "url": "https://www.instagram.com/p/DdAAd1epJ7R/",
-    "title": "Los códigos se respetan crj 💪 #dylancito #parati #hombres ##codigos",
-    "summary": "Los códigos se respetan crj 💪 #",
-    "category": "tech",
+    "title": "Top 5 códigos de lealtad y amistad entre hombres",
+    "summary": "Lista humorística sobre cinco reglas no escritas de amistad masculina: lealtad en grupo, respeto por parejas o ex, discreción y no hablar mal a espaldas.",
+    "category": "ocio",
     "tags": [
-      "tech",
-      "desarrollo"
+      "amistad",
+      "humor",
+      "codigos"
     ]
   },
   {
@@ -5156,84 +5229,91 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dc9xdi7N3WQ",
     "index": 427,
     "url": "https://www.instagram.com/p/Dc9xdi7N3WQ/",
-    "title": "3 cosas que te ayudan a tener pareja 🤫",
-    "summary": "3 cosas que te ayudan a tener pareja 🤫",
-    "category": "otros",
+    "title": "3 hábitos psicológicos que facilitan encontrar pareja",
+    "summary": "Resume tres claves basadas en psicología para conectar mejor: frecuentar los mismos espacios, hacer preguntas de seguimiento y tolerar la incertidumbre al actuar.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "psicologia",
+      "pareja",
+      "confianza"
     ]
   },
   {
     "id": "ig-DXXhzTqF_oL",
     "index": 428,
     "url": "https://www.instagram.com/p/DXXhzTqF_oL/",
-    "title": "Cómo Reaccionar Cuando te Terminan 💔 • • • • #ruptura #relacione",
-    "summary": "Cómo Reaccionar Cuando te Terminan 💔 • • • •",
-    "category": "oratoria",
+    "title": "Cómo reaccionar con dignidad ante una ruptura amorosa",
+    "summary": "Muestra por qué no debes suplicar tras una ruptura y da tres respuestas concretas para afrontarla con respeto, cierre emocional y límites claros.",
+    "category": "mentalidad",
     "tags": [
-      "comunicacion",
-      "voz"
+      "ruptura",
+      "autoestima",
+      "limites"
     ]
   },
   {
     "id": "ig-DcKT-LWBwKC",
     "index": 429,
     "url": "https://www.instagram.com/p/DcKT-LWBwKC/",
-    "title": "Vamos a verlo juntos 🤯",
-    "summary": "Vamos a verlo juntos 🤯",
-    "category": "otros",
+    "title": "El costo oculto de alternar tareas frente a agruparlas",
+    "summary": "Experimento en vivo: contar del 1 al 10 y de la A a la J seguidos toma 3.9 s, pero alternarlos (1A, 2B...) tarda 22.4 s. Muestra cómo cambiar la forma de ejecutar multiplica resultados sin más recursos.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "productividad",
+      "multitarea",
+      "enfoque"
     ]
   },
   {
     "id": "ig-Dc9BwbuCfD4",
     "index": 430,
     "url": "https://www.instagram.com/p/Dc9BwbuCfD4/",
-    "title": "Comenta JURADO y déjame ayudarte a cambiar tu vida y tu comunic",
-    "summary": "Comenta JURADO y déjame ayudarte a cambiar tu vida y tu comunic",
+    "title": "Siete errores comunes de dicción y gramática al hablar",
+    "summary": "Corrige siete fallos frecuentes frente a clientes: di intemperie, resiliencia, cónyuge, antes de todo, con base en, inscribirse en y negociar en lugar de interperie, resilencia, en base a o negocear.",
     "category": "oratoria",
     "tags": [
-      "comunicacion",
-      "voz"
+      "oratoria",
+      "diccion",
+      "gramatica"
     ]
   },
   {
     "id": "ig-DYsXbc-sZWB",
     "index": 431,
     "url": "https://www.instagram.com/p/DYsXbc-sZWB/",
-    "title": "Cómo Hablar Con Más Carisma ✨✅ • • • • • #carisma #confianza #com",
-    "summary": "Cómo Hablar Con Más Carisma • • • • • ón",
+    "title": "Seis hábitos para hablar con más carisma y empatía",
+    "summary": "Compara respuestas que apagan una charla frente a alternativas carismáticas: cambia el ego por interés genuino, haz cumplidos específicos, responde con entusiasmo y aborda conflictos con madurez.",
     "category": "oratoria",
     "tags": [
+      "carisma",
       "comunicacion",
-      "voz"
+      "empatia"
     ]
   },
   {
     "id": "ig-Dc-D4QVhGO-",
     "index": 432,
     "url": "https://www.instagram.com/p/Dc-D4QVhGO-/",
-    "title": "Pon a prueba tu dicción y tu voz #hablarenpublico #publicspeaking",
-    "summary": "Pon a prueba tu dicción y tu voz ónefectiva",
+    "title": "Ejercicio guiado de oratoria para practicar ritmo y pausas",
+    "summary": "Guion en teleprompter para entrenar voz y presencia escénica en tiempo real: indica cuándo hacer pausas, bajar la velocidad, subir la energía, mirar al público y cerrar con fuerza.",
     "category": "oratoria",
     "tags": [
-      "comunicacion",
-      "voz"
+      "oratoria",
+      "practica",
+      "diccion"
     ]
   },
   {
     "id": "ig-Dc9-dLFOqiN",
     "index": 433,
     "url": "https://www.instagram.com/p/Dc9-dLFOqiN/",
-    "title": "Maduro y educado",
-    "summary": "Maduro y educado.",
-    "category": "otros",
+    "title": "Tres hábitos de madurez y etiqueta social en eventos",
+    "summary": "Compara el comportamiento de un hombre maduro frente al de un adolescente o niño en reuniones: saluda a todos, presenta a sus acompañantes e integra al grupo en la charla en vez de aislarse con el móvil.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "otros"
+      "etiqueta",
+      "madurez",
+      "habilidades sociales"
     ]
   },
   {
@@ -5252,12 +5332,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dc7MBTqtNK1",
     "index": 435,
     "url": "https://www.instagram.com/p/Dc7MBTqtNK1/",
-    "title": "Nada #mdt #animalhospital #fpyシ゚ #fyy #edit",
-    "summary": "Nada #mdt #animalhospital #fpyシ゚ #fyy #edit",
-    "category": "otros",
+    "title": "Clip musical de Roblox jugando como cirujano en Animal Hospital",
+    "summary": "Video corto de entretenimiento en Roblox donde un avatar de gato con gorro quirúrgico baila y recorre los pasillos de un hospital tras completar un turno con música funk de fondo.",
+    "category": "ocio",
     "tags": [
-      "growth",
-      "otros"
+      "roblox",
+      "gaming",
+      "entretenimiento"
     ]
   },
   {
@@ -5276,12 +5357,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DaUcarhxMuW",
     "index": 437,
     "url": "https://www.instagram.com/p/DaUcarhxMuW/",
-    "title": "Día 12/20 Detectando Señales El Apoyo 🫂",
-    "summary": "Día 12/20 Detectando Señales El Apoyo 🫂",
-    "category": "otros",
+    "title": "Cómo dar apoyo emocional leyendo las señales de la otra persona",
+    "summary": "Guía práctica para acompañar sin imponer consejos: si se aleja respeta su espacio, si te busca en silencio hazle compañía, si se desahoga solo escucha y opina únicamente cuando te lo pida.",
+    "category": "bienestar",
     "tags": [
-      "growth",
-      "otros"
+      "empatia",
+      "apoyo emocional",
+      "escucha activa"
     ]
   },
   {
@@ -5300,12 +5382,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dcqvfinx4aG",
     "index": 439,
     "url": "https://www.instagram.com/p/Dcqvfinx4aG/",
-    "title": "Make a easy paper storage box no glue",
-    "summary": "Make a easy paper storage box no glue . . . . . . . シ",
-    "category": "otros",
+    "title": "Cómo doblar una caja organizadora de papel sin pegamento",
+    "summary": "Tutorial paso a paso de origami utilitario para armar una bandeja o caja de almacenamiento usando solo una hoja de papel doblada y encajada en sus bordes, sin tijeras ni pegamento.",
+    "category": "ocio",
     "tags": [
-      "growth",
-      "otros"
+      "origami",
+      "manualidades",
+      "organizacion"
     ]
   },
   {
@@ -5324,24 +5407,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dcjs38lss2E",
     "index": 441,
     "url": "https://www.instagram.com/p/Dcjs38lss2E/",
-    "title": "Tienes que tener cambios en ti para obtener resultados diferentes",
-    "summary": "Tienes que tener cambios en ti para obtener resultados diferentes",
-    "category": "tech",
+    "title": "Cinco conductas cotidianas que alejan a las personas",
+    "summary": "Enumera cinco hábitos sociales dañinos: centrar toda charla en ti, corregir a todos, no escuchar, fingir inocencia y juzgar tanto al otro que pierda la confianza contigo.",
+    "category": "mentalidad",
     "tags": [
-      "tech",
-      "desarrollo"
+      "relaciones",
+      "autoconocimiento",
+      "comunicacion"
     ]
   },
   {
     "id": "ig-Dc6c3qHFGoY",
     "index": 442,
     "url": "https://www.instagram.com/p/Dc6c3qHFGoY/",
-    "title": "Cada acción importa y por eso DEBES EVITAR ser esta persona y no",
-    "summary": "Cada acción importa y por eso DEBES EVITAR ser esta persona y no lo digo como una crítica externa, por mucho tiempo YO fui la persona en cuestión Pero déjame decirte que no hay nada más que sufrimiento en sentir pena.",
-    "category": "otros",
+    "title": "Deja la pena ajena para conectar con gente nueva",
+    "summary": "Explica cómo sentir pena ajena hacia quienes socializan libremente bloquea tu propia vida social, e invita a soltar ese prejuicio para animarte a hablar con personas nuevas.",
+    "category": "oratoria",
     "tags": [
-      "growth",
-      "otros"
+      "habilidades sociales",
+      "timidez",
+      "comunicacion"
     ]
   },
   {
@@ -5692,10 +5777,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dct9lU1FKvE",
     "index": 470,
     "url": "https://www.instagram.com/p/Dct9lU1FKvE/",
-    "title": "Guardado visual #470",
-    "summary": "Carousel",
-    "category": "visual",
-    "tags": []
+    "title": "Carrusel de Instagram no disponible",
+    "summary": "Publicación en formato carrusel de Instagram cuyo contenido no pudo descargarse ni recuperarse porque no tenía formato de video ni descripción disponible.",
+    "category": "otros",
+    "tags": [
+      "instagram",
+      "carrusel",
+      "pendiente"
+    ]
   },
   {
     "id": "ig-Dc7C9uyRHqd",
@@ -6075,13 +6164,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbGChnQxYAI",
     "index": 500,
     "url": "https://www.instagram.com/p/DbGChnQxYAI/",
-    "title": "Animación corta humorística",
-    "summary": "Contenido animado de humor para entretenimiento general.",
+    "title": "Gallo y ganso con zapatos de vestir en animación meme",
+    "summary": "Animación 3D humorística donde un gallo observa desconcertado un zapato negro hasta que aparece un ganso usándolos como calzado al ritmo de Gangnam Style.",
     "category": "ocio",
     "tags": [
       "animacion",
       "humor",
-      "ocio"
+      "meme"
     ]
   },
   {
@@ -6127,12 +6216,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dc1RsKSxXoQ",
     "index": 504,
     "url": "https://www.instagram.com/p/Dc1RsKSxXoQ/",
-    "title": "Criterios personales al elegir pareja",
-    "summary": "Lista de advertencias subjetivas sobre dinámicas y perfiles que el autor recomienda evitar al buscar una relación estable.",
-    "category": "otros",
+    "title": "Ocho perfiles de pareja que el autor recomienda evitar",
+    "summary": "Lista dirigida a hombres con ocho tipos de pareja que sugiere evitar al salir, como exparejas, compañeras de trabajo o buscadoras de atención, priorizando tranquilidad y límites.",
+    "category": "mentalidad",
     "tags": [
       "relaciones",
-      "citas"
+      "citas",
+      "limites"
     ]
   },
   {
@@ -6306,12 +6396,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dczod-3OVBB",
     "index": 518,
     "url": "https://www.instagram.com/p/Dczod-3OVBB/",
-    "title": "Lenguaje corporal y postura según la madurez",
-    "summary": "Comparativa visual de postura y presencia al estar de pie entre las actitudes de niño, adolescente y hombre.",
-    "category": "otros",
+    "title": "Diferencias de actitud entre hombre, adolescente y niño",
+    "summary": "Compara tres escenas cotidianas —esperar fila, ceder el paso y atender una llamada en público— mostrando cómo la paciencia, el respeto al espacio ajeno y la discreción reflejan madurez.",
+    "category": "mentalidad",
     "tags": [
-      "postura",
-      "presencia"
+      "madurez",
+      "respeto",
+      "etiqueta"
     ]
   },
   {
@@ -6694,22 +6785,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dcl67ThMuu7",
     "index": 548,
     "url": "https://www.instagram.com/p/Dcl67ThMuu7/",
-    "title": "6 mentalidades que vas a agradecer tener",
-    "summary": "6 mentalidades que vas a agradecer tener",
-    "category": "otros",
+    "title": "Seis mentalidades clave para sostener tu progreso personal",
+    "summary": "Propone seis principios prácticos: construir constancia en días aburridos, no recaer en días malos, empezar sin sentirte listo, ganar confianza actuando, controlar solo tu esfuerzo y usar errores como datos.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "mentalidad",
+      "disciplina",
+      "constancia"
     ]
   },
   {
     "id": "ig-DckEf6Hhnoh",
     "index": 549,
     "url": "https://www.instagram.com/p/DckEf6Hhnoh/",
-    "title": "Yo sí doy respuestas así de largas jajaja",
-    "summary": "Yo sí doy respuestas así de largas jajaja",
-    "category": "otros",
+    "title": "Cómo evitar silencios incómodos usando hilos conversacionales",
+    "summary": "Enseña a responder preguntas rutinarias como \"¿cómo estás?\" ofreciendo tres o cuatro temas concretos de tu día —hilos conversacionales— para que la otra persona elija de cuál seguir hablando.",
+    "category": "oratoria",
     "tags": [
-      "otros"
+      "conversacion",
+      "oratoria",
+      "habilidades sociales"
     ]
   },
   {
@@ -6728,11 +6823,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DckFkDpOq39",
     "index": 551,
     "url": "https://www.instagram.com/p/DckFkDpOq39/",
-    "title": "Cómo comportarte con clase en un hotel",
-    "summary": "Consejos de etiqueta y orden al hospedarte en un hotel, empezando por no desordenar la habitación al llegar.",
-    "category": "otros",
+    "title": "Reglas de etiqueta y respeto al hospedarte en un hotel",
+    "summary": "Consejos de convivencia en hoteles: mantén el orden para ayudar al personal de limpieza, evita ruidos que molesten a otros huéspedes y no te lleves toallas ni jabones.",
+    "category": "ocio",
     "tags": [
       "etiqueta",
+      "hoteles",
       "viajes"
     ]
   },
@@ -6740,12 +6836,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcjSM3Xu9pn",
     "index": 552,
     "url": "https://www.instagram.com/p/DcjSM3Xu9pn/",
-    "title": "No es timidez es tu mente que te sabotea",
-    "summary": "No es timidez, es tu mente que te sabotea",
+    "title": "No es timidez: creencias limitantes que frenan tu espontaneidad",
+    "summary": "Explica que la supuesta timidez suele ser miedo por creencias limitantes que sabotean tu espontaneidad; propone cuestionarlas mediante teatro terapéutico y autoevaluación.",
     "category": "mentalidad",
     "tags": [
       "mentalidad",
-      "tecnologia"
+      "creencias limitantes",
+      "timidez"
     ]
   },
   {
@@ -6765,22 +6862,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DchSNBLhFYJ",
     "index": 554,
     "url": "https://www.instagram.com/p/DchSNBLhFYJ/",
-    "title": "Eres feliz con tu vida ?",
-    "summary": "Eres feliz con tu vida ? ️",
+    "title": "¿Vives para ti o para buscar la aprobación de los demás?",
+    "summary": "Reflexión sobre dejar de seguir el calendario social impuesto por familia o entorno, dejar ser a los demás y tomar decisiones propias en carrera, trabajo o pareja.",
     "category": "mentalidad",
     "tags": [
-      "mentalidad"
+      "autonomía",
+      "decisiones",
+      "propósito"
     ]
   },
   {
     "id": "ig-DW7UPiXgOsy",
     "index": 555,
     "url": "https://www.instagram.com/p/DW7UPiXgOsy/",
-    "title": "Ni modo",
-    "summary": "Ni modo",
+    "title": "Respuesta con humor en cosplay ante críticas sobre el peso",
+    "summary": "Clip breve de humor y cosplay donde la creadora responde con seguridad e ironía a un comentario sobre subir de peso, enfocándose en lo que a ella le gusta de su cuerpo.",
     "category": "ocio",
     "tags": [
-      "ocio"
+      "cosplay",
+      "humor",
+      "autoestima"
     ]
   },
   {
@@ -6825,12 +6926,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DceIVE0AfNq",
     "index": 559,
     "url": "https://www.instagram.com/p/DceIVE0AfNq/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
+    "title": "Seis ejercicios evaluados para mejorar tu oratoria y dicción",
+    "summary": "Evalúa seis prácticas de comunicación: destaca grabarte en video, revisar tus audios de WhatsApp, practicar frente al espejo e improvisar un minuto, frente a trabalenguas o lápiz en la boca.",
     "category": "oratoria",
     "tags": [
       "oratoria",
-      "tecnologia"
+      "comunicación",
+      "ejercicios"
     ]
   },
   {
@@ -6849,35 +6951,39 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dcby6rjpF9w",
     "index": 561,
     "url": "https://www.instagram.com/p/Dcby6rjpF9w/",
-    "title": "Tutorial de como ser infeliz Síganme los infelices",
-    "summary": "Tutorial de como ser infeliz . Síganme los infelices.",
-    "category": "tech",
+    "title": "Hábitos diarios que alimentan la infelicidad, en clave irónica",
+    "summary": "Usa psicología inversa para señalar hábitos que sabotean tu bienestar: encerrarte sin moverte, gastar de más, compararte con otros, evitar problemas, quejarte y autoengañarte.",
+    "category": "mentalidad",
     "tags": [
-      "tech",
-      "tecnologia"
+      "hábitos",
+      "bienestar",
+      "autocrítica"
     ]
   },
   {
     "id": "ig-DcKTDzWOQWY",
     "index": 562,
     "url": "https://www.instagram.com/p/DcKTDzWOQWY/",
-    "title": "Evita el mal olor",
-    "summary": "Evita el mal olor.",
-    "category": "otros",
+    "title": "Tres errores de higiene diaria que causan mal olor corporal",
+    "summary": "Señala tres fallos comunes que generan mal olor: olvidar lavar detrás de las orejas, nuca y pecho; aplicar perfume sobre sudor sin lavarse antes; y usar ropa que aún está húmeda.",
+    "category": "bienestar",
     "tags": [
-      "otros"
+      "higiene",
+      "cuidado personal",
+      "olor corporal"
     ]
   },
   {
     "id": "ig-DbJt3Z5Ra8W",
     "index": 563,
     "url": "https://www.instagram.com/p/DbJt3Z5Ra8W/",
-    "title": "Cómo Conocer a Tus Suegros Por Primera Vez",
-    "summary": "Cómo Conocer a Tus Suegros Por Primera Vez • • • • •",
+    "title": "Guía práctica para conocer a tus suegros y dar buena impresión",
+    "summary": "Consejos de trato y comunicación al conocer a los padres de tu pareja: llevar un detalle, dar un saludo firme, guardar el celular en la mesa, conversar con amabilidad y ayudar a recoger los platos.",
     "category": "oratoria",
     "tags": [
-      "oratoria",
-      "tecnologia"
+      "habilidades sociales",
+      "etiqueta",
+      "comunicación"
     ]
   },
   {
@@ -6909,12 +7015,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcG0sQhRD7G",
     "index": 566,
     "url": "https://www.instagram.com/p/DcG0sQhRD7G/",
-    "title": "Suerte en sus parciales",
-    "summary": "Suerte en sus parciales🫣.",
+    "title": "Método de estudio con IA y lectura sin pantallas para exámenes",
+    "summary": "Combina leer apuntes dos veces y descansar diez minutos sin pantallas con Astra AI para generar resúmenes, imprimir, subrayar y hacer simulacros cronometrados de examen.",
     "category": "estudio",
     "tags": [
       "estudio",
-      "tecnologia"
+      "examenes",
+      "ia"
     ]
   },
   {
@@ -6932,12 +7039,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcZLaGKOc1e",
     "index": 568,
     "url": "https://www.instagram.com/p/DcZLaGKOc1e/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
+    "title": "Habilidades clave de desarrollo backend para 2026",
+    "summary": "Lista visual de tecnologías backend esenciales: caché con Redis, SQL y NoSQL, programación asíncrona y reactiva, Kafka, seguridad OWASP y Zero Trust, microservicios y OpenTelemetry.",
     "category": "tech",
     "tags": [
-      "tech",
-      "tecnologia"
+      "backend",
+      "arquitectura",
+      "programacion"
     ]
   },
   {
@@ -6955,23 +7063,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcHkiXHxHXh",
     "index": 570,
     "url": "https://www.instagram.com/p/DcHkiXHxHXh/",
-    "title": "Soy el único que piensa así?",
-    "summary": "Soy el único que piensa así?",
+    "title": "Responder sin juegos ni miedo a parecer intenso en pareja",
+    "summary": "Cuestiona la regla de tardar en responder mensajes para no parecer intenso. Propone contestar con naturalidad y explicar las demoras por respeto y afecto genuino.",
     "category": "mentalidad",
     "tags": [
-      "mentalidad"
+      "relaciones",
+      "comunicacion",
+      "autenticidad"
     ]
   },
   {
     "id": "ig-DbHAwdGkTdI",
     "index": 571,
     "url": "https://www.instagram.com/p/DbHAwdGkTdI/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
+    "title": "Ejercicio de pausas en tres pasos para eliminar muletillas",
+    "summary": "Entrena tu cerebro a sustituir muletillas por silencios conscientes: habla haciendo pausas cada dos palabras, luego cada tres y finalmente cada cinco hasta ganar fluidez.",
     "category": "oratoria",
     "tags": [
       "oratoria",
-      "tecnologia"
+      "muletillas",
+      "pausas"
     ]
   },
   {
@@ -6989,22 +7100,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbrOqrcq1t2",
     "index": 573,
     "url": "https://www.instagram.com/p/DbrOqrcq1t2/",
-    "title": "No te deformes para encajar",
-    "summary": "No te deformes para encajar.",
-    "category": "otros",
+    "title": "No deformes tu identidad ni tus principios para encajar",
+    "summary": "Con la metáfora de forzar un enchufe incompatible, advierte contra cambiar valores y convicciones para ser aceptado en entornos ajenos y anima a buscar espacios donde ser auténtico.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "identidad",
+      "principios",
+      "autenticidad"
     ]
   },
   {
     "id": "ig-DcZOoSmuJ0x",
     "index": 574,
     "url": "https://www.instagram.com/p/DcZOoSmuJ0x/",
-    "title": "Guarda el vídeo para cuando lo necesites",
-    "summary": "Guarda el vídeo para cuando lo necesites",
-    "category": "otros",
+    "title": "Cinco leyes prácticas para resolver problemas y trabajar mejor",
+    "summary": "Resume cinco principios clave: Ley de Murphy para prevenir fallos, Kidlin para definir problemas por escrito, Falkland para evitar decisiones inútiles, Gilbert sobre iniciativa y Wilson sobre priorizar conocimiento.",
+    "category": "carrera",
     "tags": [
-      "otros"
+      "productividad",
+      "decisiones",
+      "trabajo"
     ]
   },
   {
@@ -7035,11 +7150,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcXdCccxRx-",
     "index": 577,
     "url": "https://www.instagram.com/p/DcXdCccxRx-/",
-    "title": "El poder de la reestructuración cognitiva",
-    "summary": "El poder de la reestructuración cognitiva",
-    "category": "otros",
+    "title": "Reestructuración cognitiva en seis pasos contra la insuficiencia",
+    "summary": "Ejemplifica cómo desarmar el pensamiento de no ser suficiente en seis pasos: pensarlo, nombrarlo como idea, notarlo, cuestionarlo con logros reales, desidentificarse y tomar distancia.",
+    "category": "bienestar",
     "tags": [
-      "otros"
+      "psicologia",
+      "pensamientos",
+      "autoestima"
     ]
   },
   {
@@ -7071,34 +7188,39 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Db5-TQPkuRi",
     "index": 580,
     "url": "https://www.instagram.com/p/Db5-TQPkuRi/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
+    "title": "Hábitos de comunicación que te hacen perder respeto y autoridad",
+    "summary": "Señala errores al comunicarte que restan respeto: contar tu intimidad de más, usar risa nerviosa, buscar aprobación, ser excesivamente amable, justificarte en exceso, no poner límites y decir siempre que sí.",
     "category": "oratoria",
     "tags": [
-      "oratoria",
-      "tecnologia"
+      "comunicacion",
+      "limites",
+      "autoridad"
     ]
   },
   {
     "id": "ig-DcKbZ2duvvx",
     "index": 581,
     "url": "https://www.instagram.com/p/DcKbZ2duvvx/",
-    "title": "No es de vida o muerte",
-    "summary": "No es de vida o muerte.",
-    "category": "otros",
+    "title": "Cómo iniciar charlas con extraños usando contexto",
+    "summary": "Explica que dar un motivo o contexto antes de hacer una pregunta a desconocidos reduce la incomodidad y vuelve la conversación mucho más fluida.",
+    "category": "oratoria",
     "tags": [
-      "otros"
+      "habilidades sociales",
+      "conversación",
+      "oratoria"
     ]
   },
   {
     "id": "ig-DcPlfYhOGLw",
     "index": 582,
     "url": "https://www.instagram.com/p/DcPlfYhOGLw/",
-    "title": "Claves importantes",
-    "summary": "Claves importantes.",
-    "category": "otros",
+    "title": "Nueve señales para conocer a alguien en silencio",
+    "summary": "Lista nueve detalles de lenguaje corporal y conducta para evaluar disciplina, respeto, madurez, confianza e intenciones reales al observar a una persona.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "lenguaje corporal",
+      "observación",
+      "psicología"
     ]
   },
   {
@@ -7117,46 +7239,52 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcUgsycxPHu",
     "index": 584,
     "url": "https://www.instagram.com/p/DcUgsycxPHu/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
-    "category": "mentalidad",
+    "title": "Por qué cuesta demostrar y aceptar afecto genuino",
+    "summary": "Reflexiona sobre cómo crecer en hogares poco afectivos dificulta decir te quiero, dar abrazos o recibir cariño sin sospechar que la otra persona busca algo a cambio.",
+    "category": "bienestar",
     "tags": [
-      "mentalidad"
+      "afecto",
+      "salud emocional",
+      "crianza"
     ]
   },
   {
     "id": "ig-DcXaztiT89T",
     "index": 585,
     "url": "https://www.instagram.com/p/DcXaztiT89T/",
-    "title": "Deja de evitar hablar con personas",
-    "summary": "Deja de evitar hablar con personas",
+    "title": "Supera la timidez practicando charlas breves en la calle",
+    "summary": "Aconseja a personas tímidas hacer preguntas simples a desconocidos en la calle para normalizar el contacto social y convertir el diálogo en parte de su zona de confort.",
     "category": "oratoria",
     "tags": [
-      "oratoria",
-      "comunicacion"
+      "timidez",
+      "habilidades sociales",
+      "conversación"
     ]
   },
   {
     "id": "ig-DcXBn1hRqRe",
     "index": 586,
     "url": "https://www.instagram.com/p/DcXBn1hRqRe/",
-    "title": "Asesoría de visagismo y corte según tipo de rostro",
-    "summary": "Análisis de rasgos faciales para recomendar el corte de cabello y estilo de barba que mejor armonizan con el rostro.",
-    "category": "otros",
+    "title": "Análisis de visagismo: barba y corte según el rostro",
+    "summary": "Evalúa cráneo, perfil y cabello de Lautaro La Cobra para mostrar cómo usar la barba y el volumen lateral del corte para equilibrar la mandíbula y disimular la papada.",
+    "category": "bienestar",
     "tags": [
       "visagismo",
-      "estilo"
+      "corte de cabello",
+      "barba"
     ]
   },
   {
     "id": "ig-DcUBxCbCIDl",
     "index": 587,
     "url": "https://www.instagram.com/p/DcUBxCbCIDl/",
-    "title": "Tengo algo que decirte",
-    "summary": "Tengo algo que decirte…",
+    "title": "Nadie recuerda tus errores: la libertad de no ser juzgado",
+    "summary": "Explica que la gente olvida tus fallos en minutos porque cada quien vive centrado en sus problemas, y usa esa idea para perder el miedo al qué dirán y actuar.",
     "category": "mentalidad",
     "tags": [
-      "mentalidad"
+      "miedo al rechazo",
+      "mentalidad",
+      "acción"
     ]
   },
   {
@@ -7175,12 +7303,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcWtj9tOC8G",
     "index": 589,
     "url": "https://www.instagram.com/p/DcWtj9tOC8G/",
-    "title": "Por qué la IA siempre te describe bonito",
-    "summary": "Por qué la IA siempre te describe bonito 🪞",
+    "title": "Por qué la IA te halaga al describirte: efecto Forer y RLHF",
+    "summary": "Analiza por qué los modelos de IA dan retratos halagadores: efecto Forer, relleno de contexto, sesgo de adulación por RLHF y sensibilidad al tono del prompt.",
     "category": "tech",
     "tags": [
-      "tech",
-      "tecnologia"
+      "inteligencia artificial",
+      "efecto forer",
+      "rlhf"
     ]
   },
   {
@@ -7198,12 +7327,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcUigL6hd4o",
     "index": 591,
     "url": "https://www.instagram.com/p/DcUigL6hd4o/",
-    "title": "Hace estas cosas y las personas se volverán adictas a ti",
-    "summary": "Hace estas cosas y las personas se volverán adictas a ti",
-    "category": "mentalidad",
+    "title": "Tres hábitos de Dale Carnegie para conectar con cualquiera",
+    "summary": "Resume tres claves de conversación: repetir el nombre de la persona, mostrar interés genuino escuchando más que hablando y conversar sobre lo que le apasiona.",
+    "category": "oratoria",
     "tags": [
-      "mentalidad",
-      "habitos"
+      "carisma",
+      "escucha activa",
+      "dale carnegie"
     ]
   },
   {
@@ -7234,35 +7364,39 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dbn8zO3jv7Y",
     "index": 594,
     "url": "https://www.instagram.com/p/Dbn8zO3jv7Y/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
-    "category": "oratoria",
+    "title": "Hábitos en soledad para perder el miedo al qué dirán",
+    "summary": "Propone actividades a solas como ir al cine, cenar fuera, viajar, acampar o pasar un día en silencio para superar la timidez, dejar la validación externa y ganar control mental.",
+    "category": "mentalidad",
     "tags": [
-      "oratoria",
-      "tecnologia"
+      "soledad",
+      "autoconfianza",
+      "mentalidad"
     ]
   },
   {
     "id": "ig-DcG-YHjCuLr",
     "index": 595,
     "url": "https://www.instagram.com/p/DcG-YHjCuLr/",
-    "title": "Clip breve sin contexto visual (bynachetee)",
-    "summary": "Video con fondo negro y subtítulos parciales (\"mañana, me ha hecho?\") cuyo mensaje completo depende del audio.",
-    "category": "otros",
+    "title": "Cómo encontrar rumbo a los 20 persiguiendo tus sueños",
+    "summary": "Cuenta cómo al anotar de qué se arrepentiría si muriera mañana entendió que, aunque los deseos cambien a los 20 años, esa lista revela los sueños que marcan su camino.",
+    "category": "mentalidad",
     "tags": [
-      "clip",
-      "audio"
+      "proposito",
+      "juventud",
+      "reflexion"
     ]
   },
   {
     "id": "ig-DcCZAmMPy4W",
     "index": 596,
     "url": "https://www.instagram.com/p/DcCZAmMPy4W/",
-    "title": "Yo he sido los tres y tu?",
-    "summary": "Yo he sido los tres , y tu?",
-    "category": "mentalidad",
+    "title": "Los 3 tipos de oyentes y cómo practicar la escucha presente",
+    "summary": "Diferencia al oyente reparador que da soluciones rápidas, al egoísta que habla de sí mismo y al presente, que valida emociones y hace preguntas para profundizar.",
+    "category": "oratoria",
     "tags": [
-      "mentalidad"
+      "escucha activa",
+      "comunicacion",
+      "empatia"
     ]
   },
   {
@@ -7293,11 +7427,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Db9Nyggib1F",
     "index": 599,
     "url": "https://www.instagram.com/p/Db9Nyggib1F/",
-    "title": "TOP 5 BUFFS Temporales MÁS ROTOS que tiene tu personaje",
-    "summary": "TOP 5 BUFFS Temporales MÁS ROTOS que tiene tu personaje",
-    "category": "ocio",
+    "title": "Mecanismos fisiológicos del cuerpo explicados como buffs",
+    "summary": "Explica en clave gamer cómo funcionan el segundo aire al quemar grasa, la analgesia por estrés, el estado de flujo y el combo de sueño y glucosa estable para rendir mejor.",
+    "category": "bienestar",
     "tags": [
-      "ocio"
+      "fisiologia",
+      "rendimiento",
+      "salud"
     ]
   },
   {
@@ -7329,56 +7465,65 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Db4QFkqjPgK",
     "index": 602,
     "url": "https://www.instagram.com/p/Db4QFkqjPgK/",
-    "title": "3 señales tu salu mental se está pudriendo",
-    "summary": "3 señales tu salu mental se está pudriendo",
-    "category": "otros",
+    "title": "3 señales de deterioro en la salud mental y cómo frenarlo",
+    "summary": "Identifica la irritabilidad constante, la pérdida de interés por hobbies y el agotamiento crónico como señales de desgaste, y propone reemplazar malos hábitos diarios como el scroll excesivo.",
+    "category": "bienestar",
     "tags": [
-      "otros"
+      "salud mental",
+      "habitos",
+      "bienestar"
     ]
   },
   {
     "id": "ig-DbwNRaYimKE",
     "index": 603,
     "url": "https://www.instagram.com/p/DbwNRaYimKE/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
-    "category": "oratoria",
+    "title": "11 hábitos y disciplinas clave para el desarrollo personal",
+    "summary": "Enumera once prácticas de autodisciplina como aprender a cocinar, meditar, tener templanza, generar ingresos, madrugar, comer sano, comunicar mejor y saber aburrirse o arriesgar.",
+    "category": "mentalidad",
     "tags": [
-      "oratoria",
-      "tecnologia"
+      "disciplina",
+      "desarrollo personal",
+      "habitos"
     ]
   },
   {
     "id": "ig-DbG_6V7MIAv",
     "index": 604,
     "url": "https://www.instagram.com/p/DbG_6V7MIAv/",
-    "title": "Mira AntiProcrasstinación Gratis Ahora Video",
-    "summary": "Mira Anti-Procrasstinación Gratis Ahora Video",
-    "category": "otros",
+    "title": "Invitación a masterclass gratuita contra la procrastinación",
+    "summary": "Video promocional de una clase gratuita enfocada en reducir la sobrecarga mental, entender la psicología de la procrastinación y terminar las tareas iniciadas.",
+    "category": "estudio",
     "tags": [
-      "otros"
+      "procrastinacion",
+      "productividad",
+      "foco"
     ]
   },
   {
     "id": "ig-Dbt885RiX0j",
     "index": 605,
     "url": "https://www.instagram.com/p/Dbt885RiX0j/",
-    "title": "3 hábitos que destruyen tus amistades",
-    "summary": "3 hábitos que destruyen tus amistades",
+    "title": "3 hábitos que deterioran tus amistades y cómo evitarlos",
+    "summary": "Advierte contra castigar con silencio, evitar conversaciones difíciles y ponerse a la defensiva; propone hablar los conflictos a tiempo y resolver los problemas en equipo.",
     "category": "mentalidad",
     "tags": [
-      "mentalidad"
+      "amistad",
+      "comunicacion",
+      "relaciones"
     ]
   },
   {
     "id": "ig-DbozZTUiILt",
     "index": 606,
     "url": "https://www.instagram.com/p/DbozZTUiILt/",
-    "title": "5 formas de dejar de tomarte todo personal",
-    "summary": "5 formas de dejar de tomarte todo personal",
-    "category": "otros",
+    "title": "5 claves para dejar de tomarte todo personal",
+    "summary": "Propone cuestionar historias mentales, no confundir emociones con hechos, buscar explicaciones alternativas, separar crítica de identidad y aceptar la incertidumbre para ganar calma.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "mentalidad",
+      "emociones",
+      "autoestima"
     ]
   },
   {
@@ -7396,22 +7541,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbrYNoalBkb",
     "index": 608,
     "url": "https://www.instagram.com/p/DbrYNoalBkb/",
-    "title": "3 hábitos que están cocinando tu cerebro",
-    "summary": "3 hábitos que están cocinando tu cerebro",
-    "category": "mentalidad",
+    "title": "3 hábitos que dañan tu cerebro y cómo revertirlos",
+    "summary": "Explica por qué scrollear sin pausa, hacer multitarea y pasar el día encerrado agotan tu enfoque. Propone dejar el celular, terminar una tarea a la vez y salir a caminar al sol.",
+    "category": "bienestar",
     "tags": [
-      "mentalidad"
+      "enfoque",
+      "habitos",
+      "atencion"
     ]
   },
   {
     "id": "ig-DbqP3kPNTxg",
     "index": 609,
     "url": "https://www.instagram.com/p/DbqP3kPNTxg/",
-    "title": "Guarda el vídeo para cuando más lo necesites",
-    "summary": "Guarda el vídeo para cuando más lo necesites",
-    "category": "otros",
+    "title": "5 sesgos cognitivos con los que te engañas a diario",
+    "summary": "Detalla cinco trampas mentales: sesgo de disponibilidad, falso consenso, sesgo retrospectivo, exceso de optimismo y punto ciego del sesgo, mostrando cómo distorsionan tus decisiones.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "sesgos",
+      "psicologia",
+      "decisiones"
     ]
   },
   {
@@ -7430,23 +7579,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dbg8CRixs5t",
     "index": 611,
     "url": "https://www.instagram.com/p/Dbg8CRixs5t/",
-    "title": "Cambia tu percepción sobre el fracaso",
-    "summary": "Cambia tu percepción sobre el fracaso ‍️",
+    "title": "Cómo cambiar tu percepción sobre el fracaso",
+    "summary": "Replantea el error como aprendizaje necesario para detectar fallos, adaptarse y desarrollar nuevas habilidades. Al perder el miedo a fallar, el progreso deja de depender de la suerte.",
     "category": "mentalidad",
     "tags": [
-      "mentalidad",
-      "tecnologia"
+      "fracaso",
+      "resiliencia",
+      "aprendizaje"
     ]
   },
   {
     "id": "ig-DbWx25tiTaa",
     "index": 612,
     "url": "https://www.instagram.com/p/DbWx25tiTaa/",
-    "title": "Cosas 1010 para hacer en vez de scrollear",
-    "summary": "Cosas 10/10 para hacer en vez de scrollear",
-    "category": "otros",
+    "title": "3 actividades útiles para reemplazar el scroll",
+    "summary": "Sugiere sustituir el scroll por estudiar un tema de interés con calma, practicar miniacciones para entrenar habilidades como el carisma y salir a caminar sin rumbo por un parque nuevo.",
+    "category": "bienestar",
     "tags": [
-      "otros"
+      "habitos",
+      "aprendizaje",
+      "atencion"
     ]
   },
   {
@@ -7488,56 +7640,65 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dber0MwOH7A",
     "index": 616,
     "url": "https://www.instagram.com/p/Dber0MwOH7A/",
-    "title": "la gente que no toma iniciativa",
-    "summary": "la gente que no toma iniciativa",
-    "category": "tech",
+    "title": "Desahogo sobre la gente que nunca toma iniciativa",
+    "summary": "Monólogo humorístico sobre el desgaste de ser siempre quien propone planes o conversaciones, concluyendo que cuando existe interés real de la otra persona siempre se nota.",
+    "category": "ocio",
     "tags": [
-      "tech",
-      "tecnologia"
+      "humor",
+      "relaciones",
+      "iniciativa"
     ]
   },
   {
     "id": "ig-DbRKEvUN5WA",
     "index": 617,
     "url": "https://www.instagram.com/p/DbRKEvUN5WA/",
-    "title": "Fácil Guarda apunta y aplica Tu favorita?",
-    "summary": "Fácil. Guarda, apunta y aplica Tu favorita?",
-    "category": "otros",
+    "title": "5 frases estoicas y filosóficas para pasar a la acción",
+    "summary": "Comenta cinco citas de Marco Aurelio, Nietzsche, Confucio, Séneca y Epicteto sobre controlar tu mente, empezar por pasos pequeños, prepararse y demostrar tus valores con hechos.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "estoicismo",
+      "filosofia",
+      "accion"
     ]
   },
   {
     "id": "ig-DbHVCn_mkK7",
     "index": 618,
     "url": "https://www.instagram.com/p/DbHVCn_mkK7/",
-    "title": "3 formas de construir una mente fuerte",
-    "summary": "3 formas de construir una mente fuerte",
+    "title": "3 formas prácticas de construir una mente fuerte",
+    "summary": "Enseña a fortalecer la mente haciendo tareas difíciles a propósito, cuestionando la veracidad y utilidad de tus pensamientos y entrenando el cerebro para notar lo que salió bien.",
     "category": "mentalidad",
     "tags": [
-      "mentalidad"
+      "mentalidad",
+      "fortaleza",
+      "pensamientos"
     ]
   },
   {
     "id": "ig-DbJmgO5NG8_",
     "index": 619,
     "url": "https://www.instagram.com/p/DbJmgO5NG8_/",
-    "title": "Digno de entender",
-    "summary": "Digno de entender",
-    "category": "otros",
+    "title": "Las 5 leyes del esfuerzo para mantener la disciplina",
+    "summary": "Explica cinco principios clave sobre el esfuerzo y los hábitos: meseta latente, rendimientos crecientes, reducir fricción, interés compuesto e identidad para sostener la disciplina sin rendirse.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "habitos",
+      "disciplina",
+      "mentalidad"
     ]
   },
   {
     "id": "ig-DbEidRhBHd0",
     "index": 620,
     "url": "https://www.instagram.com/p/DbEidRhBHd0/",
-    "title": "The Game David Fincher 1997 Disponible en YouTube",
-    "summary": "The Game - David Fincher (1997) Disponible en YouTube.",
+    "title": "The Game (1997): thriller psicológico de David Fincher",
+    "summary": "Reseña sin spoilers de The Game, donde un banquero millonario recibe como regalo un misterioso juego de la empresa CRS que desata experiencias extremas y paranoia hasta dudar de la realidad.",
     "category": "ocio",
     "tags": [
-      "ocio"
+      "cine",
+      "thriller",
+      "recomendacion"
     ]
   },
   {
@@ -7591,34 +7752,39 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbbLWQjR0dC",
     "index": 625,
     "url": "https://www.instagram.com/p/DbbLWQjR0dC/",
-    "title": "Amar no es sentir",
-    "summary": "Amar no es sentir…",
-    "category": "otros",
+    "title": "Amar es decidir, no solo sentir: diferencia con el enamoramiento",
+    "summary": "Reflexión basada en G. K. Chesterton que distingue el enamoramiento pasajero centrado en uno mismo del amor real como acto de voluntad para buscar el bien del otro cada día.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "amor",
+      "relaciones",
+      "reflexion"
     ]
   },
   {
     "id": "ig-DYLhe3SBZbY",
     "index": 626,
     "url": "https://www.instagram.com/p/DYLhe3SBZbY/",
-    "title": "Mi lado mas debil siempre seras tu mamá",
-    "summary": "Mi lado mas debil, siempre seras tu mamá.",
+    "title": "Carta de gratitud y perdón de un hijo hacia su madre",
+    "summary": "Monólogo narrado sobre escenas de Minecraft donde un hijo pide perdón por sus desplantes, reconoce que su madre también vive por primera vez y agradece su fortaleza y entrega.",
     "category": "mentalidad",
     "tags": [
-      "mentalidad"
+      "gratitud",
+      "familia",
+      "reflexion"
     ]
   },
   {
     "id": "ig-DbMiGRHsYxd",
     "index": 627,
     "url": "https://www.instagram.com/p/DbMiGRHsYxd/",
-    "title": "Cuando alguien que te interesa deja de responder",
-    "summary": "Video humorístico y cotidiano sobre la experiencia de conversar por mensajes con alguien que te interesa y recibir silencio repentino.",
-    "category": "otros",
+    "title": "Humor sobre el ghosting y la ansiedad al esperar respuesta",
+    "summary": "Sketch cómico sobre la ansiedad cotidiana cuando alguien que te interesa deja de contestar por horas y descubres que acaba de subir una historia en redes sociales.",
+    "category": "ocio",
     "tags": [
-      "mensajes",
-      "relaciones"
+      "humor",
+      "redes sociales",
+      "citas"
     ]
   },
   {
@@ -7661,34 +7827,39 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbYvs3yRuoP",
     "index": 631,
     "url": "https://www.instagram.com/p/DbYvs3yRuoP/",
-    "title": "QUIÉN LE HIZO TANTO DAÑO A MARIO BENEDETTI ?",
-    "summary": "QUIÉN LE HIZO TANTO DAÑO A MARIO BENEDETTI ?",
-    "category": "otros",
+    "title": "Seis frases de Mario Benedetti sobre el desamor y los vínculos",
+    "summary": "Recopilación de seis citas atribuidas a Mario Benedetti sobre el duelo afectivo, la responsabilidad al abrir la puerta a alguien, la insistencia y la memoria emocional tras una ruptura.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "benedetti",
+      "desamor",
+      "frases"
     ]
   },
   {
     "id": "ig-Dbao51gBman",
     "index": 632,
     "url": "https://www.instagram.com/p/Dbao51gBman/",
-    "title": "En qué rango de repeticiones entrenaste en tu última sesión ??",
-    "summary": "En qué rango de repeticiones entrenaste en tu última sesión ?? .",
+    "title": "Los 4 tipos de fuerza según tu rango de repeticiones y carga",
+    "summary": "Explica cómo adaptar repeticiones, peso y velocidad según tu objetivo: fuerza máxima (pocas reps, carga alta), hipertrofia (reps medias), resistencia (reps altas, poco peso) y potencia (máxima velocidad).",
     "category": "bienestar",
     "tags": [
-      "bienestar",
-      "entrenamiento"
+      "entrenamiento",
+      "fuerza",
+      "hipertrofia"
     ]
   },
   {
     "id": "ig-Dbb59yEvwEm",
     "index": 633,
     "url": "https://www.instagram.com/p/Dbb59yEvwEm/",
-    "title": "Cómo volverte bueno en cualquier cosa",
-    "summary": "Cómo volverte bueno en cualquier cosa",
-    "category": "otros",
+    "title": "Método de 3 pasos para aprender cualquier habilidad más rápido",
+    "summary": "Propone tres pasos para dominar una habilidad: validar si realmente la necesitas, desglosarla para priorizar los componentes de mayor retorno y eliminar teoría de relleno para ejecutar.",
+    "category": "estudio",
     "tags": [
-      "otros"
+      "aprendizaje",
+      "habilidades",
+      "productividad"
     ]
   },
   {
@@ -7771,58 +7942,64 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DYdyVLesX13",
     "index": 640,
     "url": "https://www.instagram.com/p/DYdyVLesX13/",
-    "title": "La Adaptación Hedonista Por Qué la Gratitud Desaparece",
-    "summary": "La Adaptación Hedonista Por Qué la Gratitud Desaparece",
-    "category": "otros",
+    "title": "Adaptación hedonista y la regla del 80% al dar",
+    "summary": "Explica cómo las personas se acostumbran al 100% que das y notan solo cuando falta. Propone mantener un 80% base para que valoren tu 20% extra en momentos clave.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "adaptacion hedonista",
+      "gratitud",
+      "relaciones"
     ]
   },
   {
     "id": "ig-DZoMmiPBNzE",
     "index": 641,
     "url": "https://www.instagram.com/p/DZoMmiPBNzE/",
-    "title": "Si tú pareja hace esto sal corriendo",
-    "summary": "Si tú pareja hace esto, sal corriendo.",
+    "title": "Límites propios en pareja y madurez emocional",
+    "summary": "Analiza un clip donde una mujer espera que su novio la defienda ante un extraño y termina cediendo. Contrasta la autonomía para poner límites frente a la dependencia emocional.",
     "category": "mentalidad",
     "tags": [
-      "mentalidad",
-      "tecnologia"
+      "limites",
+      "pareja",
+      "madurez emocional"
     ]
   },
   {
     "id": "ig-DbXA1xzNu-T",
     "index": 642,
     "url": "https://www.instagram.com/p/DbXA1xzNu-T/",
-    "title": "las consecuencias de no cumplir tu palabra",
-    "summary": "las consecuencias de no cumplir tu palabra.",
-    "category": "tech",
+    "title": "Cinco consecuencias de no cumplir tu propia palabra",
+    "summary": "Detalla cómo fallarte a ti mismo destruye tu autoconfianza, normaliza el autosabotaje, debilita tu identidad, fomenta excusas y te hace creer incapaz de cambiar.",
+    "category": "mentalidad",
     "tags": [
-      "tech",
-      "tecnologia"
+      "autodisciplina",
+      "confianza",
+      "identidad"
     ]
   },
   {
     "id": "ig-DbJKIKiDBps",
     "index": 643,
     "url": "https://www.instagram.com/p/DbJKIKiDBps/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
-    "category": "oratoria",
+    "title": "Por qué algunos hombres se alejan en crisis por vergüenza",
+    "summary": "Explica el autosabotaje masculino en momentos difíciles: la presión de poder con todo genera vergüenza y lleva a distanciarse de quien aman para no arrastrarla.",
+    "category": "mentalidad",
     "tags": [
-      "oratoria",
-      "tecnologia"
+      "autosabotaje",
+      "emociones",
+      "pareja"
     ]
   },
   {
     "id": "ig-DZN-Mhhv8qz",
     "index": 644,
     "url": "https://www.instagram.com/p/DZN-Mhhv8qz/",
-    "title": "Como se los explicas ?",
-    "summary": "Como se los explicas ?",
+    "title": "Contenido restringido: Cómo se los explicas",
+    "summary": "Publicación de Instagram inaccesible por restricción de audiencia; el título original plantea cómo explicar una situación o hecho difícil a otras personas.",
     "category": "otros",
     "tags": [
-      "otros"
+      "instagram",
+      "contenido restringido"
     ]
   },
   {
@@ -7853,23 +8030,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbZT6H5x0fA",
     "index": 647,
     "url": "https://www.instagram.com/p/DbZT6H5x0fA/",
-    "title": "Este es mi mayor miedo",
-    "summary": "Este es mi mayor miedo",
+    "title": "El miedo a no vivir por esperar el momento perfecto",
+    "summary": "Reflexiona sobre cómo postergamos vivir esperando tener más tiempo, dinero o valentía, advirtiendo el riesgo de pasar años preparándonos para una vida que nunca empieza.",
     "category": "mentalidad",
     "tags": [
-      "mentalidad",
-      "tecnologia"
+      "proposito",
+      "presente",
+      "reflexion"
     ]
   },
   {
     "id": "ig-DbZJ-rDOVBg",
     "index": 648,
     "url": "https://www.instagram.com/p/DbZJ-rDOVBg/",
-    "title": "el amor también es de uno",
-    "summary": "el amor también es de uno.",
+    "title": "Reflexión sobre confesar un amor no correspondido",
+    "summary": "Monólogo narrado sobre Minecraft acerca de confesar sentimientos a una amistad, enfrentar el silencio del rechazo y lamentar haber arruinado el vínculo previo.",
     "category": "mentalidad",
     "tags": [
-      "mentalidad"
+      "amor no correspondido",
+      "amistad",
+      "rechazo"
     ]
   },
   {
@@ -7902,11 +8082,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbZKqzuPnJx",
     "index": 651,
     "url": "https://www.instagram.com/p/DbZKqzuPnJx/",
-    "title": "Cómo ser BUENO en CUALQUIER COSA La herramienta que menciono al",
-    "summary": "Cómo ser BUENO en CUALQUIER COSA. La herramienta que menciono al final para aumentar concentración y bajar tiempo en pantalla - .os Seguí a para más contenido como este",
-    "category": "otros",
+    "title": "Tres pilares para aprender y dominar cualquier habilidad",
+    "summary": "Propone tres claves para destacar en cualquier área: practicar metaaprendizaje, cuidar sueño y nutrición para rendir cognitivamente y eliminar distracciones digitales.",
+    "category": "estudio",
     "tags": [
-      "otros"
+      "metaaprendizaje",
+      "estudio",
+      "concentracion"
     ]
   },
   {
@@ -8043,13 +8225,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbDvtSbAZ6R",
     "index": 662,
     "url": "https://www.instagram.com/p/DbDvtSbAZ6R/",
-    "title": "Tarjeta web interactiva con ramo de flores digital",
-    "summary": "Experiencia web minimalista donde al abrir un sobre digital se despliega un ramo animado de flores como detalle creativo para regalar.",
-    "category": "otros",
+    "title": "Tarjeta web con ramo de flores y álbum scrapbook interactivo",
+    "summary": "Sitio web de regalo que abre un ramo floral animado y despliega un álbum digital estilo scrapbook con fotos polaroid, carta, audio, Spotify y mapa de recuerdos.",
+    "category": "ocio",
     "tags": [
-      "web",
-      "flores",
-      "detalle"
+      "regalo",
+      "scrapbook",
+      "web"
     ]
   },
   {
@@ -8182,22 +8364,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbKNHB9utBV",
     "index": 673,
     "url": "https://www.instagram.com/p/DbKNHB9utBV/",
-    "title": "no debería gustarme",
-    "summary": "no debería gustarme",
-    "category": "otros",
+    "title": "Por qué atrae más quien no corresponde ni da atención",
+    "summary": "Monólogo sobre cómo la falta de interés ajeno genera un efecto paradójico de mayor atracción y apego hacia la persona equivocada pese a las advertencias.",
+    "category": "mentalidad",
     "tags": [
-      "otros"
+      "relaciones",
+      "atracción",
+      "apego"
     ]
   },
   {
     "id": "ig-DbADcH-uDio",
     "index": 674,
     "url": "https://www.instagram.com/p/DbADcH-uDio/",
-    "title": "estoy confundido",
-    "summary": "estoy confundido",
-    "category": "otros",
+    "title": "Sentirse solo estando acompañado y aprender a estar contigo",
+    "summary": "Reflexión sobre el vacío emocional y el sobrepensar nocturno aun teniendo amigos y familia, cerrando con la idea de aceptar la soledad y valorarse como propia compañía.",
+    "category": "bienestar",
     "tags": [
-      "otros"
+      "soledad",
+      "sobrepensar",
+      "emociones"
     ]
   },
   {
@@ -8395,12 +8581,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbHkFtdRW6L",
     "index": 690,
     "url": "https://www.instagram.com/p/DbHkFtdRW6L/",
-    "title": "Clip breve de Dilan Samuel sobre ayuda",
-    "summary": "Video corto de tono personal etiquetado con ayuda, sin contexto temático suficiente en los fotogramas para extraer una guía.",
-    "category": "otros",
+    "title": "Frustración por sentir que 24 horas no alcanzan al día",
+    "summary": "Reflexión personal sobre la sensación de falta de tiempo para cumplir metas diarias y la duda entre mejorar la gestión propia o aceptar que el día es corto.",
+    "category": "mentalidad",
     "tags": [
-      "clip",
-      "otros"
+      "tiempo",
+      "productividad",
+      "frustración"
     ]
   },
   {
@@ -10064,19 +10251,27 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DZEi7PFiIpo",
     "index": 820,
     "url": "https://www.instagram.com/p/DZEi7PFiIpo/",
-    "title": "Guardado visual #820",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Publicación privada o inaccesible de Instagram (820)",
+    "summary": "Enlace guardado de Instagram cuya descarga falló por respuesta vacía al requerir sesión o no estar disponible públicamente para su análisis.",
+    "category": "otros",
+    "tags": [
+      "instagram",
+      "inaccesible",
+      "archivo"
+    ]
   },
   {
     "id": "ig-DZc88spFUap",
     "index": 821,
     "url": "https://www.instagram.com/p/DZc88spFUap/",
-    "title": "Guardado visual #821",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Publicación privada o inaccesible de Instagram (821)",
+    "summary": "Enlace guardado de Instagram sin vista previa ni descripción porque la plataforma devolvió una respuesta multimedia vacía sin sesión iniciada.",
+    "category": "otros",
+    "tags": [
+      "instagram",
+      "inaccesible",
+      "archivo"
+    ]
   },
   {
     "id": "ig-DZrLXLDN1yP",
@@ -12076,10 +12271,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C-1PkWDuZOS",
     "index": 977,
     "url": "https://www.instagram.com/p/C-1PkWDuZOS/",
-    "title": "Guardado visual #977",
-    "summary": "Carousel",
-    "category": "visual",
-    "tags": []
+    "title": "Carrusel de imágenes de Instagram sin formato de video (977)",
+    "summary": "Publicación en formato carrusel de Instagram sin pistas de video descargables ni texto descriptivo en los metadatos para determinar su temática.",
+    "category": "otros",
+    "tags": [
+      "instagram",
+      "carrusel",
+      "imágenes"
+    ]
   },
   {
     "id": "ig-C_HuCRAAfnH",
@@ -12111,10 +12310,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C_O130MvHOn",
     "index": 980,
     "url": "https://www.instagram.com/p/C_O130MvHOn/",
-    "title": "Guardado visual #980",
-    "summary": "Carousel",
-    "category": "visual",
-    "tags": []
+    "title": "Carrusel de imágenes de Instagram sin formato de video (980)",
+    "summary": "Elemento guardado tipo carrusel de Instagram que solo contiene imágenes sin flujo de video ni descripción textual disponible para catalogar su tema.",
+    "category": "otros",
+    "tags": [
+      "instagram",
+      "carrusel",
+      "imágenes"
+    ]
   },
   {
     "id": "ig-C8enAKwgzY2",
@@ -12146,10 +12349,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C-2f9VnSx8N",
     "index": 983,
     "url": "https://www.instagram.com/p/C-2f9VnSx8N/",
-    "title": "Guardado visual #983",
-    "summary": "Carousel",
-    "category": "visual",
-    "tags": []
+    "title": "Carrusel de Instagram sin video disponible (ID 983)",
+    "summary": "Publicación de Instagram en formato carrusel que no contiene archivo de video ni descripción textual recuperable para identificar su tema.",
+    "category": "otros",
+    "tags": [
+      "instagram",
+      "carrusel",
+      "archivo"
+    ]
   },
   {
     "id": "ig-C_HOMHSAyp7",
@@ -12180,10 +12387,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C-3T6XcvM12",
     "index": 986,
     "url": "https://www.instagram.com/p/C-3T6XcvM12/",
-    "title": "Guardado visual #986",
-    "summary": "Carousel",
-    "category": "visual",
-    "tags": []
+    "title": "Carrusel de Instagram sin video disponible (ID 986)",
+    "summary": "Guardado de Instagram tipo carrusel sin pista de video descargable ni texto descriptivo que permita determinar el contenido original.",
+    "category": "otros",
+    "tags": [
+      "instagram",
+      "carrusel",
+      "imagen"
+    ]
   },
   {
     "id": "ig-C-u2T5xi22q",
@@ -12657,13 +12868,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C9sSiGYCXiI",
     "index": 1023,
     "url": "https://www.instagram.com/p/C9sSiGYCXiI/",
-    "title": "Cómo estilizar un outfit básico (wearing vs styling)",
-    "summary": "Diferencia visual entre solo ponerse camiseta y pantalón blanco frente a estilizarlos ajustando el fajado, las mangas y las proporciones del conjunto.",
+    "title": "Cómo estilizar un conjunto blanco básico paso a paso",
+    "summary": "Compara llevar camiseta y pantalón blanco sueltos frente a estilizarlos fajando la prenda, ajustando mangas y sumando suéter al hombro, bolso y audífonos.",
     "category": "otros",
     "tags": [
-      "estilo",
-      "outfits",
-      "moda-masculina"
+      "estilismo",
+      "moda",
+      "proporciones"
     ]
   },
   {
@@ -12877,13 +13088,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C3S5GBRrSY3",
     "index": 1040,
     "url": "https://www.instagram.com/p/C3S5GBRrSY3/",
-    "title": "Trucos prácticos de cocina y hogar diario",
-    "summary": "Compilado de consejos cotidianos para el hogar, como técnicas rápidas para cortar fruta y soluciones cuando la lavadora carga agua lentamente.",
+    "title": "Cinco soluciones rápidas para fallas comunes de lavadora",
+    "summary": "Explica cómo limpiar el filtro de entrada por carga lenta, reconectar el tubo de presión, ajustar el embrague a 20 grados, cambiar fusible y lijar el contacto de puerta.",
     "category": "otros",
     "tags": [
-      "lifehacks",
-      "hogar",
-      "consejos"
+      "lavadora",
+      "reparacion",
+      "hogar"
     ]
   },
   {
@@ -13020,13 +13231,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C9QADqoRXeO",
     "index": 1051,
     "url": "https://www.instagram.com/p/C9QADqoRXeO/",
-    "title": "Guia de cuidado y conservacion de prendas textiles",
-    "summary": "Aplica consejos especificos de lavado y mantenimiento para prolongar la vida util de ropa de alta calidad.",
+    "title": "Guía para interpretar símbolos de cuidado en etiquetas de ropa",
+    "summary": "Explica los íconos de lavado a mano o ciclo delicado según líneas, centrifugado, puntos de temperatura en plancha, prohibición de blanqueador y lavado en seco con P.",
     "category": "otros",
     "tags": [
-      "ropa",
-      "moda",
-      "tips"
+      "etiquetas",
+      "lavado",
+      "ropa"
     ]
   },
   {
@@ -13228,13 +13439,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C8mQhaMKSEo",
     "index": 1067,
     "url": "https://www.instagram.com/p/C8mQhaMKSEo/",
-    "title": "Cómo fajar y llevar bien una camisa de vestir",
-    "summary": "Truco de estilo masculino para ajustar correctamente la camisa dentro del pantalón evitando pliegues sueltos en la cintura y logrando un calce limpio.",
+    "title": "Cinco ajustes para lucir mejor una camisa negra de vestir",
+    "summary": "Muestra la diferencia entre usar camisa suelta y estilizarla con pliegue lateral al fajar, cinturón, mangas dobladas al antebrazo, cuello abierto y reloj.",
     "category": "otros",
     "tags": [
-      "moda-masculina",
       "camisa",
-      "estilo"
+      "estilismo",
+      "vestimenta"
     ]
   },
   {
@@ -14347,10 +14558,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C6G3QEAOf6R",
     "index": 1155,
     "url": "https://www.instagram.com/p/C6G3QEAOf6R/",
-    "title": "Guardado visual #1155",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Publicación de Instagram con acceso restringido (ID 1155)",
+    "summary": "Elemento guardado cuya descarga falló por restricciones de audiencia en Instagram y carece de descripción o archivo multimedia para su análisis.",
+    "category": "otros",
+    "tags": [
+      "instagram",
+      "restringido",
+      "archivo"
+    ]
   },
   {
     "id": "ig-C6_pFKHrkHt",
@@ -14911,12 +15126,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C2HF7q5xaBS",
     "index": 1202,
     "url": "https://www.instagram.com/p/C2HF7q5xaBS/",
-    "title": "Supuesto truco de acceso a cámara por enlace",
-    "summary": "Video viral que muestra el envío de enlaces externos por mensajería para simular acceso remoto a la cámara desde el móvil.",
-    "category": "otros",
+    "title": "Cómo funciona el phishing de cámara mediante enlaces falsos",
+    "summary": "Demuestra cómo un bot de Telegram disfraza un enlace de descarga de miniaturas para enviarlo por WhatsApp y capturar fotos de la cámara frontal al abrirlo.",
+    "category": "tech",
     "tags": [
       "ciberseguridad",
-      "enlaces"
+      "phishing",
+      "privacidad"
     ]
   },
   {
@@ -15070,12 +15286,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C169718O0dk",
     "index": 1215,
     "url": "https://www.instagram.com/p/C169718O0dk/",
-    "title": "Trucos prácticos del hogar para el día a día",
-    "summary": "Recopilación de consejos domésticos cotidianos, desde cortes prácticos en cocina hasta soluciones si la lavadora carga lento.",
+    "title": "Cinco arreglos caseros para fallas frecuentes de lavadora",
+    "summary": "Detalla cómo destapar el filtro de agua, reconectar la manguera de presión, calibrar el embrague si vibra, reemplazar el fusible y limpiar el sensor de tapa.",
     "category": "otros",
     "tags": [
-      "hogar",
-      "trucos-diarios"
+      "lavadora",
+      "mantenimiento",
+      "hogar"
     ]
   },
   {
@@ -15835,10 +16052,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-CxdJ-UntCg1",
     "index": 1277,
     "url": "https://www.instagram.com/p/CxdJ-UntCg1/",
-    "title": "Guardado visual #1277",
-    "summary": "Carousel",
-    "category": "visual",
-    "tags": []
+    "title": "Carrusel de Instagram sin video disponible (ID 1277)",
+    "summary": "Publicación de Instagram en carrusel que no dispone de formato de video ni texto asociado que permita resumir la información guardada.",
+    "category": "otros",
+    "tags": [
+      "instagram",
+      "carrusel",
+      "archivo"
+    ]
   },
   {
     "id": "ig-CxMGNE3I9ft",
