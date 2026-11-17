@@ -2,6 +2,7 @@ import { cloudSync } from '../services/CloudSync';
 import {
   BookBookmark,
   DeviceProfile,
+  FlashcardItem,
   HabitKey,
   LifeProfile,
   ModulePreferences,
@@ -28,6 +29,7 @@ function emptyHabits(): Record<HabitKey, boolean> {
     typing: false,
     language: false,
     mindset: false,
+    focuslab: false,
     singing: false,
     calm: false,
   };
@@ -74,6 +76,11 @@ export function defaultModulePrefs(): ModulePreferences {
       statusFilter: 'active',
       searchQuery: '',
     },
+    focuslab: {
+      tab: 'oratory',
+      schulteSize: 5,
+      recallDeck: 'all',
+    },
     singing: {
       lastDrillId: 'major5',
     },
@@ -99,6 +106,8 @@ function defaultProfile(): LifeProfile {
     vaultFavorites: [],
     vaultNotes: {},
     customVaultItems: [],
+    customFlashcards: [],
+    flashcardProgress: {},
     savedWords: [],
     reframeLog: [],
     bookmarks: [],
@@ -110,6 +119,9 @@ function defaultProfile(): LifeProfile {
       singingBestCents: null,
       bestWpmPc: 0,
       bestWpmMobile: 0,
+      schulteBestMs: null,
+      oratorySessions: 0,
+      recallReviewed: 0,
     },
     modulePrefs: defaultModulePrefs(),
     updatedAt: 0,
@@ -132,6 +144,9 @@ function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifePro
     vaultFavorites: Array.isArray(raw.vaultFavorites) ? raw.vaultFavorites : [],
     vaultNotes: raw.vaultNotes && typeof raw.vaultNotes === 'object' ? { ...raw.vaultNotes } : {},
     customVaultItems: Array.isArray(raw.customVaultItems) ? raw.customVaultItems : [],
+    customFlashcards: Array.isArray(raw.customFlashcards) ? raw.customFlashcards : [],
+    flashcardProgress:
+      raw.flashcardProgress && typeof raw.flashcardProgress === 'object' ? { ...raw.flashcardProgress } : {},
     savedWords: Array.isArray(raw.savedWords) ? raw.savedWords : [],
     reframeLog: Array.isArray(raw.reframeLog) ? raw.reframeLog : [],
     bookmarks: Array.isArray(raw.bookmarks) ? raw.bookmarks : [],
@@ -143,6 +158,7 @@ function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifePro
       language: { ...base.modulePrefs.language, ...(mp.language ?? {}) },
       mindset: { ...base.modulePrefs.mindset, ...(mp.mindset ?? {}) },
       vault: { ...base.modulePrefs.vault, ...(mp.vault ?? {}) },
+      focuslab: { ...base.modulePrefs.focuslab, ...(mp.focuslab ?? {}) },
       singing: { ...base.modulePrefs.singing, ...(mp.singing ?? {}) },
       calm: { ...base.modulePrefs.calm, ...(mp.calm ?? {}) },
     },
@@ -475,6 +491,62 @@ class LifeStore {
     this.profile.bookmarks.unshift({ ...bookmark, updatedAt: Date.now() });
     this.profile.bookmarks = this.profile.bookmarks.slice(0, 30);
     this.markHabit('read');
+    this.save();
+  }
+
+  public recordOratorySession(): void {
+    this.profile.stats.oratorySessions += 1;
+    this.markHabit('focuslab');
+    this.save();
+  }
+
+  public recordSchulteTime(ms: number, size: 4 | 5 | 6): void {
+    if (size === 5) {
+      const prev = this.profile.stats.schulteBestMs;
+      if (prev === null || ms < prev) {
+        this.profile.stats.schulteBestMs = Math.round(ms);
+      }
+    }
+    this.markHabit('focuslab');
+    this.save();
+  }
+
+  public reviewFlashcard(id: string, rating: 'again' | 'good' | 'easy'): void {
+    const cur = this.profile.flashcardProgress[id] ?? { nextReviewAt: 0, intervalDays: 0, reps: 0 };
+    const nextReps = rating === 'again' ? 0 : cur.reps + 1;
+    const intervalDays =
+      rating === 'again'
+        ? 0
+        : rating === 'good'
+          ? Math.max(2, cur.intervalDays * 2 || 2)
+          : Math.max(5, cur.intervalDays * 3 || 5);
+    const nextReviewAt =
+      intervalDays === 0
+        ? Date.now() + 10 * 60 * 1000
+        : Date.now() + intervalDays * 24 * 3600 * 1000;
+    this.profile.flashcardProgress[id] = { nextReviewAt, intervalDays, reps: nextReps };
+    this.profile.stats.recallReviewed += 1;
+    this.markHabit('focuslab');
+    this.save();
+  }
+
+  public addCustomFlashcard(deck: string, front: string, back: string): FlashcardItem {
+    const item: FlashcardItem = {
+      id: `fcc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      deck: deck.trim() || 'Mis Tarjetas',
+      front: front.trim(),
+      back: back.trim(),
+      source: 'Tarjeta propia',
+      isCustom: true,
+    };
+    this.profile.customFlashcards.unshift(item);
+    this.save();
+    return item;
+  }
+
+  public removeCustomFlashcard(id: string): void {
+    this.profile.customFlashcards = this.profile.customFlashcards.filter((c) => c.id !== id);
+    delete this.profile.flashcardProgress[id];
     this.save();
   }
 }

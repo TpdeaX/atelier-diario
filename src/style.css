@@ -2082,3 +2082,151 @@ button {
     row-gap: 6px;
   }
 }
+
+/* ==================== FOCUS LAB (ORATORIA, SCHULTE & EVOCACIÓN) ==================== */
+
+.al-focus-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.al-fl-prompt-box {
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.al-fl-prompt-box h3 {
+  margin: 8px 0 6px;
+  font-size: 1.04rem;
+}
+
+.al-fl-prompt-box p {
+  margin: 0;
+  color: var(--ink-secondary);
+  line-height: 1.48;
+}
+
+.al-fl-framework {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-subtle);
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.al-fl-clock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.al-fl-clock {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.al-fl-filler-row {
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.al-fl-transcript {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.al-fl-steps {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  line-height: 1.45;
+}
+
+.al-fl-schulte-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.al-fl-schulte-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.al-schulte-grid {
+  display: grid;
+  gap: 8px;
+  max-width: 440px;
+  width: 100%;
+  margin: 4px auto 0;
+}
+
+.al-schulte-cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--ink-primary);
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.al-schulte-cell:hover {
+  border-color: var(--accent);
+}
+
+.al-schulte-cell.is-found {
+  background: rgba(20, 125, 88, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.al-schulte-cell.is-wrong {
+  background: rgba(220, 38, 38, 0.18);
+  border-color: #dc2626;
+  transform: scale(0.95);
+}
+
+.al-fl-recall-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.al-fl-recall-front {
+  margin: 12px 0 8px;
+  font-size: 1.15rem;
+  line-height: 1.4;
+}
+
+.al-fl-recall-back {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-card);
+}
+
+.al-fl-recall-back p {
+  margin: 4px 0 0;
+  line-height: 1.5;
+}
+

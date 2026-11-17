@@ -36,6 +36,7 @@ const HABIT_LABELS: { key: HabitKey; label: string; target: ModuleId }[] = [
   { key: 'typing', label: 'Mecanografía', target: 'typing' },
   { key: 'language', label: 'Ortografía y léxico', target: 'language' },
   { key: 'mindset', label: 'Frases e ideas', target: 'mindset' },
+  { key: 'focuslab', label: 'Oratoria y enfoque', target: 'focuslab' },
   { key: 'singing', label: 'Canto y afinación', target: 'singing' },
   { key: 'calm', label: 'Calma y respiración', target: 'calm' },
 ];
@@ -206,6 +207,18 @@ export class HomeView {
         icon: Icons.archive,
         route: 'vault',
         badgeText: 'Recursos',
+      },
+      {
+        id: 'mod-focuslab',
+        prefix: 'Módulo',
+        title: 'Oratoria y Enfoque',
+        subtitle: `${profile.stats.oratorySessions} exposiciones · ${profile.stats.recallReviewed} evocaciones`,
+        category: 'atelier',
+        c1: '#0F766E',
+        c2: '#2DD4BF',
+        icon: Icons.mic,
+        route: 'focuslab',
+        badgeText: profile.todayHabits.focuslab ? 'Hecho hoy' : 'Práctica',
       },
       {
         id: 'mod-singing',
@@ -429,7 +442,7 @@ export class HomeView {
         <section class="al-pulse-row">
           <div class="al-panel al-habits-card">
             <div class="al-card-head">
-              <h2>Tu ritmo de hoy (${doneCount}/8)</h2>
+              <h2>Tu ritmo de hoy (${doneCount}/${HABIT_LABELS.length})</h2>
               <span class="al-streak-badge">${profile.dailyStreak === 1 ? '1 día seguido' : `${profile.dailyStreak} días seguidos`}</span>
             </div>
             <div class="al-habits-list">${habitChips}</div>

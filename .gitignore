@@ -1,3 +1,6 @@
 node_modules/
 dist/
 .DS_Store
+scripts/.tmp_*
+scripts/saves-raw.json
+scripts/ig_new_delta.json

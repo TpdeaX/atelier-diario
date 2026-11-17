@@ -7,6 +7,7 @@ export type ModuleId =
   | 'language'
   | 'mindset'
   | 'vault'
+  | 'focuslab'
   | 'singing'
   | 'calm';
 
@@ -17,6 +18,7 @@ export type HabitKey =
   | 'typing'
   | 'language'
   | 'mindset'
+  | 'focuslab'
   | 'singing'
   | 'calm';
 
@@ -94,6 +96,21 @@ export interface VaultItem {
   createdAt?: number;
 }
 
+export interface FlashcardItem {
+  id: string;
+  deck: string;
+  front: string;
+  back: string;
+  source?: string;
+  isCustom?: boolean;
+}
+
+export interface FlashcardProgress {
+  nextReviewAt: number;
+  intervalDays: number;
+  reps: number;
+}
+
 export interface ModulePreferences {
   reader: {
     sourceTab: 'wikisource' | 'wikipedia' | 'openlibrary';
@@ -134,6 +151,11 @@ export interface ModulePreferences {
     statusFilter: 'active' | VaultStatus;
     searchQuery: string;
   };
+  focuslab: {
+    tab: 'oratory' | 'schulte' | 'recall';
+    schulteSize: 4 | 5 | 6;
+    recallDeck: string;
+  };
   singing: {
     lastDrillId: string;
   };
@@ -157,6 +179,8 @@ export interface LifeProfile {
   vaultFavorites: string[];
   vaultNotes: Record<string, string>;
   customVaultItems: VaultItem[];
+  customFlashcards: FlashcardItem[];
+  flashcardProgress: Record<string, FlashcardProgress>;
   savedWords: SavedWord[];
   reframeLog: ReframeEntry[];
   bookmarks: BookBookmark[];
@@ -168,6 +192,9 @@ export interface LifeProfile {
     singingBestCents: number | null;
     bestWpmPc: number;
     bestWpmMobile: number;
+    schulteBestMs: number | null;
+    oratorySessions: number;
+    recallReviewed: number;
   };
   modulePrefs: ModulePreferences;
   updatedAt: number;

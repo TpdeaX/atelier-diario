@@ -8,6 +8,7 @@ import { ModuleId } from './types';
 import { EcosystemModals } from './ui/EcosystemModals';
 import { CalligraphyView } from './views/CalligraphyView';
 import { CalmView } from './views/CalmView';
+import { FocusLabView } from './views/FocusLabView';
 import { HomeView } from './views/HomeView';
 import { LanguageView } from './views/LanguageView';
 import { MindsetView } from './views/MindsetView';
@@ -26,6 +27,7 @@ const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[]
   { id: 'language', label: 'Léxico', icon: Icons.spell },
   { id: 'mindset', label: 'Criterio', icon: Icons.bulb },
   { id: 'vault', label: 'Baúl', icon: Icons.archive },
+  { id: 'focuslab', label: 'Oratoria/Foco', icon: Icons.mic },
   { id: 'singing', label: 'Canto', icon: Icons.mic },
   { id: 'calm', label: 'Calma', icon: Icons.wind },
 ];
@@ -39,6 +41,7 @@ const typingView = new TypingView();
 const languageView = new LanguageView();
 const mindsetView = new MindsetView();
 const vaultView = new VaultView();
+const focusLabView = new FocusLabView();
 const singingView = new SingingView();
 const calmView = new CalmView();
 
@@ -53,6 +56,7 @@ const VALID_ROUTES = new Set<ModuleId>([
   'language',
   'mindset',
   'vault',
+  'focuslab',
   'singing',
   'calm',
 ]);
@@ -80,6 +84,9 @@ function navigate(next: ModuleId): void {
   }
   if (currentModule === 'studio' && next !== 'studio') {
     studioView.unmount();
+  }
+  if (currentModule === 'focuslab' && next !== 'focuslab') {
+    focusLabView.unmount();
   }
   currentModule = next;
   if (window.location.hash !== `#${next}`) {
@@ -221,6 +228,9 @@ function renderApp(): void {
       break;
     case 'vault':
       vaultView.render(mainEl);
+      break;
+    case 'focuslab':
+      focusLabView.render(mainEl);
       break;
     case 'singing':
       singingView.render(mainEl);
