@@ -6,6 +6,7 @@ export type ModuleId =
   | 'typing'
   | 'language'
   | 'mindset'
+  | 'vault'
   | 'singing'
   | 'calm';
 
@@ -56,7 +57,41 @@ export interface PhraseItem {
   meaning: string;
   whenToUse: string;
   dailyAction: string;
+  sourceUrl?: string;
   isCustom?: boolean;
+}
+
+export type VaultCategory =
+  | 'mentalidad'
+  | 'oratoria'
+  | 'tech'
+  | 'estudio'
+  | 'carrera'
+  | 'bienestar'
+  | 'otros'
+  | 'ocio'
+  | 'visual';
+
+export type VaultStatus = 'pending' | 'seen' | 'applied' | 'archived';
+
+export type VaultFilterCategory =
+  | 'useful'
+  | 'all'
+  | 'favs'
+  | 'applied'
+  | 'custom'
+  | VaultCategory;
+
+export interface VaultItem {
+  id: string;
+  index?: number;
+  url: string;
+  title: string;
+  summary: string;
+  category: VaultCategory;
+  tags: string[];
+  isCustom?: boolean;
+  createdAt?: number;
 }
 
 export interface ModulePreferences {
@@ -94,6 +129,11 @@ export interface ModulePreferences {
     category: 'all' | 'favs' | PhraseItem['category'];
     searchQuery: string;
   };
+  vault: {
+    category: VaultFilterCategory;
+    statusFilter: 'active' | VaultStatus;
+    searchQuery: string;
+  };
   singing: {
     lastDrillId: string;
   };
@@ -113,6 +153,10 @@ export interface LifeProfile {
   todayHabits: Record<HabitKey, boolean>;
   favoritePhraseIds: string[];
   customPhrases: PhraseItem[];
+  vaultStatuses: Record<string, VaultStatus>;
+  vaultFavorites: string[];
+  vaultNotes: Record<string, string>;
+  customVaultItems: VaultItem[];
   savedWords: SavedWord[];
   reframeLog: ReframeEntry[];
   bookmarks: BookBookmark[];

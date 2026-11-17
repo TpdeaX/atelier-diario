@@ -39,6 +39,11 @@ export class MindsetView {
             <span class="al-mono-pill">${CAT_LABELS[p.category] ?? p.category}${p.isCustom ? ' · Propia' : ''}</span>
             <div class="al-tool-group">
               ${
+                p.sourceUrl
+                  ? `<a class="al-icon-btn" href="${p.sourceUrl}" target="_blank" rel="noopener noreferrer" title="Ver post original">${Icons.arrowUpRight(14)}</a>`
+                  : ''
+              }
+              ${
                 p.isCustom
                   ? `<button type="button" class="al-icon-btn" data-del-phrase="${p.id}" title="Eliminar frase propia">${Icons.trash(14)}</button>`
                   : ''

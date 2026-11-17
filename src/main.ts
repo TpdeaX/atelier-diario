@@ -15,6 +15,7 @@ import { ReaderView } from './views/ReaderView';
 import { SingingView } from './views/SingingView';
 import { StudioView } from './views/StudioView';
 import { TypingView } from './views/TypingView';
+import { VaultView } from './views/VaultView';
 
 const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[] = [
   { id: 'home', label: 'Directorio', icon: Icons.grid },
@@ -24,6 +25,7 @@ const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[]
   { id: 'typing', label: 'Mecanografía', icon: Icons.keyboard },
   { id: 'language', label: 'Léxico', icon: Icons.spell },
   { id: 'mindset', label: 'Criterio', icon: Icons.bulb },
+  { id: 'vault', label: 'Baúl', icon: Icons.archive },
   { id: 'singing', label: 'Canto', icon: Icons.mic },
   { id: 'calm', label: 'Calma', icon: Icons.wind },
 ];
@@ -36,6 +38,7 @@ const calligraphyView = new CalligraphyView();
 const typingView = new TypingView();
 const languageView = new LanguageView();
 const mindsetView = new MindsetView();
+const vaultView = new VaultView();
 const singingView = new SingingView();
 const calmView = new CalmView();
 
@@ -49,6 +52,7 @@ const VALID_ROUTES = new Set<ModuleId>([
   'typing',
   'language',
   'mindset',
+  'vault',
   'singing',
   'calm',
 ]);
@@ -215,6 +219,9 @@ function renderApp(): void {
     case 'mindset':
       mindsetView.render(mainEl);
       break;
+    case 'vault':
+      vaultView.render(mainEl);
+      break;
     case 'singing':
       singingView.render(mainEl);
       break;
@@ -240,6 +247,13 @@ cloudSync.onStatusChange(() => {
 
 initEcosystemRealtime(() => {
   renderApp();
+});
+
+window.addEventListener('hashchange', () => {
+  const next = (window.location.hash.replace('#', '') || 'home') as ModuleId;
+  if (VALID_ROUTES.has(next) && next !== currentModule) {
+    navigate(next);
+  }
 });
 
 renderApp();

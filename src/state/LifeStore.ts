@@ -9,6 +9,8 @@ import {
   ReframeEntry,
   SavedWord,
   ThemeMode,
+  VaultItem,
+  VaultStatus,
 } from '../types';
 
 const STORAGE_KEY = 'atelier_diario_profile_v1';
@@ -67,6 +69,11 @@ export function defaultModulePrefs(): ModulePreferences {
       category: 'all',
       searchQuery: '',
     },
+    vault: {
+      category: 'useful',
+      statusFilter: 'active',
+      searchQuery: '',
+    },
     singing: {
       lastDrillId: 'major5',
     },
@@ -88,6 +95,10 @@ function defaultProfile(): LifeProfile {
     todayHabits: emptyHabits(),
     favoritePhraseIds: [],
     customPhrases: [],
+    vaultStatuses: {},
+    vaultFavorites: [],
+    vaultNotes: {},
+    customVaultItems: [],
     savedWords: [],
     reframeLog: [],
     bookmarks: [],
@@ -116,6 +127,11 @@ function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifePro
     stats: { ...base.stats, ...(raw.stats ?? {}) },
     favoritePhraseIds: Array.isArray(raw.favoritePhraseIds) ? raw.favoritePhraseIds : [],
     customPhrases: Array.isArray(raw.customPhrases) ? raw.customPhrases : [],
+    vaultStatuses:
+      raw.vaultStatuses && typeof raw.vaultStatuses === 'object' ? { ...raw.vaultStatuses } : {},
+    vaultFavorites: Array.isArray(raw.vaultFavorites) ? raw.vaultFavorites : [],
+    vaultNotes: raw.vaultNotes && typeof raw.vaultNotes === 'object' ? { ...raw.vaultNotes } : {},
+    customVaultItems: Array.isArray(raw.customVaultItems) ? raw.customVaultItems : [],
     savedWords: Array.isArray(raw.savedWords) ? raw.savedWords : [],
     reframeLog: Array.isArray(raw.reframeLog) ? raw.reframeLog : [],
     bookmarks: Array.isArray(raw.bookmarks) ? raw.bookmarks : [],
@@ -126,6 +142,7 @@ function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifePro
       typing: { ...base.modulePrefs.typing, ...(mp.typing ?? {}) },
       language: { ...base.modulePrefs.language, ...(mp.language ?? {}) },
       mindset: { ...base.modulePrefs.mindset, ...(mp.mindset ?? {}) },
+      vault: { ...base.modulePrefs.vault, ...(mp.vault ?? {}) },
       singing: { ...base.modulePrefs.singing, ...(mp.singing ?? {}) },
       calm: { ...base.modulePrefs.calm, ...(mp.calm ?? {}) },
     },
@@ -297,6 +314,99 @@ class LifeStore {
     this.profile.customPhrases = this.profile.customPhrases.filter((p) => p.id !== id);
     this.profile.favoritePhraseIds = this.profile.favoritePhraseIds.filter((fid) => fid !== id);
     this.save();
+  }
+
+  public setVaultStatus(id: string, status: VaultStatus): void {
+    if (status === 'pending') {
+      delete this.profile.vaultStatuses[id];
+    } else {
+      this.profile.vaultStatuses[id] = status;
+    }
+    this.save();
+  }
+
+  public toggleVaultFavorite(id: string): boolean {
+    const idx = this.profile.vaultFavorites.indexOf(id);
+    if (idx >= 0) {
+      this.profile.vaultFavorites.splice(idx, 1);
+      this.save();
+      return false;
+    }
+    this.profile.vaultFavorites.unshift(id);
+    this.save();
+    return true;
+  }
+
+  public setVaultNote(id: string, note: string): void {
+    const clean = note.trim();
+    if (!clean) {
+      delete this.profile.vaultNotes[id];
+    } else {
+      this.profile.vaultNotes[id] = clean;
+    }
+    this.save();
+  }
+
+  public addCustomVaultItem(input: Omit<VaultItem, 'id' | 'isCustom' | 'createdAt'>): VaultItem {
+    const item: VaultItem = {
+      ...input,
+      id: `vcustom-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      isCustom: true,
+      createdAt: Date.now(),
+    };
+    this.profile.customVaultItems.unshift(item);
+    this.save();
+    return item;
+  }
+
+  public importCustomVaultItems(
+    inputs: Omit<VaultItem, 'id' | 'isCustom' | 'createdAt'>[],
+    existingUrls: Set<string>
+  ): number {
+    let added = 0;
+    const seen = new Set(existingUrls);
+    for (const c of this.profile.customVaultItems) {
+      if (c.url) seen.add(c.url.trim().split('?')[0]);
+    }
+    for (const inp of inputs) {
+      const cleanUrl = (inp.url || '').trim().split('?')[0];
+      if (cleanUrl && seen.has(cleanUrl)) continue;
+      if (cleanUrl) seen.add(cleanUrl);
+      this.profile.customVaultItems.unshift({
+        ...inp,
+        url: cleanUrl || inp.url,
+        id: `vcustom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        isCustom: true,
+        createdAt: Date.now(),
+      });
+      added++;
+    }
+    if (added > 0) this.save();
+    return added;
+  }
+
+  public removeCustomVaultItem(id: string): void {
+    this.profile.customVaultItems = this.profile.customVaultItems.filter((v) => v.id !== id);
+    this.profile.vaultFavorites = this.profile.vaultFavorites.filter((fid) => fid !== id);
+    delete this.profile.vaultStatuses[id];
+    delete this.profile.vaultNotes[id];
+    this.save();
+  }
+
+  public promoteVaultToPhrase(item: VaultItem, category: PhraseItem['category']): PhraseItem {
+    const note = this.profile.vaultNotes[item.id] || '';
+    const phrase = this.addCustomPhrase({
+      category,
+      quote: item.title.replace(/…$/, ''),
+      author: 'Baúl de Guardados',
+      meaning: note || item.summary,
+      whenToUse: 'Cuando quieras recordar o aplicar esta idea guardada.',
+      dailyAction: 'Aplícalo hoy una vez y marca el recurso como aplicado.',
+      sourceUrl: item.url,
+    });
+    this.profile.vaultStatuses[item.id] = 'applied';
+    this.save();
+    return phrase;
   }
 
   public saveWord(word: string, definition: string): void {

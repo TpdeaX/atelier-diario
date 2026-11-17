@@ -1894,6 +1894,148 @@ button {
   color: var(--ink-muted);
 }
 
+/* ==================== VAULT / BAUL DE GUARDADOS ==================== */
+
+.al-vault-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.al-vault-card.is-archived {
+  opacity: 0.7;
+}
+
+.al-vault-title {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  line-height: 1.32;
+  color: var(--ink-primary);
+}
+
+.al-vault-summary {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.48;
+  color: var(--ink-secondary);
+}
+
+.al-vault-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.al-vault-tag {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  color: var(--ink-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.al-vault-status {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  color: var(--ink-secondary);
+}
+
+.al-vault-status.is-applied {
+  background: rgba(22, 101, 52, 0.14);
+  color: var(--accent-primary);
+}
+
+.al-vault-status.is-seen {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+}
+
+.al-vault-note-preview {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--bg-soft);
+  font-size: 0.84rem;
+  color: var(--ink-secondary);
+}
+
+.al-vault-note-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.al-vault-note-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.al-vault-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.al-vault-actions .al-seg-btn {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}
+
+.al-vault-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.al-vault-form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.al-vault-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--ink-primary);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  resize: vertical;
+}
+
+.al-vault-inline-cat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+}
+
+.al-vault-more-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 4px;
+}
+
+.al-btn-sm {
+  padding: 6px 11px;
+  font-size: 0.82rem;
+}
+
 /* ==================== RESPONSIVE ==================== */
 
 @media (max-width: 960px) {
