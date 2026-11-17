@@ -299,6 +299,8 @@ button {
   background: var(--bg-surface);
   border: 1px solid var(--border-strong);
   font-size: 0.82rem;
+  text-decoration: none;
+  color: inherit;
   font-weight: 700;
   color: var(--ink-primary);
   white-space: nowrap;

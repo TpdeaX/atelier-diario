@@ -85,6 +85,12 @@ function navigate(next: ModuleId): void {
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
+function resolveDirectorioUrl(): string {
+  const host = window.location.hostname;
+  if (host.endsWith('github.io')) return '../directorio/';
+  return 'http://localhost:5178/';
+}
+
 function renderApp(): void {
   applyTheme();
   const theme = lifeStore.get().theme;
@@ -111,6 +117,10 @@ function renderApp(): void {
           </div>
 
           <div class="al-topbar-actions">
+            <a class="al-back-dir-btn" href="${resolveDirectorioUrl()}" title="Ir al Directorio exclusivo del Ecosistema">
+              ${Icons.arrowLeft(14)}<span>Directorio</span>
+            </a>
+
             <button type="button" class="al-cloud-pill ${syncMeta.configured ? 'is-live' : ''} ${syncMeta.lastError ? 'is-err' : ''}" id="al-open-cloud" title="Configurar y sincronizar todo en Supabase">
               ${Icons.cloud(15)}
               <span>${cloudLabel}</span>
@@ -138,7 +148,7 @@ function renderApp(): void {
             ? `
           <div class="al-subnav-bar">
             <button type="button" class="al-back-dir-btn" data-route="home">
-              ${Icons.arrowLeft(15)}<span>Directorio</span>
+              ${Icons.grid(15)}<span>Inicio Atelier</span>
             </button>
             <nav class="al-nav" aria-label="Estudios principales">
               ${NAV_ITEMS.filter((i) => i.id !== 'home')
