@@ -100,7 +100,7 @@ if (cleanDirIdx >= 0 && args[cleanDirIdx + 1]) {
   }
 
   const cleanedById = new Map();
-  const files = fs.readdirSync(cleanDir).filter((f) => /^clean_(?:\d+|frames)\.json$/i.test(f)).sort();
+  const files = fs.readdirSync(cleanDir).filter((f) => /^clean_(?:\d+|frames|vis_\d+)\.json$/i.test(f)).sort();
   for (const f of files) {
     const arr = readJsonBom(path.join(cleanDir, f));
     for (const row of arr) {

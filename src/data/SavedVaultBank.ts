@@ -19,12 +19,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dfx3DUIOACq",
     "index": 2,
     "url": "https://www.instagram.com/p/Dfx3DUIOACq/",
-    "title": "Pez en pecera azul con subtítulo aislado",
-    "summary": "Toma de un pez alargado nadando dentro de un acuario iluminado con plantas al fondo y la palabra 'Y' en subtítulos; escena visual breve.",
-    "category": "visual",
+    "title": "Buen domingo",
+    "summary": "Buen domingo . .",
+    "category": "otros",
     "tags": [
-      "acuario",
-      "pez"
+      "instagram",
+      "alessandro"
     ]
   },
   {
@@ -513,10 +513,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dclars4MZGu",
     "index": 43,
     "url": "https://www.instagram.com/p/Dclars4MZGu/",
-    "title": "Gran ejemplo",
-    "summary": "Gran ejemplo",
-    "category": "visual",
-    "tags": []
+    "title": "Sé un hombre: mensaje directo sobre disciplina y carácter",
+    "summary": "Llamado directo de Herculesfit Team a asumir responsabilidad, dejar las excusas y actuar con carácter firme en el día a día.",
+    "category": "mentalidad",
+    "tags": [
+      "mentalidad",
+      "disciplina"
+    ]
   },
   {
     "id": "ig-DfitfkfgCBT",
@@ -666,10 +669,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dfhu4-jNLyS",
     "index": 56,
     "url": "https://www.instagram.com/p/Dfhu4-jNLyS/",
-    "title": "Guardado visual #56",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo volverte injustamente bueno en cualquier cosa",
+    "summary": "Claves de mentalidad y práctica enfocada para destacar rápidamente en cualquier habilidad o disciplina que decidas entrenar.",
+    "category": "mentalidad",
+    "tags": [
+      "habilidades",
+      "maestria"
+    ]
   },
   {
     "id": "ig-DffuAzDB4sX",
@@ -783,10 +789,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DfdtJX6uRTb",
     "index": 66,
     "url": "https://www.instagram.com/p/DfdtJX6uRTb/",
-    "title": "Incomódalos",
-    "summary": "Incomódalos.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo recibir un insulto con clase usando el silencio",
+    "summary": "Ante una ofensa, mantén la calma y aplica de 5 a 7 segundos de silencio con serenidad para incomodar al agresor y conservar tu compostura.",
+    "category": "oratoria",
+    "tags": [
+      "comunicacion",
+      "silencio"
+    ]
   },
   {
     "id": "ig-Dfd6Meyu-Ok",
@@ -828,12 +837,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DfbX2OxK-F6",
     "index": 70,
     "url": "https://www.instagram.com/p/DfbX2OxK-F6/",
-    "title": "Inspiracion visual de El Principito",
-    "summary": "Arte visual inspirado en enseñanzas clásicas de literatura.",
-    "category": "visual",
+    "title": "Por qué algunas personas se vuelven importantes (El Principito)",
+    "summary": "Reflexión inspirada en El Principito sobre los vínculos humanos y cómo el tiempo y cuidado que inviertes en alguien lo vuelve único.",
+    "category": "mentalidad",
     "tags": [
-      "arte",
-      "inspiracion"
+      "relaciones",
+      "reflexion"
     ]
   },
   {
@@ -912,19 +921,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DfYRX-XuSuV",
     "index": 77,
     "url": "https://www.instagram.com/p/DfYRX-XuSuV/",
-    "title": "Guardado visual #77",
-    "summary": "Yo ese",
-    "category": "visual",
-    "tags": []
+    "title": "Top 3 cosas que hacer después de las 10 pm: jugar videojuegos",
+    "summary": "Clip de humor cotidiano sobre planes nocturnos de descanso en casa, empezando por jugar videojuegos después de las 10 pm.",
+    "category": "ocio",
+    "tags": [
+      "humor",
+      "videojuegos"
+    ]
   },
   {
     "id": "ig-DfYjaPAukyQ",
     "index": 78,
     "url": "https://www.instagram.com/p/DfYjaPAukyQ/",
-    "title": "Guardado visual #78",
-    "summary": "👍✋️🫵",
-    "category": "visual",
-    "tags": []
+    "title": "Saludos con aura: gestos corporales al saludar a distancia",
+    "summary": "Tres formas de saludar con mano, puño y gesto discreto al caminar en la calle para proyectar seguridad y presencia.",
+    "category": "otros",
+    "tags": [
+      "presencia",
+      "saludos"
+    ]
   },
   {
     "id": "ig-DfXoaNqD9Sl",
@@ -1026,10 +1041,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dc4IQdUQiOu",
     "index": 87,
     "url": "https://www.instagram.com/p/Dc4IQdUQiOu/",
-    "title": "Guardado visual #87",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "10 hábitos incómodos para dejar de vivir como víctima",
+    "summary": "Lista de hábitos incómodos pero necesarios para salir del rol de víctima, asumir responsabilidad emocional y tomar control de tus decisiones.",
+    "category": "mentalidad",
+    "tags": [
+      "mentalidad",
+      "responsabilidad"
+    ]
   },
   {
     "id": "ig-DfXhMkuht2-",
@@ -1251,12 +1269,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DevLC3EOFk1",
     "index": 106,
     "url": "https://www.instagram.com/p/DevLC3EOFk1/",
-    "title": "Ilusiones opticas comunes",
-    "summary": "Identifica patrones visuales recurrentes en tu entorno cotidiano para entrenar la agudeza mental.",
-    "category": "visual",
+    "title": "Errores comunes de etiqueta con el celular y la postura",
+    "summary": "Comparativa visual de etiqueta masculina: evita usar el teléfono al caminar o meter las manos al bolsillo al vestir traje; mantén postura limpia.",
+    "category": "otros",
     "tags": [
-      "visual",
-      "percepcion"
+      "etiqueta",
+      "imagen"
     ]
   },
   {
@@ -1287,12 +1305,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DfLxXvdOSRI",
     "index": 109,
     "url": "https://www.instagram.com/p/DfLxXvdOSRI/",
-    "title": "Perspectiva ante los problemas",
-    "summary": "Muchas situaciones cotidianas parecen abrumadoras pero pierden gravedad al analizarlas con frialdad.",
-    "category": "visual",
+    "title": "Cómo salir con humor si pasas un momento de oso",
+    "summary": "Sketch de humor sobre cómo escapar o disimular con ingenio cuando protagonizas un momento vergonzoso en público.",
+    "category": "ocio",
     "tags": [
-      "mentalidad",
-      "perspectiva"
+      "humor",
+      "verguenza"
     ]
   },
   {
@@ -1311,10 +1329,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeKcCsPxOyD",
     "index": 111,
     "url": "https://www.instagram.com/p/DeKcCsPxOyD/",
-    "title": "Guardado visual #111",
-    "summary": "Curioso",
-    "category": "visual",
-    "tags": []
+    "title": "Conversación absurda de humor con un erizo tras la reja",
+    "summary": "Video breve de humor absurdo donde el creador asegura que un erizo detrás de una malla le resolverá una duda.",
+    "category": "ocio",
+    "tags": [
+      "humor",
+      "animales"
+    ]
   },
   {
     "id": "ig-DeckjedMNHi",
@@ -1428,12 +1449,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-De6Vl1nOYq3",
     "index": 121,
     "url": "https://www.instagram.com/p/De6Vl1nOYq3/",
-    "title": "Inspiracion visual diaria",
-    "summary": "Explora referencias visuales de alta calidad para estimular tu creatividad y sensibilidad estetica.",
-    "category": "visual",
+    "title": "Reactor vs. Responder: responde con calma y sin impulsos",
+    "summary": "Animación que contrasta a quien reacciona con rabia ante un mensaje provocador frente a quien mantiene la calma, no escala y cuida su paz.",
+    "category": "mentalidad",
     "tags": [
-      "visual",
-      "diseno"
+      "autocontrol",
+      "emociones"
     ]
   },
   {
@@ -1656,12 +1677,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-De450y7IDk4",
     "index": 140,
     "url": "https://www.instagram.com/p/De450y7IDk4/",
-    "title": "Atencion plena a los detalles",
-    "summary": "Entrena tu capacidad de observacion detallada para no pasar por alto elementos criticos en tu entorno.",
-    "category": "visual",
+    "title": "Gestos clave que cuidar con tus personas más cercanas",
+    "summary": "Reflexión sobre el valor de nuestros gestos cotidianos y lo que conviene dejar de hacer para cuidar los vínculos con quienes más queremos.",
+    "category": "mentalidad",
     "tags": [
-      "visual",
-      "atencion"
+      "relaciones",
+      "reflexion"
     ]
   },
   {
@@ -1848,11 +1869,11 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeuK3YxqMOJ",
     "index": 156,
     "url": "https://www.instagram.com/p/DeuK3YxqMOJ/",
-    "title": "Estimulacion visual y cognitiva",
-    "summary": "Pon a prueba tus capacidades cognitivas mediante retos visuales dinamicos de resolucion rapida.",
-    "category": "visual",
+    "title": "Por qué olvidas nombres pero recuerdas profesiones",
+    "summary": "Explicación visual sobre cómo funciona la memoria: retenemos mejor conceptos con contexto (como 'panadero') que nombres propios aislados.",
+    "category": "estudio",
     "tags": [
-      "visual",
+      "memoria",
       "cognicion"
     ]
   },
@@ -1896,28 +1917,37 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeZ1Ms5usH2",
     "index": 160,
     "url": "https://www.instagram.com/p/DeZ1Ms5usH2/",
-    "title": "con quién?",
-    "summary": "con quién?",
-    "category": "visual",
-    "tags": []
+    "title": "¿Con quién tendrías tu última conversación antes de morir?",
+    "summary": "Pregunta reflexiva sobre vínculos y prioridades: si solo te quedara una conversación en la vida, con quién la tendrías y qué le dirías.",
+    "category": "mentalidad",
+    "tags": [
+      "reflexion",
+      "vinculos"
+    ]
   },
   {
     "id": "ig-DefBpunukLq",
     "index": 161,
     "url": "https://www.instagram.com/p/DefBpunukLq/",
-    "title": "Guardado visual #161",
-    "summary": "🐍",
-    "category": "visual",
-    "tags": []
+    "title": "Si te muerde una serpiente, no la persigas: sánate",
+    "summary": "Metáfora sobre gestión emocional: cuando alguien te lastima, prioriza sanar la herida en vez de desgastarte buscando explicaciones.",
+    "category": "mentalidad",
+    "tags": [
+      "mentalidad",
+      "sanacion"
+    ]
   },
   {
     "id": "ig-Dep69AjjUkf",
     "index": 162,
     "url": "https://www.instagram.com/p/Dep69AjjUkf/",
-    "title": "Guardado visual #162",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "El efecto del nuevo comienzo: deja de esperar al lunes",
+    "summary": "Un hito en el calendario te separa mentalmente de fallos pasados, pero el impulso cae rápido. No esperes al lunes ni a enero: empieza hoy.",
+    "category": "mentalidad",
+    "tags": [
+      "habitos",
+      "procrastinacion"
+    ]
   },
   {
     "id": "ig-DeAe07aOds0",
@@ -1935,12 +1965,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Depyho7IEZi",
     "index": 164,
     "url": "https://www.instagram.com/p/Depyho7IEZi/",
-    "title": "Diseño visual y estetica actual",
-    "summary": "Mantente al dia con tendencias de diseño visual para elevar la calidad estetica de tus contenidos.",
-    "category": "visual",
+    "title": "Señal clara de cuando alguien está enamorado de ti",
+    "summary": "Reflexión directa sobre relaciones y amor sano: qué conductas reales demuestran interés genuino cuando alguien te ama de verdad.",
+    "category": "mentalidad",
     "tags": [
-      "visual",
-      "diseno"
+      "relaciones",
+      "amor"
     ]
   },
   {
@@ -1995,28 +2025,37 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Depj_aqRt9z",
     "index": 169,
     "url": "https://www.instagram.com/p/Depj_aqRt9z/",
-    "title": "Guardado visual #169",
-    "summary": "fyp",
-    "category": "visual",
-    "tags": []
+    "title": "Clip casual / POV personal de Sebastian Muller",
+    "summary": "Video estilo POV o trend breve grabado en cámara frontal sin explicación textual completa en pantalla ni descripción.",
+    "category": "ocio",
+    "tags": [
+      "pov",
+      "lifestyle"
+    ]
   },
   {
     "id": "ig-DepRysNDDl4",
     "index": 170,
     "url": "https://www.instagram.com/p/DepRysNDDl4/",
-    "title": "Guardado visual #170",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Usa 'nosotros' en vez de 'tú' al expresar una queja",
+    "summary": "Evita frases cargadas de 'tú' acusatorios ('llegas tarde, no avisas'). Estudios de Berkeley muestran que iniciar reclamos con 'nosotros' calma el conflicto.",
+    "category": "oratoria",
+    "tags": [
+      "comunicacion",
+      "psicologia"
+    ]
   },
   {
     "id": "ig-DepttwPxLDI",
     "index": 171,
     "url": "https://www.instagram.com/p/DepttwPxLDI/",
-    "title": "@enriquebisnes",
-    "summary": "@enriquebisnes",
-    "category": "visual",
-    "tags": []
+    "title": "Dinámica de voz y confianza: atrévete a gritar tu nombre",
+    "summary": "Reto práctico de Enrique Orantes para soltar la inhibición y proyectar seguridad personal gritando tu propio nombre con fuerza.",
+    "category": "oratoria",
+    "tags": [
+      "confianza",
+      "voz"
+    ]
   },
   {
     "id": "ig-DeotW27hjP_",
@@ -2034,19 +2073,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DepUplZI_4w",
     "index": 173,
     "url": "https://www.instagram.com/p/DepUplZI_4w/",
-    "title": "Guardado visual #173",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "No reacciones al instante: haz una pausa ante la provocación",
+    "summary": "Tu cerebro reacciona en milisegundos ante una provocación. Aprende a hacer una pausa consciente antes de responder para evitar decisiones impulsivas.",
+    "category": "mentalidad",
+    "tags": [
+      "autocontrol",
+      "psicologia"
+    ]
   },
   {
     "id": "ig-Ddaga8Esuf4",
     "index": 174,
     "url": "https://www.instagram.com/p/Ddaga8Esuf4/",
-    "title": "Guardado visual #174",
-    "summary": "Video",
-    "category": "visual",
-    "tags": []
+    "title": "Mapas visuales de técnica vocal: resonancia y mandíbula libre",
+    "summary": "Guía visual de técnica vocal para liberar la mandíbula, articular vocales con claridad y mejorar la resonancia de la voz sin tensión.",
+    "category": "oratoria",
+    "tags": [
+      "voz",
+      "oratoria"
+    ]
   },
   {
     "id": "ig-DenijdpNBNj",
@@ -2064,19 +2109,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeoaMA_J7-r",
     "index": 176,
     "url": "https://www.instagram.com/p/DeoaMA_J7-r/",
-    "title": "Guardado visual #176",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Introversión vs. timidez: no significan lo mismo",
+    "summary": "La introversión es preferencia por menor estimulación social; la timidez es incomodidad o nervios al interactuar. Puedes ser sociable y aun así sentir timidez.",
+    "category": "mentalidad",
+    "tags": [
+      "psicologia",
+      "personalidad"
+    ]
   },
   {
     "id": "ig-DenZH9RiRkA",
     "index": 177,
     "url": "https://www.instagram.com/p/DenZH9RiRkA/",
-    "title": "Guardado visual #177",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Aprende a aprender: claves para dominar temas nuevos",
+    "summary": "Consejos de psicología aplicada al aprendizaje para optimizar horas de estudio y asimilar habilidades o conocimientos nuevos con mayor eficacia.",
+    "category": "estudio",
+    "tags": [
+      "aprendizaje",
+      "estudio"
+    ]
   },
   {
     "id": "ig-Dea4LCiRKNu",
@@ -2106,19 +2157,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DenXdQduVs-",
     "index": 180,
     "url": "https://www.instagram.com/p/DenXdQduVs-/",
-    "title": "Guardado visual #180",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo te afecta el sesgo de confirmación",
+    "summary": "En discusiones o decisiones solemos buscar validar nuestras creencias en lugar de la verdad. Cuestiona tus propios supuestos antes de sacar conclusiones.",
+    "category": "mentalidad",
+    "tags": [
+      "sesgo",
+      "pensamiento crítico"
+    ]
   },
   {
     "id": "ig-Demts89stQn",
     "index": 181,
     "url": "https://www.instagram.com/p/Demts89stQn/",
-    "title": "Guardado visual #181",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Nadie es perfecto: el valor de elegirse",
+    "summary": "Todos cargamos inseguridades y miedos. Las relaciones reales no consisten en hallar a alguien sin problemas, sino en aceptar imperfecciones y elegirse cada día.",
+    "category": "mentalidad",
+    "tags": [
+      "relaciones",
+      "aceptación"
+    ]
   },
   {
     "id": "ig-Dek6cTmRTCc",
@@ -2136,10 +2193,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dekxa7SCbL9",
     "index": 183,
     "url": "https://www.instagram.com/p/Dekxa7SCbL9/",
-    "title": "Guardado visual #183",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "La forma #1 de construir seguridad personal",
+    "summary": "La seguridad no llega antes de actuar, sino después. Empieza aun con miedo: al dar el primer paso y sostenerlo en el tiempo, el temor baja y la confianza crece.",
+    "category": "mentalidad",
+    "tags": [
+      "confianza",
+      "acción"
+    ]
   },
   {
     "id": "ig-DbZeuN1zZaD",
@@ -2157,10 +2217,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dek6fwmMX0e",
     "index": 185,
     "url": "https://www.instagram.com/p/Dek6fwmMX0e/",
-    "title": "Guardado visual #185",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Deja de preocuparte por lo que aún no pasa",
+    "summary": "Preocuparte por escenarios futuros que no han ocurrido alimenta la ansiedad sin resolver nada. Enfoca tu atención en lo que sí está pasando hoy.",
+    "category": "bienestar",
+    "tags": [
+      "ansiedad",
+      "sobrepensar"
+    ]
   },
   {
     "id": "ig-Deh4AhIxkiD",
@@ -2190,19 +2253,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeiR1PCK5-2",
     "index": 188,
     "url": "https://www.instagram.com/p/DeiR1PCK5-2/",
-    "title": "Guardado visual #188",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Diferencia entre emociones y sentimientos",
+    "summary": "Distinguir tus emociones inmediatas de tus sentimientos y pensamientos te ayuda a entender qué ocurre en tu mente y gestionarlo con mayor claridad.",
+    "category": "bienestar",
+    "tags": [
+      "emociones",
+      "psicología"
+    ]
   },
   {
     "id": "ig-DeIevyFMi0p",
     "index": 189,
     "url": "https://www.instagram.com/p/DeIevyFMi0p/",
-    "title": "Guardado visual #189",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Truco psiquiátrico para dejar de sobrepensar",
+    "summary": "Segundo consejo práctico de una serie de 7 días guiada por psiquiatra para frenar el exceso de pensamientos y manejar la ansiedad cotidiana.",
+    "category": "bienestar",
+    "tags": [
+      "sobrepensar",
+      "salud mental"
+    ]
   },
   {
     "id": "ig-DeQQI5oBqEU",
@@ -2232,10 +2301,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeXadDFxu83",
     "index": 192,
     "url": "https://www.instagram.com/p/DeXadDFxu83/",
-    "title": "Guardado visual #192",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Si te deja en visto o te daña, suéltala",
+    "summary": "No inviertas tiempo ni energía en quien muestra desinterés o te deja en visto. Prioriza tu dignidad y sigue adelante.",
+    "category": "mentalidad",
+    "tags": [
+      "desapego",
+      "amor propio"
+    ]
   },
   {
     "id": "ig-DdZxyssTAhU",
@@ -2265,10 +2337,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DegCqPqA22Q",
     "index": 195,
     "url": "https://www.instagram.com/p/DegCqPqA22Q/",
-    "title": "Guardado visual #195",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Reacción viral: 'Bro hackeó el sistema'",
+    "summary": "Video de reacción y humor sobre alguien que encontró un atajo o truco ingenioso para resolver una situación cotidiana.",
+    "category": "ocio",
+    "tags": [
+      "humor",
+      "reacción"
+    ]
   },
   {
     "id": "ig-Defp-cZN_2w",
@@ -2586,24 +2661,24 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dd74uQXxy4T",
     "index": 222,
     "url": "https://www.instagram.com/p/Dd74uQXxy4T/",
-    "title": "Día 256 de 361",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "visual",
+    "title": "Deja de scrollear y practica con propósito",
+    "summary": "Consejo práctico para salir del bucle del celular y retomar tus sesiones de práctica o estudio con intención y constancia.",
+    "category": "estudio",
     "tags": [
-      "visual",
-      "habitos"
+      "hábitos",
+      "práctica"
     ]
   },
   {
     "id": "ig-DeU8n7-ikdl",
     "index": 223,
     "url": "https://www.instagram.com/p/DeU8n7-ikdl/",
-    "title": "Sígueme para cuidar tu barra de vida",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "visual",
+    "title": "Top 5 'builds' para mejorar tu personaje real",
+    "summary": "Enfoque gamificado del desarrollo personal: diseña tu estilo de vida como un personaje eligiendo hábitos que fortalezcan tu 'barra de vida'.",
+    "category": "mentalidad",
     "tags": [
-      "visual",
-      "habitos"
+      "gamificación",
+      "hábitos"
     ]
   },
   {
@@ -2622,22 +2697,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeSsZXaMEhF",
     "index": 225,
     "url": "https://www.instagram.com/p/DeSsZXaMEhF/",
-    "title": "Visual y desarrollo efectivo",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "visual",
+    "title": "Tutorial para imitar la voz de Rick",
+    "summary": "Explicación práctica de técnica vocal e imitación para lograr la voz de Rick Sánchez en doblaje o entretenimiento.",
+    "category": "ocio",
     "tags": [
-      "visual",
-      "habitos"
+      "doblaje",
+      "imitación"
     ]
   },
   {
     "id": "ig-DdhZhjTBtAJ",
     "index": 226,
     "url": "https://www.instagram.com/p/DdhZhjTBtAJ/",
-    "title": "Guardado visual #226",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Animación 3D: Looney Tunes bailando",
+    "summary": "Clip humorístico con animación 3D de Bugs Bunny, el Coyote y el Pato Lucas bailando en un patio.",
+    "category": "ocio",
+    "tags": [
+      "animación",
+      "humor"
+    ]
   },
   {
     "id": "ig-DeLE0gNAjO-",
@@ -2655,10 +2733,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeUC5KLTtWf",
     "index": 228,
     "url": "https://www.instagram.com/p/DeUC5KLTtWf/",
-    "title": "Guardado visual #228",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Meme 3D: ratones con botas bailando",
+    "summary": "Animación 3D humorística de varios ratones con botas bailando al ritmo de radios sobre el césped.",
+    "category": "ocio",
+    "tags": [
+      "meme",
+      "animación"
+    ]
   },
   {
     "id": "ig-DX4jqjTt4up",
@@ -2859,21 +2940,24 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DeCsPw3BMcx",
     "index": 245,
     "url": "https://www.instagram.com/p/DeCsPw3BMcx/",
-    "title": "Sal de ahí",
-    "summary": "Sal de ahí.",
-    "category": "visual",
-    "tags": []
+    "title": "Aléjate de entornos a los que no aspiras",
+    "summary": "Cuestiona tu círculo cercano: si no quieres terminar siendo como las personas que te rodean hoy, es momento de cambiar de ambiente.",
+    "category": "mentalidad",
+    "tags": [
+      "entorno",
+      "criterio"
+    ]
   },
   {
     "id": "ig-DcCg1uAAV_4",
     "index": 246,
     "url": "https://www.instagram.com/p/DcCg1uAAV_4/",
-    "title": "Comenta “10” y te envio 10 FORMAS para COQUETEAR sin NECESIDAD",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "visual",
+    "title": "Por qué ser solo 'buen tipo' no basta al ligar",
+    "summary": "Reflexión sobre atracción y citas: la amabilidad sin seguridad ni intención clara no genera interés genuino; evita actuar desde la necesidad.",
+    "category": "otros",
     "tags": [
-      "visual",
-      "habitos"
+      "citas",
+      "atracción"
     ]
   },
   {
@@ -3158,10 +3242,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dd3Iwaxx_Bt",
     "index": 270,
     "url": "https://www.instagram.com/p/Dd3Iwaxx_Bt/",
-    "title": "Guardado visual #270",
-    "summary": "fyp",
-    "category": "visual",
-    "tags": []
+    "title": "Sketch de humor sobre personajes y colores",
+    "summary": "Video corto de comedia actuando distintos roles o personalidades representadas por colores.",
+    "category": "ocio",
+    "tags": [
+      "comedia",
+      "sketch"
+    ]
   },
   {
     "id": "ig-Dd2RUg0tce3",
@@ -3203,10 +3290,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dd1ebD4sqpN",
     "index": 274,
     "url": "https://www.instagram.com/p/Dd1ebD4sqpN/",
-    "title": "Guardado visual #274",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Nunca pongas 'Muchas gracias' al cerrar tu PPT",
+    "summary": "Evita terminar una presentación con una diapositiva de 'Muchas gracias'; aprovecha el cierre para reforzar tu mensaje clave o llamado a la acción.",
+    "category": "oratoria",
+    "tags": [
+      "presentaciones",
+      "oratoria"
+    ]
   },
   {
     "id": "ig-Dd0JeF5tcEl",
@@ -3236,10 +3326,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Ddnow-4spki",
     "index": 277,
     "url": "https://www.instagram.com/p/Ddnow-4spki/",
-    "title": "Guardado visual #277",
-    "summary": "Video",
-    "category": "visual",
-    "tags": []
+    "title": "Apuntes bonitos: los 17 Objetivos (ODS)",
+    "summary": "Demostración de caligrafía y organización de apuntes listando los 17 Objetivos de Desarrollo Sostenible en libreta cuadriculada.",
+    "category": "estudio",
+    "tags": [
+      "apuntes",
+      "caligrafía"
+    ]
   },
   {
     "id": "ig-DdmLMV3pgWV",
@@ -3281,43 +3374,49 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdvfvHrALmF",
     "index": 281,
     "url": "https://www.instagram.com/p/DdvfvHrALmF/",
-    "title": "Visual y desarrollo efectivo",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "visual",
+    "title": "Fail en peluquería al intentar video estético",
+    "summary": "Clip cómico de peluquería donde intentan grabar un video estético girando la silla y termina en una caída inesperada.",
+    "category": "ocio",
     "tags": [
-      "visual",
-      "habitos"
+      "humor",
+      "fail"
     ]
   },
   {
     "id": "ig-DdvQ91eOFm9",
     "index": 282,
     "url": "https://www.instagram.com/p/DdvQ91eOFm9/",
-    "title": "Guardado visual #282",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Usa la declaración de postura para conectar",
+    "summary": "Para destacar al comunicar o crear marca personal, toma una postura clara aunque incomode: filtra al público equivocado y atrae a tu audiencia ideal.",
+    "category": "oratoria",
+    "tags": [
+      "comunicación",
+      "marca personal"
+    ]
   },
   {
     "id": "ig-DdtIyr9xoeA",
     "index": 283,
     "url": "https://www.instagram.com/p/DdtIyr9xoeA/",
-    "title": "Visual y desarrollo efectivo",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "visual",
+    "title": "Partida grupal de Free Fire entre amigos",
+    "summary": "Video casual de amigos jugando Free Fire juntos desde celulares y laptops.",
+    "category": "ocio",
     "tags": [
-      "visual",
-      "habitos"
+      "gaming",
+      "free fire"
     ]
   },
   {
     "id": "ig-DdubhanMTRz",
     "index": 284,
     "url": "https://www.instagram.com/p/DdubhanMTRz/",
-    "title": "Guardado visual #284",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Reflexión 8/1000 sobre tendencias y problemas",
+    "summary": "Comentario breve de la serie 8/1000 sobre la tendencia a enfocarse en los problemas y cómo replantear la perspectiva.",
+    "category": "mentalidad",
+    "tags": [
+      "reflexión",
+      "perspectiva"
+    ]
   },
   {
     "id": "ig-Ddroq1Xpd76",
@@ -3359,10 +3458,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Ddt_SS8o243",
     "index": 288,
     "url": "https://www.instagram.com/p/Ddt_SS8o243/",
-    "title": "Guardado visual #288",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "No confundas ser simplón con tener simpleza",
+    "summary": "Ser simplón es evitar profundizar; tener simpleza es procesar tanto un problema o idea que puedes explicarlo fácil. Busca claridad real, no evasión.",
+    "category": "mentalidad",
+    "tags": [
+      "claridad",
+      "autoconocimiento"
+    ]
   },
   {
     "id": "ig-Ddtr7TbBn4A",
@@ -3404,10 +3506,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dc7dCGAzXoy",
     "index": 292,
     "url": "https://www.instagram.com/p/Dc7dCGAzXoy/",
-    "title": "Guardado visual #292",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo responder si te dicen 'eres muy emocional'",
+    "summary": "Cambia el marco cuando critiquen tu sensibilidad: responde agradeciendo y mostrando que sentir y expresar emociones con madurez es fruto de trabajo personal.",
+    "category": "mentalidad",
+    "tags": [
+      "asertividad",
+      "inteligencia emocional"
+    ]
   },
   {
     "id": "ig-DdsOq0DuKbA",
@@ -3449,37 +3554,53 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Ddp0XfXpvUM",
     "index": 296,
     "url": "https://www.instagram.com/p/Ddp0XfXpvUM/",
-    "title": "Guardado visual #296",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "3 señales de que vives en piloto automático",
+    "summary": "Identifica tres señales de estar actuando en piloto automático para salir de la inercia y comenzar a tomar decisiones conscientes.",
+    "category": "mentalidad",
+    "tags": [
+      "consciencia",
+      "decisiones",
+      "habitos"
+    ]
   },
   {
     "id": "ig-DdqBKxtiMWA",
     "index": 297,
     "url": "https://www.instagram.com/p/DdqBKxtiMWA/",
-    "title": "Guardado visual #297",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "3 señales de que eres demasiado complaciente",
+    "summary": "Reconoce tres señales clave de que te cuesta decir que no para empezar a poner límites sanos y priorizar tu bienestar emocional.",
+    "category": "bienestar",
+    "tags": [
+      "psicologia",
+      "limites",
+      "asertividad"
+    ]
   },
   {
     "id": "ig-DdpaAWiMwmD",
     "index": 298,
     "url": "https://www.instagram.com/p/DdpaAWiMwmD/",
-    "title": "Guardado visual #298",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Técnica vocal: cantar agudos sin forzar la voz",
+    "summary": "Desactiva el reflejo de empuje buscando primero resonancia frontal nasal y oral, y trasládala luego a la letra para lograr agudos con proyección sin tensión.",
+    "category": "otros",
+    "tags": [
+      "canto",
+      "tecnica-vocal",
+      "resonancia"
+    ]
   },
   {
     "id": "ig-DdpdXBoO0nn",
     "index": 299,
     "url": "https://www.instagram.com/p/DdpdXBoO0nn/",
-    "title": "Guardado visual #299",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Hábitos clave para debatir y argumentar mejor",
+    "summary": "Evalúa tus hábitos de comunicación y pensamiento crítico al discutir temas difíciles para debatir con claridad, respeto y argumentos sólidos.",
+    "category": "oratoria",
+    "tags": [
+      "debate",
+      "comunicacion",
+      "argumentacion"
+    ]
   },
   {
     "id": "ig-DdmfGhOv0qJ",
@@ -3497,19 +3618,27 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdpYMeSJGAn",
     "index": 301,
     "url": "https://www.instagram.com/p/DdpYMeSJGAn/",
-    "title": "Guardado visual #301",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo responder preguntas incómodas sin dar detalles",
+    "summary": "Evita alimentar preguntas incómodas entregando información de más; usa la comunicación estratégica para redirigir la conversación con control.",
+    "category": "oratoria",
+    "tags": [
+      "comunicacion",
+      "estrategia",
+      "negociacion"
+    ]
   },
   {
     "id": "ig-DdpLEOfsdzE",
     "index": 302,
     "url": "https://www.instagram.com/p/DdpLEOfsdzE/",
-    "title": "Guardado visual #302",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Por qué buscamos la aprobación de todos",
+    "summary": "Comprende el origen psicológico del miedo al rechazo social y por qué la necesidad constante de agradar genera ansiedad.",
+    "category": "bienestar",
+    "tags": [
+      "psicologia",
+      "aprobacion",
+      "ansiedad"
+    ]
   },
   {
     "id": "ig-Dc3_BHzDzsH",
@@ -3527,67 +3656,92 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdhNynryiCO",
     "index": 304,
     "url": "https://www.instagram.com/p/DdhNynryiCO/",
-    "title": "زنگ تفریح با پیانو 🤍",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "visual",
+    "title": "Tutorial fácil en piano: melodía de La La Land",
+    "summary": "Aprende la secuencia numérica sencilla (1-3-4-5-4-3-2) sobre las teclas marcadas para tocar el tema de La La Land en piano.",
+    "category": "ocio",
     "tags": [
-      "visual",
-      "habitos"
+      "piano",
+      "musica",
+      "tutorial"
     ]
   },
   {
     "id": "ig-DdkLyJ7Rm0O",
     "index": 305,
     "url": "https://www.instagram.com/p/DdkLyJ7Rm0O/",
-    "title": "Guardado visual #305",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Actúa como la persona en la que te quieres convertir",
+    "summary": "Adopta deliberadamente la mentalidad, postura y hábitos de tu versión ideal hasta que ese comportamiento se vuelva tu nueva identidad.",
+    "category": "mentalidad",
+    "tags": [
+      "mentalidad",
+      "identidad",
+      "desarrollo"
+    ]
   },
   {
     "id": "ig-DdkTW1Qsi1t",
     "index": 306,
     "url": "https://www.instagram.com/p/DdkTW1Qsi1t/",
-    "title": "Guardado visual #306",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Reflexión para no tomarte las cosas tan en serio",
+    "summary": "Recuerda relativizar las situaciones cotidianas y evitar tomarte todo tan en serio para reducir la presión mental.",
+    "category": "mentalidad",
+    "tags": [
+      "mentalidad",
+      "perspectiva",
+      "calma"
+    ]
   },
   {
     "id": "ig-DdkiqpOjcrY",
     "index": 307,
     "url": "https://www.instagram.com/p/DdkiqpOjcrY/",
-    "title": "Guardado visual #307",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Persuasión en ventas: apela a las creencias del cliente",
+    "summary": "Las personas actúan según sus propias conclusiones; en ventas y persuasión, enfócate en ayudar al otro con lo que es importante para él, no para ti.",
+    "category": "carrera",
+    "tags": [
+      "ventas",
+      "persuasion",
+      "comunicacion"
+    ]
   },
   {
     "id": "ig-Ddk2zhhTyPx",
     "index": 308,
     "url": "https://www.instagram.com/p/Ddk2zhhTyPx/",
-    "title": "Guardado visual #308",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Autocrítica: reconoce cuándo no das tu 100%",
+    "summary": "Reflexión directa sobre la honestidad personal: evalúa con sinceridad si realmente te estás esforzando al máximo en tus metas.",
+    "category": "mentalidad",
+    "tags": [
+      "esfuerzo",
+      "disciplina",
+      "mentalidad"
+    ]
   },
   {
     "id": "ig-DdkRkAOunUh",
     "index": 309,
     "url": "https://www.instagram.com/p/DdkRkAOunUh/",
-    "title": "Guardado visual #309",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Mejores preguntas para detectar la raíz de la procrastinación",
+    "summary": "Cambia el 'por qué procrastino' por preguntas más profundas sobre qué temes al empezar; así identificas creencias limitantes como el miedo a no ser suficiente.",
+    "category": "mentalidad",
+    "tags": [
+      "procrastinacion",
+      "introspeccion",
+      "metas"
+    ]
   },
   {
     "id": "ig-DdKwtfTR3U3",
     "index": 310,
     "url": "https://www.instagram.com/p/DdKwtfTR3U3/",
-    "title": "Guardado visual #310",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Reto visual del 1 al 36 para entrenar enfoque y agilidad",
+    "summary": "Ejercita tu concentración, búsqueda de patrones y velocidad mental encontrando los números del 1 al 36 en orden contrarreloj.",
+    "category": "bienestar",
+    "tags": [
+      "enfoque",
+      "concentracion",
+      "agilidad-mental"
+    ]
   },
   {
     "id": "ig-DdkWWrfRQVE",
@@ -3617,19 +3771,27 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdDKghAMxOG",
     "index": 313,
     "url": "https://www.instagram.com/p/DdDKghAMxOG/",
-    "title": "Guardado visual #313",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Preguntas directas para aclarar interés en una cita o plan",
+    "summary": "Evita malentendidos preguntando con claridad si la otra persona tiene pareja o si realmente le interesa el plan que propones.",
+    "category": "otros",
+    "tags": [
+      "relaciones",
+      "comunicacion",
+      "citas"
+    ]
   },
   {
     "id": "ig-DdjJJyTslyj",
     "index": 314,
     "url": "https://www.instagram.com/p/DdjJJyTslyj/",
-    "title": "Guardado visual #314",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Agent Skills: estructura el desarrollo con IA como un senior",
+    "summary": "Organiza el trabajo de agentes de IA con Agent Skills (Addy Osmani) en 3 etapas: planificación, desarrollo con pruebas y revisión antes de lanzar, reduciendo errores.",
+    "category": "tech",
+    "tags": [
+      "ia",
+      "agent-skills",
+      "programacion"
+    ]
   },
   {
     "id": "ig-DdkEdF4MUs-",
@@ -3941,12 +4103,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdZO_rNxLL_",
     "index": 340,
     "url": "https://www.instagram.com/p/DdZO_rNxLL_/",
-    "title": "Visual y desarrollo efectivo",
-    "summary": "Aplica principios sistemáticos y evalúa tus resultados periódicamente para asegurar un crecimiento constante.",
-    "category": "visual",
+    "title": "8 formas silenciosas en las que impactas a los demás",
+    "summary": "Recuerda el impacto positivo invisible de tus acciones: un consejo, un buen gesto o tu forma de vivir pueden inspirar y sostener a otros sin que lo sepas.",
+    "category": "mentalidad",
     "tags": [
-      "visual",
-      "habitos"
+      "reflexion",
+      "impacto",
+      "bienestar"
     ]
   },
   {
@@ -4013,19 +4176,27 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdWiJhTx-kg",
     "index": 346,
     "url": "https://www.instagram.com/p/DdWiJhTx-kg/",
-    "title": "Guardado visual #346",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "7 hábitos al hablar que restan credibilidad e inteligencia",
+    "summary": "Identifica y corrige siete comportamientos verbales y comunicativos que perjudican cómo te perciben los demás al hablar.",
+    "category": "oratoria",
+    "tags": [
+      "oratoria",
+      "comunicacion",
+      "presencia"
+    ]
   },
   {
     "id": "ig-DdXXZ80Osmd",
     "index": 347,
     "url": "https://www.instagram.com/p/DdXXZ80Osmd/",
-    "title": "Guardado visual #347",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Fórmula para lograr metas: acción, fallo, ajuste y flexibilidad",
+    "summary": "Itera hacia tus objetivos con agudeza sensorial y flexibilidad: ejecuta una acción, usa el fallo como información, ajusta la estrategia y vuelve a intentar.",
+    "category": "mentalidad",
+    "tags": [
+      "metas",
+      "iteracion",
+      "mentalidad"
+    ]
   },
   {
     "id": "ig-DbBsENfsHAl",
@@ -4139,10 +4310,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdRThRDkXlE",
     "index": 357,
     "url": "https://www.instagram.com/p/DdRThRDkXlE/",
-    "title": "Guardado visual #357",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Buenas prácticas al programar con agentes de IA",
+    "summary": "Evita prompts vagos y chats mezclados; separa contextos, usa archivos AGENTS.md o CLAUDE.md, skills reutilizables y revisa siempre el diff antes de aceptar cambios.",
+    "category": "tech",
+    "tags": [
+      "agentes-ia",
+      "prompting",
+      "programacion"
+    ]
   },
   {
     "id": "ig-DbKN43DtUj6",
@@ -4328,19 +4503,27 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdOobOIOVFP",
     "index": 373,
     "url": "https://www.instagram.com/p/DdOobOIOVFP/",
-    "title": "Ya era hora…",
-    "summary": "Ya era hora…",
-    "category": "visual",
-    "tags": []
+    "title": "Hackea el sistema: reflexión breve de cambio de vida",
+    "summary": "Clip breve de mentalidad sobre salir del molde y replantear tu estilo de vida (requiere ver el video completo para el mensaje íntegro).",
+    "category": "mentalidad",
+    "tags": [
+      "mentalidad",
+      "motivacion",
+      "cambio"
+    ]
   },
   {
     "id": "ig-DdOG0kNBiUF",
     "index": 374,
     "url": "https://www.instagram.com/p/DdOG0kNBiUF/",
-    "title": "Guardado visual #374",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Gameplay y personajes de Touhou Project (bullet hell)",
+    "summary": "Video de entretenimiento y gaming con escenas de lluvia de balas (danmaku) e ilustraciones de Reimu y Sakuya de Touhou Project.",
+    "category": "ocio",
+    "tags": [
+      "gaming",
+      "touhou",
+      "anime"
+    ]
   },
   {
     "id": "ig-DdOo-X2Mn6P",
@@ -4370,12 +4553,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdIyZS3xP-f",
     "index": 377,
     "url": "https://www.instagram.com/p/DdIyZS3xP-f/",
-    "title": "Sígueme para mejorar tu vida a través de la verdad",
-    "summary": "Sígueme para mejorar tu vida a través de la verdad",
-    "category": "visual",
+    "title": "Cómo interpretar las críticas y que hablen a tus espaldas",
+    "summary": "Replantea el miedo a la crítica: generar comentarios a tus espaldas suele ser señal de relevancia y visibilidad frente a los demás.",
+    "category": "mentalidad",
     "tags": [
-      "growth",
-      "visual"
+      "mentalidad",
+      "critica",
+      "resiliencia"
     ]
   },
   {
@@ -4694,12 +4878,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdIM4_bNQF0",
     "index": 404,
     "url": "https://www.instagram.com/p/DdIM4_bNQF0/",
-    "title": "Comenta “Speaker9” y te envío toda la información para una semana",
-    "summary": "ónefectiva",
-    "category": "visual",
+    "title": "3 gestos corporales que debes cuidar al hablar en público",
+    "summary": "Cuida tu lenguaje no verbal —como señalar con el dedo, la postura al sentarte y la posición de las manos— para proyectar seguridad al hablar en público.",
+    "category": "oratoria",
     "tags": [
-      "growth",
-      "visual"
+      "oratoria",
+      "lenguaje-corporal",
+      "comunicacion"
     ]
   },
   {
@@ -4862,11 +5047,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DdCRH1OTVEG",
     "index": 418,
     "url": "https://www.instagram.com/p/DdCRH1OTVEG/",
-    "title": "Guardado visual #418",
-    "summary": "trans",
-    "category": "visual",
+    "title": "Técnica vocal rápida: cómo reducir el peso vocal",
+    "summary": "Demostración práctica de entrenamiento vocal enfocada en disminuir el peso vocal para lograr una voz más ligera y femenina.",
+    "category": "otros",
     "tags": [
-      "trans"
+      "voz",
+      "tecnica-vocal",
+      "entrenamiento"
     ]
   },
   {
@@ -5161,10 +5348,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dc4COlIoH-L",
     "index": 443,
     "url": "https://www.instagram.com/p/Dc4COlIoH-L/",
-    "title": "Guardado visual #443",
-    "summary": "hazlos.",
-    "category": "visual",
-    "tags": []
+    "title": "10 trucos ocultos para ganar en la vida",
+    "summary": "Lista de diez hábitos y principios prácticos de mentalidad para mejorar tus resultados y avanzar con ventaja en la vida.",
+    "category": "mentalidad",
+    "tags": [
+      "mentalidad",
+      "habitos"
+    ]
   },
   {
     "id": "ig-Dc7M2f4gptG",
@@ -5350,13 +5540,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dbs_wrvOFw8",
     "index": 458,
     "url": "https://www.instagram.com/p/Dbs_wrvOFw8/",
-    "title": "Manualidades y creación DIY paso a paso",
-    "summary": "Proceso artesanal manual enfocado en la relajación sensorial y el diseño visual.",
-    "category": "visual",
+    "title": "Cómo hacer una rosa de papel paso a paso",
+    "summary": "Tutorial visual de papiroflexia para doblar y armar una rosa decorativa en papel de forma sencilla.",
+    "category": "ocio",
     "tags": [
       "manualidades",
-      "diy",
-      "creatividad"
+      "origami"
     ]
   },
   {
@@ -5466,22 +5655,24 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dc30pKBupT4",
     "index": 467,
     "url": "https://www.instagram.com/p/Dc30pKBupT4/",
-    "title": "Guardado visual #467",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo responder sin incomodar en una conversación",
+    "summary": "Consejo de comunicación para evitar respuestas reactivas cuando alguien te hace una pregunta incómoda.",
+    "category": "oratoria",
+    "tags": [
+      "comunicacion",
+      "respuestas"
+    ]
   },
   {
     "id": "ig-Dc7iXP6g0PC",
     "index": 468,
     "url": "https://www.instagram.com/p/Dc7iXP6g0PC/",
-    "title": "Elimina excusas y pasa a la acción",
-    "summary": "Identifica las barreras mentales que retrasan tus tareas y adopta una mentalidad de ejecución directa.",
-    "category": "visual",
+    "title": "Deja las excusas y pasa a la acción",
+    "summary": "Reflexión breve sobre dejar de postergar con excusas y enfocarte en las razones para ejecutar tus pendientes.",
+    "category": "mentalidad",
     "tags": [
-      "accion",
-      "excusas",
-      "enfoque"
+      "mentalidad",
+      "accion"
     ]
   },
   {
@@ -5575,13 +5766,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dbn_SeCu5zE",
     "index": 476,
     "url": "https://www.instagram.com/p/Dbn_SeCu5zE/",
-    "title": "Inspiración visual y estética urbana",
-    "summary": "Recopilación de imágenes y momentos con enfoque estético y atmosférico.",
-    "category": "visual",
+    "title": "La actitud de la gente feliz siempre anima",
+    "summary": "Recordatorio emocional sobre cómo las personas alegres y cercanas contagian buena energía y animan a quienes las rodean.",
+    "category": "bienestar",
     "tags": [
-      "inspo",
-      "visual",
-      "estetica"
+      "actitud",
+      "bienestar"
     ]
   },
   {
@@ -5809,10 +5999,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbrsGfrR7PN",
     "index": 494,
     "url": "https://www.instagram.com/p/DbrsGfrR7PN/",
-    "title": "Anota esto",
-    "summary": "Anota esto",
-    "category": "visual",
-    "tags": []
+    "title": "Mejora tu vocabulario con expresiones más elegantes",
+    "summary": "Reemplaza frases comunes por alternativas más corteses y precisas, como decir \"me agrada\", \"un placer\" o \"cuéntame\".",
+    "category": "oratoria",
+    "tags": [
+      "vocabulario",
+      "oratoria"
+    ]
   },
   {
     "id": "ig-Dc2dbKCtbFN",
@@ -5844,10 +6037,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dc3qJqItuHo",
     "index": 497,
     "url": "https://www.instagram.com/p/Dc3qJqItuHo/",
-    "title": "Guardado visual #497",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Reflexión sobre la inteligencia y la perspectiva",
+    "summary": "Análisis breve de Ramiro Contenido sobre cómo cambia la forma de pensar y actuar a medida que desarrollas tu inteligencia.",
+    "category": "mentalidad",
+    "tags": [
+      "inteligencia",
+      "reflexion"
+    ]
   },
   {
     "id": "ig-Dap6r0wuoMa",
@@ -5931,10 +6127,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dc1RsKSxXoQ",
     "index": 504,
     "url": "https://www.instagram.com/p/Dc1RsKSxXoQ/",
-    "title": "Guardado visual #504",
-    "summary": "👌🏼",
-    "category": "visual",
-    "tags": []
+    "title": "Criterios personales al elegir pareja",
+    "summary": "Lista de advertencias subjetivas sobre dinámicas y perfiles que el autor recomienda evitar al buscar una relación estable.",
+    "category": "otros",
+    "tags": [
+      "relaciones",
+      "citas"
+    ]
   },
   {
     "id": "ig-Dc1m1GVID0u",
@@ -5992,10 +6191,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcVa_Rig0eH",
     "index": 509,
     "url": "https://www.instagram.com/p/DcVa_Rig0eH/",
-    "title": "Guardado visual #509",
-    "summary": "🫣",
-    "category": "visual",
-    "tags": []
+    "title": "Descenso en bicicleta por escaleras urbanas",
+    "summary": "Video en primera persona de ciclismo urbano bajando escaleras estrechas acompañado de una opinión breve.",
+    "category": "ocio",
+    "tags": [
+      "ciclismo",
+      "deporte"
+    ]
   },
   {
     "id": "ig-Dc2QhjZTsYS",
@@ -6040,13 +6242,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dc0TqdPOGFi",
     "index": 513,
     "url": "https://www.instagram.com/p/Dc0TqdPOGFi/",
-    "title": "Proceso creativo y dirección de arte visual",
-    "summary": "Exploración de la dirección creativa y el diseño visual como expresión artística sin encasillamientos.",
-    "category": "visual",
+    "title": "El artista que decide no encasillarse",
+    "summary": "Reflexión visual sobre evitar las etiquetas creativas, explorar múltiples disciplinas y mantener la mente abierta al crear.",
+    "category": "mentalidad",
     "tags": [
-      "arte",
-      "discrecion",
-      "creativo"
+      "creatividad",
+      "arte"
     ]
   },
   {
@@ -6105,10 +6306,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dczod-3OVBB",
     "index": 518,
     "url": "https://www.instagram.com/p/Dczod-3OVBB/",
-    "title": "Sé un hombre",
-    "summary": "Sé un hombre.",
-    "category": "visual",
-    "tags": []
+    "title": "Lenguaje corporal y postura según la madurez",
+    "summary": "Comparativa visual de postura y presencia al estar de pie entre las actitudes de niño, adolescente y hombre.",
+    "category": "otros",
+    "tags": [
+      "postura",
+      "presencia"
+    ]
   },
   {
     "id": "ig-DcgowVJqKBN",
@@ -6283,10 +6487,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcmuXDssh8u",
     "index": 532,
     "url": "https://www.instagram.com/p/DcmuXDssh8u/",
-    "title": "Seguime 🙃",
-    "summary": "Seguime 🙃",
-    "category": "visual",
-    "tags": []
+    "title": "Organiza tu vida con un solo cuaderno",
+    "summary": "Método rápido para centralizar pendientes, ideas y prioridades diarias usando únicamente un cuaderno físico.",
+    "category": "estudio",
+    "tags": [
+      "organizacion",
+      "productividad"
+    ]
   },
   {
     "id": "ig-DcCPW-rAwFq",
@@ -6509,20 +6716,24 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcjcOTURHJI",
     "index": 550,
     "url": "https://www.instagram.com/p/DcjcOTURHJI/",
-    "title": "Guardado visual #550",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "10 razones por las que no te respetan",
+    "summary": "Señala conductas cotidianas que debilitan tu autoridad y explica cómo proyectar límites claros para ganar respeto.",
+    "category": "mentalidad",
+    "tags": [
+      "respeto",
+      "limites"
+    ]
   },
   {
     "id": "ig-DckFkDpOq39",
     "index": 551,
     "url": "https://www.instagram.com/p/DckFkDpOq39/",
-    "title": "Un buen huesped",
-    "summary": "Un buen huesped.",
-    "category": "visual",
+    "title": "Cómo comportarte con clase en un hotel",
+    "summary": "Consejos de etiqueta y orden al hospedarte en un hotel, empezando por no desordenar la habitación al llegar.",
+    "category": "otros",
     "tags": [
-      "visual"
+      "etiqueta",
+      "viajes"
     ]
   },
   {
@@ -6576,11 +6787,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DccjDUMRozq",
     "index": 556,
     "url": "https://www.instagram.com/p/DccjDUMRozq/",
-    "title": "Guardado visual #556",
-    "summary": "soldering",
-    "category": "visual",
+    "title": "Soldadura de cables en placa electrónica (PCB)",
+    "summary": "Demostración práctica de soldadura limpia de cables LED en los pines de una placa de circuito impreso.",
+    "category": "tech",
     "tags": [
-      "soldering"
+      "electronica",
+      "soldadura"
     ]
   },
   {
@@ -6834,10 +7046,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcWx8ckNAo7",
     "index": 578,
     "url": "https://www.instagram.com/p/DcWx8ckNAo7/",
-    "title": "Guardado visual #578",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "12 reflexiones de desarrollo personal y relaciones",
+    "summary": "Lista de doce puntos sobre crecimiento interior, espiritualidad y vínculos humanos presentada por Felipe Vidal.",
+    "category": "mentalidad",
+    "tags": [
+      "espiritualidad",
+      "relaciones"
+    ]
   },
   {
     "id": "ig-DbulvDxuKNE",
@@ -6925,11 +7140,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcXBn1hRqRe",
     "index": 586,
     "url": "https://www.instagram.com/p/DcXBn1hRqRe/",
-    "title": "Asesoría Visagista SB",
-    "summary": "Asesoría Visagista SB . . .",
-    "category": "visual",
+    "title": "Asesoría de visagismo y corte según tipo de rostro",
+    "summary": "Análisis de rasgos faciales para recomendar el corte de cabello y estilo de barba que mejor armonizan con el rostro.",
+    "category": "otros",
     "tags": [
-      "visual"
+      "visagismo",
+      "estilo"
     ]
   },
   {
@@ -7030,10 +7246,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DcG-YHjCuLr",
     "index": 595,
     "url": "https://www.instagram.com/p/DcG-YHjCuLr/",
-    "title": "Guardado visual #595",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Clip breve sin contexto visual (bynachetee)",
+    "summary": "Video con fondo negro y subtítulos parciales (\"mañana, me ha hecho?\") cuyo mensaje completo depende del audio.",
+    "category": "otros",
+    "tags": [
+      "clip",
+      "audio"
+    ]
   },
   {
     "id": "ig-DcCZAmMPy4W",
@@ -7050,11 +7269,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Db6HYGztVC4",
     "index": 597,
     "url": "https://www.instagram.com/p/Db6HYGztVC4/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
-    "category": "visual",
+    "title": "7 tips para controlar tu mente y no sobrepensar",
+    "summary": "Estrategias prácticas para manejar pensamientos intrusivos; el primer paso es verbalizar lo que te preocupa para quitarle fuerza.",
+    "category": "mentalidad",
     "tags": [
-      "visual"
+      "mentalidad",
+      "autocontrol"
     ]
   },
   {
@@ -7198,11 +7418,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dbi3pXuthiS",
     "index": 610,
     "url": "https://www.instagram.com/p/Dbi3pXuthiS/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
-    "category": "visual",
+    "title": "Hábitos de quienes alcanzan sus objetivos vs. quienes abandonan",
+    "summary": "Comparativa de 8 hábitos clave: hacer lo difícil primero y buscar mejora constante frente a rendirse ante la dificultad.",
+    "category": "mentalidad",
     "tags": [
-      "visual"
+      "habitos",
+      "objetivos"
     ]
   },
   {
@@ -7255,10 +7476,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dbgrda8Qs_8",
     "index": 615,
     "url": "https://www.instagram.com/p/Dbgrda8Qs_8/",
-    "title": "Guardado visual #615",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Estar ocupado no es sanar, es evitar el problema",
+    "summary": "Si solo estás bien cuando te mantienes ocupado, estás distrayéndote; lo no resuelto se acumula hasta quebrarte.",
+    "category": "bienestar",
+    "tags": [
+      "sanacion",
+      "emociones"
+    ]
   },
   {
     "id": "ig-Dber0MwOH7A",
@@ -7389,11 +7613,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbMiGRHsYxd",
     "index": 627,
     "url": "https://www.instagram.com/p/DbMiGRHsYxd/",
-    "title": "Yo sé que si",
-    "summary": "Yo sé que si",
-    "category": "visual",
+    "title": "Cuando alguien que te interesa deja de responder",
+    "summary": "Video humorístico y cotidiano sobre la experiencia de conversar por mensajes con alguien que te interesa y recibir silencio repentino.",
+    "category": "otros",
     "tags": [
-      "visual"
+      "mensajes",
+      "relaciones"
     ]
   },
   {
@@ -7412,19 +7637,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbZkT0CvU7g",
     "index": 629,
     "url": "https://www.instagram.com/p/DbZkT0CvU7g/",
-    "title": "Guardado visual #629",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Anécdota breve o sketch de Abraham Zarazúa",
+    "summary": "Clip corto hablado a cámara con tono de humor o anécdota rápida (\"y Mario bebe morirás\").",
+    "category": "ocio",
+    "tags": [
+      "humor",
+      "clip"
+    ]
   },
   {
     "id": "ig-DbY--2dRbvC",
     "index": 630,
     "url": "https://www.instagram.com/p/DbY--2dRbvC/",
-    "title": "Guardado visual #630",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "La nostalgia miente: recuerda toda la historia",
+    "summary": "No vuelvas con alguien solo por idealizar los buenos momentos; recuerda también las heridas y promesas rotas antes de decidir.",
+    "category": "bienestar",
+    "tags": [
+      "desamor",
+      "bienestar"
+    ]
   },
   {
     "id": "ig-DbYvs3yRuoP",
@@ -7476,21 +7707,27 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbEjQkgNYa2",
     "index": 635,
     "url": "https://www.instagram.com/p/DbEjQkgNYa2/",
-    "title": "Idea clave",
-    "summary": "Concepto práctico extraído de redes sociales.",
-    "category": "visual",
+    "title": "5 formas de recuperar tu dopamina",
+    "summary": "Resetea tu sistema de recompensa reduciendo la sobreestimulación diaria, empezando por hábitos simples como caminar sin auriculares.",
+    "category": "bienestar",
     "tags": [
-      "visual"
+      "dopamina",
+      "habitos",
+      "bienestar"
     ]
   },
   {
     "id": "ig-DbY9YCWPvnG",
     "index": 636,
     "url": "https://www.instagram.com/p/DbY9YCWPvnG/",
-    "title": "Guardado visual #636",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Ranking de músculos según dificultad para crecer",
+    "summary": "Clasifica los grupos musculares por facilidad de hipertrofia: desde glúteos y hombros hasta pantorrillas y antebrazos, para priorizar tu entrenamiento.",
+    "category": "bienestar",
+    "tags": [
+      "gym",
+      "hipertrofia",
+      "entrenamiento"
+    ]
   },
   {
     "id": "ig-DbYm4S_RBej",
@@ -7508,20 +7745,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbbCl76tu0x",
     "index": 638,
     "url": "https://www.instagram.com/p/DbbCl76tu0x/",
-    "title": "To the moon",
-    "summary": "To the moon",
-    "category": "visual",
-    "tags": []
+    "title": "5 hábitos clave si realmente quieres cambiar",
+    "summary": "El cambio real empieza por decisiones básicas de disciplina diaria, comenzando por acostarte temprano para mejorar tu descanso y energía.",
+    "category": "mentalidad",
+    "tags": [
+      "habitos",
+      "disciplina",
+      "cambio"
+    ]
   },
   {
     "id": "ig-DbTy0-ouxUG",
     "index": 639,
     "url": "https://www.instagram.com/p/DbTy0-ouxUG/",
-    "title": "QUE",
-    "summary": "QUE",
-    "category": "visual",
+    "title": "Clip de stream reaccionando a estiramientos 3D",
+    "summary": "Clip humorístico de transmisión en Kick donde el creador reacciona sorprendido a una animación anatómica de estiramientos en la cama.",
+    "category": "ocio",
     "tags": [
-      "visual"
+      "clips",
+      "stream",
+      "humor"
     ]
   },
   {
@@ -7597,11 +7840,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbZTKYpBxaT",
     "index": 646,
     "url": "https://www.instagram.com/p/DbZTKYpBxaT/",
-    "title": "nochesblancas",
-    "summary": "nochesblancas",
-    "category": "visual",
+    "title": "Storytelling sobre Noches Blancas y desamor",
+    "summary": "Relato reflexivo inspirado en Noches Blancas sobre pasar tiempo consolando a alguien por el dolor que le causó otra persona.",
+    "category": "ocio",
     "tags": [
-      "nochesblancas"
+      "storytelling",
+      "literatura",
+      "reflexion"
     ]
   },
   {
@@ -7631,21 +7876,27 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbDAgfaIrcF",
     "index": 649,
     "url": "https://www.instagram.com/p/DbDAgfaIrcF/",
-    "title": "Si quieres conseguir un físico estético de verdad deja de centrar",
-    "summary": "Si quieres conseguir un físico estético de verdad deja de centrarte solo en el abdomen",
-    "category": "visual",
+    "title": "Cómo lograr un físico estético más allá del abdomen",
+    "summary": "Para conseguir una estética equilibrada, no te limites a entrenar abdominales; trabaja las proporciones de cintura, hombros y espalda.",
+    "category": "bienestar",
     "tags": [
-      "visual"
+      "fitness",
+      "estetica",
+      "entrenamiento"
     ]
   },
   {
     "id": "ig-DbZZxtOp5RK",
     "index": 650,
     "url": "https://www.instagram.com/p/DbZZxtOp5RK/",
-    "title": "Has madurado?",
-    "summary": "Has madurado?",
-    "category": "visual",
-    "tags": []
+    "title": "6 señales claras de madurez personal",
+    "summary": "Evalúa tu crecimiento personal observando conductas clave como predicar con el ejemplo y saber poner límites en tu entorno.",
+    "category": "mentalidad",
+    "tags": [
+      "madurez",
+      "desarrollo",
+      "mentalidad"
+    ]
   },
   {
     "id": "ig-DbZKqzuPnJx",
@@ -7662,190 +7913,270 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbZbHqWub-_",
     "index": 652,
     "url": "https://www.instagram.com/p/DbZbHqWub-_/",
-    "title": "Guardado visual #652",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Desapégate de la opinión ajena para ser feliz",
+    "summary": "Prioriza tu bienestar y autenticidad dejando de buscar validación externa o temer a lo que opinen los demás sobre tus decisiones.",
+    "category": "mentalidad",
+    "tags": [
+      "mentalidad",
+      "autoestima",
+      "autenticidad"
+    ]
   },
   {
     "id": "ig-DbUZOFTiHEI",
     "index": 653,
     "url": "https://www.instagram.com/p/DbUZOFTiHEI/",
-    "title": "Guardado visual #653",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Día 15 optimizando el sueño: 3 mejores hábitos",
+    "summary": "Aplica los tres hábitos clave para mejorar la calidad del descanso nocturno, incluyendo lectura previa y regulación de luz.",
+    "category": "bienestar",
+    "tags": [
+      "sueno",
+      "habitos",
+      "salud"
+    ]
   },
   {
     "id": "ig-DXs73E6ABYU",
     "index": 654,
     "url": "https://www.instagram.com/p/DXs73E6ABYU/",
-    "title": "Guardado visual #654",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Resiliencia olímpica: el arte de perder y volver",
+    "summary": "La historia de Óscar Figueroa demuestra que una derrota o lesión grave no define tu carrera si mantienes la constancia hasta alcanzar tu meta.",
+    "category": "mentalidad",
+    "tags": [
+      "resiliencia",
+      "mentalidad",
+      "deporte"
+    ]
   },
   {
     "id": "ig-DbRrbDotLJM",
     "index": 655,
     "url": "https://www.instagram.com/p/DbRrbDotLJM/",
-    "title": "Guardado visual #655",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cuida tu mente y valores tanto como tu físico",
+    "summary": "Entrenar el cuerpo es valioso, pero cultivar tu estabilidad emocional, integridad y valores personales resulta igual de atractivo y esencial.",
+    "category": "mentalidad",
+    "tags": [
+      "valores",
+      "integridad",
+      "desarrollo"
+    ]
   },
   {
     "id": "ig-DbTK7h8K0hY",
     "index": 656,
     "url": "https://www.instagram.com/p/DbTK7h8K0hY/",
-    "title": "Guardado visual #656",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Fórmula práctica para construir confianza en ti",
+    "summary": "Tu autoconfianza crece cuando aumentas la proporción de promesas personales que te cumples frente a las que dejas sin hacer.",
+    "category": "mentalidad",
+    "tags": [
+      "confianza",
+      "disciplina",
+      "habitos"
+    ]
   },
   {
     "id": "ig-DbT_Eg3BreL",
     "index": 657,
     "url": "https://www.instagram.com/p/DbT_Eg3BreL/",
-    "title": "Guardado visual #657",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Por qué el sentido del humor impulsa tu éxito",
+    "summary": "Reflexión de desarrollo personal sobre cómo el humor y la ligereza social favorecen mejores conexiones y resultados en la vida.",
+    "category": "mentalidad",
+    "tags": [
+      "carisma",
+      "humor",
+      "desarrollo"
+    ]
   },
   {
     "id": "ig-DbTepgUKZhA",
     "index": 658,
     "url": "https://www.instagram.com/p/DbTepgUKZhA/",
-    "title": "Guardado visual #658",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Lo valioso en la vida más allá de la suerte",
+    "summary": "Reflexión visual sobre construir una vida significativa paso a paso en lugar de esperar golpes de suerte como ganar la lotería.",
+    "category": "mentalidad",
+    "tags": [
+      "reflexion",
+      "proposito",
+      "vida"
+    ]
   },
   {
     "id": "ig-DbUgQxNAJM4",
     "index": 659,
     "url": "https://www.instagram.com/p/DbUgQxNAJM4/",
-    "title": "Guardado visual #659",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "El amor sano no debería sentirse como desgaste",
+    "summary": "Reflexión sobre vínculos y reciprocidad: si alguien dice tener interés pero sus acciones generan duda, replantea lo que aceptas.",
+    "category": "mentalidad",
+    "tags": [
+      "relaciones",
+      "reflexion",
+      "amor"
+    ]
   },
   {
     "id": "ig-DbUMjTSArXw",
     "index": 660,
     "url": "https://www.instagram.com/p/DbUMjTSArXw/",
-    "title": "Guardado visual #660",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Por qué importa el orden de reglas en .gitignore",
+    "summary": "Organiza correctamente las reglas y excepciones (!) dentro de .gitignore, ya que Git evalúa los patrones en orden y un mal acomodo expone archivos.",
+    "category": "tech",
+    "tags": [
+      "git",
+      "gitignore",
+      "programacion"
+    ]
   },
   {
     "id": "ig-DbR_fj3OCqe",
     "index": 661,
     "url": "https://www.instagram.com/p/DbR_fj3OCqe/",
-    "title": "Guardado visual #661",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Reto de cambio físico en 30 días de ejercicio",
+    "summary": "Documenta la evolución corporal en un mes de entrenamiento constante para demostrar el impacto de la disciplina diaria a corto plazo.",
+    "category": "bienestar",
+    "tags": [
+      "fitness",
+      "reto",
+      "ejercicio"
+    ]
   },
   {
     "id": "ig-DbDvtSbAZ6R",
     "index": 662,
     "url": "https://www.instagram.com/p/DbDvtSbAZ6R/",
-    "title": "Guardado visual #662",
-    "summary": "Video",
-    "category": "visual",
-    "tags": []
+    "title": "Tarjeta web interactiva con ramo de flores digital",
+    "summary": "Experiencia web minimalista donde al abrir un sobre digital se despliega un ramo animado de flores como detalle creativo para regalar.",
+    "category": "otros",
+    "tags": [
+      "web",
+      "flores",
+      "detalle"
+    ]
   },
   {
     "id": "ig-DbPPOscTOgD",
     "index": 663,
     "url": "https://www.instagram.com/p/DbPPOscTOgD/",
-    "title": "Guardado visual #663",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "5 hábitos para aprender a programar más rápido",
+    "summary": "Acelera tu aprendizaje tomando apuntes propios y diagramas, dividiendo proyectos en pasos pequeños, dominando fundamentos y explicando lo aprendido.",
+    "category": "estudio",
+    "tags": [
+      "estudio",
+      "programacion",
+      "habitos"
+    ]
   },
   {
     "id": "ig-DbPsxZuO-7o",
     "index": 664,
     "url": "https://www.instagram.com/p/DbPsxZuO-7o/",
-    "title": "Guardado visual #664",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "La perspectiva: valora lo cotidiano antes de perderlo",
+    "summary": "Reflexión sobre dejar de dar por sentados los momentos y personas cotidianas, ya que la perspectiva cambia por completo cuando llegan a faltar.",
+    "category": "mentalidad",
+    "tags": [
+      "gratitud",
+      "perspectiva",
+      "reflexion"
+    ]
   },
   {
     "id": "ig-Dade_uCRlsp",
     "index": 665,
     "url": "https://www.instagram.com/p/Dade_uCRlsp/",
-    "title": "Guardado visual #665",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Esencialismo: dejar ir para hacer espacio a lo nuevo",
+    "summary": "Suelta objetos, hábitos o cargas que guardas 'por si acaso'; elegir dejar ir libera espacio mental y abre paso a nuevas oportunidades.",
+    "category": "mentalidad",
+    "tags": [
+      "esencialismo",
+      "soltar",
+      "reflexion"
+    ]
   },
   {
     "id": "ig-DaMB2l1thc9",
     "index": 666,
     "url": "https://www.instagram.com/p/DaMB2l1thc9/",
-    "title": "Guardado visual #666",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Reflexión sobre el valor de aprender a dejar ir",
+    "summary": "Videoensayo breve sobre aceptar el cierre de etapas y soltar lo que ya cumplió su ciclo para seguir avanzando con ligereza.",
+    "category": "mentalidad",
+    "tags": [
+      "reflexion",
+      "soltar",
+      "motivacion"
+    ]
   },
   {
     "id": "ig-Da-ieT-gxQN",
     "index": 667,
     "url": "https://www.instagram.com/p/Da-ieT-gxQN/",
-    "title": "Guardado visual #667",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo la postura corporal influye en el perfil facial",
+    "summary": "Evita la postura encorvada y la cabeza adelantada; la tensión constante en el cuello altera la alineación postural y el desarrollo facial a largo plazo.",
+    "category": "bienestar",
+    "tags": [
+      "postura",
+      "salud",
+      "habitos"
+    ]
   },
   {
     "id": "ig-DbJe9R2pJzB",
     "index": 668,
     "url": "https://www.instagram.com/p/DbJe9R2pJzB/",
-    "title": "Guardado visual #668",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "La diferencia entre oír música y vivirla de verdad",
+    "summary": "Reflexión audiovisual sobre conectar emocionalmente y prestar atención plena a la música en lugar de usarla solo como ruido de fondo.",
+    "category": "ocio",
+    "tags": [
+      "musica",
+      "arte",
+      "atencion"
+    ]
   },
   {
     "id": "ig-DadF6bZNFsQ",
     "index": 669,
     "url": "https://www.instagram.com/p/DadF6bZNFsQ/",
-    "title": "Guardado visual #669",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Nadie vendrá a salvarte: asume tu responsabilidad",
+    "summary": "Reflexión sobre dejar de esperar ayuda externa y asumir el control de tu progreso personal con acción propia.",
+    "category": "mentalidad",
+    "tags": [
+      "motivación",
+      "responsabilidad"
+    ]
   },
   {
     "id": "ig-DaceSVBIf_V",
     "index": 670,
     "url": "https://www.instagram.com/p/DaceSVBIf_V/",
-    "title": "Guardado visual #670",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Apuesta por ti mismo y tus objetivos",
+    "summary": "Mensaje de enfoque personal: confía en tu criterio y atrévete a apostar por tu crecimiento antes de esperar aprobación.",
+    "category": "mentalidad",
+    "tags": [
+      "motivación",
+      "autoconfianza"
+    ]
   },
   {
     "id": "ig-DZyV8rwOVO7",
     "index": 671,
     "url": "https://www.instagram.com/p/DZyV8rwOVO7/",
-    "title": "Guardado visual #671",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "¿Qué es la Capa 8 en redes y ciberseguridad?",
+    "summary": "Explicación del concepto real y humorístico de capa 8 en el modelo OSI: el usuario humano como origen frecuente de fallos.",
+    "category": "tech",
+    "tags": [
+      "ciberseguridad",
+      "redes"
+    ]
   },
   {
     "id": "ig-DbL1Wo2hqI-",
     "index": 672,
     "url": "https://www.instagram.com/p/DbL1Wo2hqI-/",
-    "title": "Guardado visual #672",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Escena emotiva de My Dress-Up Darling (Cap. 11)",
+    "summary": "Clip destacado de la relación entre Marin Kitagawa y Gojo Wakana en el episodio 11 de la primera temporada del anime.",
+    "category": "ocio",
+    "tags": [
+      "anime",
+      "entretenimiento"
+    ]
   },
   {
     "id": "ig-DbKNHB9utBV",
@@ -7963,28 +8294,37 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbJimTjulRW",
     "index": 682,
     "url": "https://www.instagram.com/p/DbJimTjulRW/",
-    "title": "Guardado visual #682",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "6 acciones prácticas para mejorar tu vida social",
+    "summary": "Pasos concretos que puedes aplicar hoy mismo para fortalecer tus relaciones y construir una vida social más activa.",
+    "category": "bienestar",
+    "tags": [
+      "vida social",
+      "relaciones"
+    ]
   },
   {
     "id": "ig-DbH4IwezyIc",
     "index": 683,
     "url": "https://www.instagram.com/p/DbH4IwezyIc/",
-    "title": "Guardado visual #683",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Hábitos básicos: aprende a cocinar y entrena",
+    "summary": "Consejos prácticos para elevar tu bienestar y autonomía diaria: cocina comida saludable y mantén una rutina de entrenamiento.",
+    "category": "bienestar",
+    "tags": [
+      "hábitos",
+      "entrenamiento"
+    ]
   },
   {
     "id": "ig-DbJcjEtP_pe",
     "index": 684,
     "url": "https://www.instagram.com/p/DbJcjEtP_pe/",
-    "title": "Guardado visual #684",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "El valor de la gratitud por lo que ya tienes",
+    "summary": "Practica la gratitud diaria por lo esencial —salud, techo, comida y personas que te apoyan— en lugar de darlo por hecho.",
+    "category": "mentalidad",
+    "tags": [
+      "gratitud",
+      "mentalidad"
+    ]
   },
   {
     "id": "ig-DYuXNI_J7cw",
@@ -8055,33 +8395,36 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbHkFtdRW6L",
     "index": 690,
     "url": "https://www.instagram.com/p/DbHkFtdRW6L/",
-    "title": "Guardado visual #690",
-    "summary": "ayuda",
-    "category": "visual",
+    "title": "Clip breve de Dilan Samuel sobre ayuda",
+    "summary": "Video corto de tono personal etiquetado con ayuda, sin contexto temático suficiente en los fotogramas para extraer una guía.",
+    "category": "otros",
     "tags": [
-      "ayuda"
+      "clip",
+      "otros"
     ]
   },
   {
     "id": "ig-DbFNxjJuVOT",
     "index": 691,
     "url": "https://www.instagram.com/p/DbFNxjJuVOT/",
-    "title": "Guardado visual #691",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Superar la timidez como habilidad clave actual",
+    "summary": "Reflexión directa sobre cómo la timidez frena oportunidades y por qué conviene trabajar la seguridad y la iniciativa social.",
+    "category": "mentalidad",
+    "tags": [
+      "timidez",
+      "confianza"
+    ]
   },
   {
     "id": "ig-DbHHPAwB9Ub",
     "index": 692,
     "url": "https://www.instagram.com/p/DbHHPAwB9Ub/",
-    "title": "Concepto visual de riesgo",
-    "summary": "Analiza composiciones visuales orientadas a transmitir sensaciones de riesgo y reto.",
-    "category": "visual",
+    "title": "Reto de riesgo en Geometry Dash",
+    "summary": "Gameplay de Geometry Dash en tramos avanzados enfocado en asumir el riesgo del nivel sin dejarte frenar por el miedo.",
+    "category": "ocio",
     "tags": [
-      "visual",
-      "arte",
-      "diseno"
+      "gaming",
+      "geometrydash"
     ]
   },
   {
@@ -8114,10 +8457,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DZYS1Z9gNIJ",
     "index": 695,
     "url": "https://www.instagram.com/p/DZYS1Z9gNIJ/",
-    "title": "Gente intensa",
-    "summary": "Gente intensa",
-    "category": "visual",
-    "tags": []
+    "title": "Reacción de Chimparoncito a video de pesca",
+    "summary": "Clip de stream comentando con humor a personas intensas mientras observa una escena de pesca y preparación en el río.",
+    "category": "ocio",
+    "tags": [
+      "stream",
+      "reacción"
+    ]
   },
   {
     "id": "ig-DbG9vXwoQ_b",
@@ -8149,10 +8495,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbE0cEBu4Qx",
     "index": 698,
     "url": "https://www.instagram.com/p/DbE0cEBu4Qx/",
-    "title": "Pinchologia",
-    "summary": "Pinchologia",
-    "category": "visual",
-    "tags": []
+    "title": "Actitud de desapego ante lo que no controlas",
+    "summary": "Consejo directo sobre practicar el desapego emocional y evitar desgastarte por problemas u opiniones que no puedes controlar.",
+    "category": "mentalidad",
+    "tags": [
+      "desapego",
+      "mentalidad"
+    ]
   },
   {
     "id": "ig-DbD_Sr7q-Ei",
@@ -8171,23 +8520,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DaeeBiLOB62",
     "index": 700,
     "url": "https://www.instagram.com/p/DaeeBiLOB62/",
-    "title": "Expresion de intensidad emocional",
-    "summary": "Explora formatos de expresion visual centrados en la intensidad de la personalidad.",
-    "category": "visual",
+    "title": "Humor sobre ser una persona intensa",
+    "summary": "Reel humorístico y cotidiano sobre la intensidad personal en gustos, gestos y situaciones del día a día.",
+    "category": "ocio",
     "tags": [
-      "visual",
-      "expresion",
-      "arte"
+      "humor",
+      "entretenimiento"
     ]
   },
   {
     "id": "ig-DbHH0HcIEAg",
     "index": 701,
     "url": "https://www.instagram.com/p/DbHH0HcIEAg/",
-    "title": "Guardado visual #701",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "La constancia confirma que vas por buen camino",
+    "summary": "Recordatorio de perseverancia: aguantar los momentos difíciles y seguir adelante indica que avanzas en la dirección correcta.",
+    "category": "mentalidad",
+    "tags": [
+      "perseverancia",
+      "disciplina"
+    ]
   },
   {
     "id": "ig-DbGsKKOvX-j",
@@ -8219,10 +8570,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbDdpsrR1Wg",
     "index": 704,
     "url": "https://www.instagram.com/p/DbDdpsrR1Wg/",
-    "title": "Guardado visual #704",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Creer antes de ver para cambiar tu realidad",
+    "summary": "Si solo crees cuando ves resultados, te condenas a repetir tu pasado; cambia tu mentalidad primero para crear algo distinto.",
+    "category": "mentalidad",
+    "tags": [
+      "mentalidad",
+      "creencias"
+    ]
   },
   {
     "id": "ig-Datd2VDRJjY",
@@ -8254,10 +8608,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DYiatjDAuvm",
     "index": 707,
     "url": "https://www.instagram.com/p/DYiatjDAuvm/",
-    "title": "Guardado visual #707",
-    "summary": "😩",
-    "category": "visual",
-    "tags": []
+    "title": "Afrontar el dolor para sanar heridas emocionales",
+    "summary": "Metáfora sobre no salir corriendo ante lo que duele: detente a entender qué te hiere para sanar en lugar de solo escapar.",
+    "category": "mentalidad",
+    "tags": [
+      "emociones",
+      "sanación"
+    ]
   },
   {
     "id": "ig-DatdmSQRm8B",
@@ -8276,10 +8633,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DbCf_MNNRu1",
     "index": 709,
     "url": "https://www.instagram.com/p/DbCf_MNNRu1/",
-    "title": "Guardado visual #709",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Motivación personal sobre metas y sueños",
+    "summary": "Charla motivacional breve centrada en el compromiso diario necesario para sostener tus metas y perseguir tus sueños.",
+    "category": "mentalidad",
+    "tags": [
+      "motivación",
+      "metas"
+    ]
   },
   {
     "id": "ig-DbCcnJvtKgY",
@@ -8467,10 +8827,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Da5k_0Rtkge",
     "index": 724,
     "url": "https://www.instagram.com/p/Da5k_0Rtkge/",
-    "title": "Guardado visual #724",
-    "summary": "10/10",
-    "category": "visual",
-    "tags": []
+    "title": "10 hábitos incómodos para dejar de procrastinar",
+    "summary": "Diez hábitos prácticos e incómodos para vencer la procrastinación: habla menos de tus planes y pasa rápido a la acción.",
+    "category": "mentalidad",
+    "tags": [
+      "procrastinación",
+      "hábitos"
+    ]
   },
   {
     "id": "ig-Da39qe0pJpG",
@@ -8593,10 +8956,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DavZILGzxzm",
     "index": 734,
     "url": "https://www.instagram.com/p/DavZILGzxzm/",
-    "title": "Guardado visual #734",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Errores que arruinan tus 20s: equilibrio y vida social",
+    "summary": "Tres errores comunes en los 20s: enfocarse solo en estudiar, abusar de la fiesta y descuidar las habilidades sociales por timidez.",
+    "category": "mentalidad",
+    "tags": [
+      "veintes",
+      "habilidades sociales"
+    ]
   },
   {
     "id": "ig-DYKpA9NIvU3",
@@ -8836,10 +9202,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DarR8-gOQGJ",
     "index": 753,
     "url": "https://www.instagram.com/p/DarR8-gOQGJ/",
-    "title": "Se imparable",
-    "summary": "Se imparable",
-    "category": "visual",
-    "tags": []
+    "title": "5 hábitos de personas imparables",
+    "summary": "Cinco hábitos diarios de fortaleza interior —iniciando por la vida espiritual— para mantener el enfoque y ser constante.",
+    "category": "mentalidad",
+    "tags": [
+      "hábitos",
+      "constancia"
+    ]
   },
   {
     "id": "ig-DarKmPVC7KL",
@@ -8858,10 +9227,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DaokiR8qzWy",
     "index": 755,
     "url": "https://www.instagram.com/p/DaokiR8qzWy/",
-    "title": "Guardado visual #755",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Sobrepensar y armar escenarios imaginarios",
+    "summary": "Reflexión sobre el hábito de imaginar escenarios ficticios en la cabeza, especialmente antes de dormir, y su impacto mental.",
+    "category": "bienestar",
+    "tags": [
+      "sobrepensar",
+      "salud mental"
+    ]
   },
   {
     "id": "ig-DaqXDBIzRcG",
@@ -8958,13 +9330,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Dal4Ueoq0T8",
     "index": 763,
     "url": "https://www.instagram.com/p/Dal4Ueoq0T8/",
-    "title": "Actualidad del futbol mundial",
-    "summary": "Sigue los analisis visuales de las grandes figuras del futbol internacional.",
-    "category": "visual",
+    "title": "Análisis de figuras rumbo al Mundial 2026",
+    "summary": "Comentario futbolístico sobre figuras internacionales como Haaland, Mbappé y referentes de cara al Mundial 2026.",
+    "category": "ocio",
     "tags": [
-      "futbol",
-      "deportes",
-      "visual"
+      "fútbol",
+      "mundial2026"
     ]
   },
   {
@@ -9179,10 +9550,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DabY_MpJBI4",
     "index": 780,
     "url": "https://www.instagram.com/p/DabY_MpJBI4/",
-    "title": "Guardado visual #780",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo transformar tus creencias limitantes (Día 20)",
+    "summary": "Paso práctico tras identificar creencias que te frenan: aprende a cuestionarlas y sustituirlas por ideas que impulsen acción.",
+    "category": "mentalidad",
+    "tags": [
+      "creencias",
+      "mentalidad"
+    ]
   },
   {
     "id": "ig-DabDOtcOnxR",
@@ -9201,10 +9575,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DaauOCrNR8W",
     "index": 782,
     "url": "https://www.instagram.com/p/DaauOCrNR8W/",
-    "title": "@nachoarmada_",
-    "summary": "@nachoarmada_",
-    "category": "visual",
-    "tags": []
+    "title": "5 leyes que explican el sufrimiento innecesario",
+    "summary": "Cinco leyes psicológicas —como la adaptación hedónica— que explican por qué sufrimos sin necesidad y cómo verlo con claridad.",
+    "category": "mentalidad",
+    "tags": [
+      "psicología",
+      "mentalidad"
+    ]
   },
   {
     "id": "ig-DaZDJAQM6Li",
@@ -9249,19 +9626,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DaWqn5KMH_o",
     "index": 786,
     "url": "https://www.instagram.com/p/DaWqn5KMH_o/",
-    "title": "Guardado visual #786",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "10 hábitos diarios para fortalecer tu disciplina",
+    "summary": "Incorpora hábitos concretos y repetibles cada día —como entrenar, madrugar y cuidar tu rutina— para construir disciplina real y consistencia.",
+    "category": "mentalidad",
+    "tags": [
+      "habitos",
+      "disciplina"
+    ]
   },
   {
     "id": "ig-DaQdAZNorhi",
     "index": 787,
     "url": "https://www.instagram.com/p/DaQdAZNorhi/",
-    "title": "Guardado visual #787",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Lecciones clave tras perder un hackathon",
+    "summary": "Reflexión sobre qué evitar al competir en un hackathon: no confiarse, validar la idea a tiempo y ejecutar mejor bajo presión.",
+    "category": "carrera",
+    "tags": [
+      "hackathon",
+      "aprendizaje"
+    ]
   },
   {
     "id": "ig-DaT33GYOLnJ",
@@ -9501,10 +9884,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DaMSlTjNm4S",
     "index": 806,
     "url": "https://www.instagram.com/p/DaMSlTjNm4S/",
-    "title": "Guardado visual #806",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "10 formas de dejar de autosabotearte",
+    "summary": "Estrategias prácticas para identificar patrones de autosabotaje y mantenerte enfocado en tus metas con mayor disciplina mental.",
+    "category": "mentalidad",
+    "tags": [
+      "autosabotaje",
+      "mentalidad"
+    ]
   },
   {
     "id": "ig-DaN10c5CGRD",
@@ -9640,10 +10026,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DYBZ_61NrOu",
     "index": 817,
     "url": "https://www.instagram.com/p/DYBZ_61NrOu/",
-    "title": "Dia 122 de 361",
-    "summary": "Dia 122 de 361",
-    "category": "visual",
-    "tags": []
+    "title": "Práctica diaria en lengua de señas (Día 122)",
+    "summary": "Reto diario para aprender y practicar expresiones en lengua de señas, como preguntar si alguien puede hacer algo y dar la bienvenida.",
+    "category": "estudio",
+    "tags": [
+      "lengua-de-senas",
+      "aprendizaje"
+    ]
   },
   {
     "id": "ig-DZBMiLFPtFc",
@@ -9719,10 +10108,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DaIkswgKB75",
     "index": 824,
     "url": "https://www.instagram.com/p/DaIkswgKB75/",
-    "title": "Guardado visual #824",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "3 conductas a evitar para mejorar tu autocontrol",
+    "summary": "Señala tres hábitos asociados a la falta de autocontrol —empezando por el lenguaje hipersexualizado— para tomar conciencia y corregirlos.",
+    "category": "mentalidad",
+    "tags": [
+      "autocontrol",
+      "habitos"
+    ]
   },
   {
     "id": "ig-DXMRkj0jAVa",
@@ -9754,19 +10146,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DaDcZ7tO3IR",
     "index": 827,
     "url": "https://www.instagram.com/p/DaDcZ7tO3IR/",
-    "title": "Guardado visual #827",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "7 formas de volverte irreconocible",
+    "summary": "Guía de transformación personal que parte por corregir el descanso y adoptar hábitos clave para cambiar tus resultados en pocos meses.",
+    "category": "mentalidad",
+    "tags": [
+      "transformacion",
+      "habitos"
+    ]
   },
   {
     "id": "ig-DaD47DCt0nF",
     "index": 828,
     "url": "https://www.instagram.com/p/DaD47DCt0nF/",
-    "title": "Guardado visual #828",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "7 perfiles que nunca logran sus objetivos",
+    "summary": "Identifica siete actitudes y errores comunes que bloquean el cumplimiento de metas para evitarlos en tu día a día.",
+    "category": "mentalidad",
+    "tags": [
+      "objetivos",
+      "mentalidad"
+    ]
   },
   {
     "id": "ig-DZfnrOBlWdw",
@@ -9798,10 +10196,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DV6Zy10kd5A",
     "index": 831,
     "url": "https://www.instagram.com/p/DV6Zy10kd5A/",
-    "title": "Guardado visual #831",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Hábitos básicos de higiene y cuidado personal",
+    "summary": "Rutinas simples de higiene, vestimenta limpia y arreglo personal —como cuidar uñas y usar prendas básicas limpias— para proyectar mejor imagen.",
+    "category": "bienestar",
+    "tags": [
+      "higiene",
+      "cuidado-personal"
+    ]
   },
   {
     "id": "ig-DaDQU85thQi",
@@ -9820,28 +10221,37 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DaE41H8C62d",
     "index": 833,
     "url": "https://www.instagram.com/p/DaE41H8C62d/",
-    "title": "Guardado visual #833",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Hábitos simples para disciplina y salud mental",
+    "summary": "Acciones cotidianas como hacer la cama y tomar duchas frías fortalecen la disciplina diaria y ayudan a cuidar tu salud mental.",
+    "category": "bienestar",
+    "tags": [
+      "salud-mental",
+      "habitos"
+    ]
   },
   {
     "id": "ig-DaDw3kGIquh",
     "index": 834,
     "url": "https://www.instagram.com/p/DaDw3kGIquh/",
-    "title": "Guardado visual #834",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo procesar mejor y entrenar tu inteligencia",
+    "summary": "Aprende a pensar mejor viendo conferencias sobre temas que desconoces para ampliar tu criterio y capacidad de análisis.",
+    "category": "estudio",
+    "tags": [
+      "aprendizaje",
+      "pensamiento"
+    ]
   },
   {
     "id": "ig-DaErczxIASb",
     "index": 835,
     "url": "https://www.instagram.com/p/DaErczxIASb/",
-    "title": "Guardado visual #835",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Enfócate 6 meses para transformar tus resultados",
+    "summary": "Recordatorio motivacional de que seis meses de enfoque constante bastan para lograr un cambio físico y personal notable si empiezas hoy.",
+    "category": "mentalidad",
+    "tags": [
+      "enfoque",
+      "constancia"
+    ]
   },
   {
     "id": "ig-DZItq94RGG4",
@@ -9925,23 +10335,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DZYkPd2AM8r",
     "index": 842,
     "url": "https://www.instagram.com/p/DZYkPd2AM8r/",
-    "title": "Interpretación y doblaje de voz",
-    "summary": "Demostración de técnicas de actuación de voz, locución y comedia aplicada a la interpretación de personajes.",
-    "category": "visual",
+    "title": "Calentamiento vocal antes de hablar o grabar",
+    "summary": "Muestra con humor la importancia de calentar la voz y hacer ejercicios de dicción cinco minutos antes de grabar o hablar para no trabarte.",
+    "category": "oratoria",
     "tags": [
-      "doblaje",
-      "voz",
-      "actuación"
+      "locucion",
+      "diccion"
     ]
   },
   {
     "id": "ig-DZWKNRCNp3Y",
     "index": 843,
     "url": "https://www.instagram.com/p/DZWKNRCNp3Y/",
-    "title": "Guardado visual #843",
-    "summary": "Aprende.",
-    "category": "visual",
-    "tags": []
+    "title": "Habilidades clave para recuperar tu mente",
+    "summary": "Destaca habilidades fundamentales como aprender a aprender y aprender a escribir para recuperar tu enfoque y claridad mental.",
+    "category": "estudio",
+    "tags": [
+      "aprender",
+      "escritura"
+    ]
   },
   {
     "id": "ig-DWhooSuETrc",
@@ -10025,13 +10437,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DU_TJ7MCFue",
     "index": 850,
     "url": "https://www.instagram.com/p/DU_TJ7MCFue/",
-    "title": "Estética visual y movimiento dinámico",
-    "summary": "Contenido audiovisual enfocado en texturas visuales, transiciones y efectos de movimiento estético.",
-    "category": "visual",
+    "title": "Tutorial de patada de delfín en natación",
+    "summary": "Muestra paso a paso la técnica correcta de la patada de delfín bajo el agua y señala los errores de postura más comunes que debes corregir.",
+    "category": "bienestar",
     "tags": [
-      "visual",
-      "estética",
-      "arte"
+      "natacion",
+      "tecnica"
     ]
   },
   {
@@ -10831,10 +11242,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DJiBb3tyiFB",
     "index": 912,
     "url": "https://www.instagram.com/p/DJiBb3tyiFB/",
-    "title": "Guardado visual #912",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "ChatPDF: analiza y chatea con cualquier PDF",
+    "summary": "Presenta ChatPDF, una herramienta de IA donde subes documentos PDF para hacer preguntas, resumir investigaciones y extraer respuestas al instante.",
+    "category": "tech",
+    "tags": [
+      "ia",
+      "pdf"
+    ]
   },
   {
     "id": "ig-DKEBKS-gEL7",
@@ -11243,13 +11657,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DD2jQp3SI_p",
     "index": 944,
     "url": "https://www.instagram.com/p/DD2jQp3SI_p/",
-    "title": "Diseño de sistemas web interactivos",
-    "summary": "Muestra la estructura y estética limpia de aplicaciones web modernas.",
-    "category": "visual",
+    "title": "Panel administrativo para sistema web",
+    "summary": "Demostración de un dashboard web de administración con métricas de saldo, ventas mensuales, productos y menú lateral modular.",
+    "category": "tech",
     "tags": [
-      "visual",
-      "sistema",
-      "web"
+      "dashboard",
+      "desarrollo-web"
     ]
   },
   {
@@ -11269,10 +11682,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DB7AqAQyvaJ",
     "index": 946,
     "url": "https://www.instagram.com/p/DB7AqAQyvaJ/",
-    "title": "Guardado visual #946",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Comparativa entre ChatGPT Plus, Claude Pro y ChatLLM",
+    "summary": "Analiza el costo de suscripciones de IA como ChatGPT Plus y Claude Pro ($20/mes) frente a plataformas unificadas como ChatLLM de Abacus.",
+    "category": "tech",
+    "tags": [
+      "ia",
+      "chatgpt"
+    ]
   },
   {
     "id": "ig-DDSKPS1KIIF",
@@ -11330,13 +11746,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DAWB0C_O2zo",
     "index": 951,
     "url": "https://www.instagram.com/p/DAWB0C_O2zo/",
-    "title": "Recursos y herramientas de diseño gráfico",
-    "summary": "Obtén assets y técnicas de edición en Photoshop para mejorar tus composiciones visuales.",
-    "category": "visual",
+    "title": "Humor sobre los retos de un diseñador UX",
+    "summary": "Meme sobre cómo los diseñadores UX/UI enfrentan problemas complejos buscando soluciones rápidas y efectivas para mejorar la experiencia.",
+    "category": "tech",
     "tags": [
-      "diseno",
-      "photoshop",
-      "grafico"
+      "ux-ui",
+      "diseno"
     ]
   },
   {
@@ -11369,13 +11784,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C-lBBt3AJEM",
     "index": 954,
     "url": "https://www.instagram.com/p/C-lBBt3AJEM/",
-    "title": "Fondos de pantalla estéticos para desarrolladores",
-    "summary": "Configura un entorno de trabajo visualmente agradable para tus sesiones de programación.",
-    "category": "visual",
+    "title": "Diseño de pantalla Login con HTML, CSS y SweetAlert2",
+    "summary": "Muestra una interfaz de inicio de sesión limpia con fondo geométrico y uso de SweetAlert2 en HTML/JavaScript para mejorar la estética web.",
+    "category": "tech",
     "tags": [
-      "setup",
-      "visual",
-      "developer"
+      "frontend",
+      "login"
     ]
   },
   {
@@ -11447,23 +11861,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C-9K89BuUzW",
     "index": 960,
     "url": "https://www.instagram.com/p/C-9K89BuUzW/",
-    "title": "Herramientas de IA sin censura",
-    "summary": "Explora modelos de inteligencia artificial de código abierto con menores restricciones de contenido.",
-    "category": "visual",
+    "title": "Cómo poner a prueba los filtros de censura en IA",
+    "summary": "Explora los límites y filtros de moderación de contenido en modelos de IA como ChatGPT al solicitar generación de imágenes.",
+    "category": "tech",
     "tags": [
       "ia",
-      "opensource",
-      "tech"
+      "moderacion"
     ]
   },
   {
     "id": "ig-DA69bQOyduK",
     "index": 961,
     "url": "https://www.instagram.com/p/DA69bQOyduK/",
-    "title": "Guardado visual #961",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Por qué las IA suelen fallar en matemáticas",
+    "summary": "Explica las limitaciones de los modelos de lenguaje actuales al resolver operaciones matemáticas y por qué cometen errores de cálculo.",
+    "category": "tech",
+    "tags": [
+      "ia",
+      "matematicas"
+    ]
   },
   {
     "id": "ig-DA0Um_dv5Nm",
@@ -11534,91 +11950,127 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-DAWCp0IIkzs",
     "index": 967,
     "url": "https://www.instagram.com/p/DAWCp0IIkzs/",
-    "title": "Guardado visual #967",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Consejo clave para mejorar tu portafolio dev",
+    "summary": "Recomendaciones prácticas sobre cómo estructurar y presentar proyectos en tu portafolio y GitHub como desarrollador web.",
+    "category": "carrera",
+    "tags": [
+      "portafolio",
+      "desarrollo-web"
+    ]
   },
   {
     "id": "ig-DAQ6H74o3A6",
     "index": 968,
     "url": "https://www.instagram.com/p/DAQ6H74o3A6/",
-    "title": "Guardado visual #968",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Iconify: más de 200 mil iconos gratis para apps",
+    "summary": "Presenta Iconify (icon-sets.iconify.design), una biblioteca con más de 200 mil iconos open source listos para usar en proyectos web y apps.",
+    "category": "tech",
+    "tags": [
+      "iconos",
+      "desarrollo-web"
+    ]
   },
   {
     "id": "ig-DADyDz7sRA6",
     "index": 969,
     "url": "https://www.instagram.com/p/DADyDz7sRA6/",
-    "title": "Guardado visual #969",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Página de login animada con HTML y CSS (Día 53)",
+    "summary": "Proyecto práctico del reto 100 días de código: formulario animado de inicio de sesión y registro construido con HTML y transiciones CSS.",
+    "category": "tech",
+    "tags": [
+      "css",
+      "html"
+    ]
   },
   {
     "id": "ig-C_gSsJct16s",
     "index": 970,
     "url": "https://www.instagram.com/p/C_gSsJct16s/",
-    "title": "Guardado visual #970",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cheat sheets para lenguajes y frameworks",
+    "summary": "Colección visual de hojas de referencia rápida para Bash, C, C#, JS, PHP, Django, Laravel, Node.js y frontend. Útil para consultar sintaxis al programar.",
+    "category": "tech",
+    "tags": [
+      "cheatsheet",
+      "programacion",
+      "referencia"
+    ]
   },
   {
     "id": "ig-C-HQR4RAZUT",
     "index": 971,
     "url": "https://www.instagram.com/p/C-HQR4RAZUT/",
-    "title": "Guardado visual #971",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Comunidad para practicar proyectos reales en equipo",
+    "summary": "Espacio colaborativo para programadores de todos los niveles orientado a practicar trabajo en equipo desarrollando proyectos reales de software.",
+    "category": "carrera",
+    "tags": [
+      "proyectos",
+      "trabajo-en-equipo",
+      "programacion"
+    ]
   },
   {
     "id": "ig-C_tnDgGC_1K",
     "index": 972,
     "url": "https://www.instagram.com/p/C_tnDgGC_1K/",
-    "title": "Guardado visual #972",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Coddy: aprende a programar con retos diarios",
+    "summary": "Plataforma interactiva (coddy.tech) estilo Duolingo para aprender Python, HTML, Java y más con +100 cursos, retos diarios y asistencia de IA.",
+    "category": "tech",
+    "tags": [
+      "programacion",
+      "coddy"
+    ]
   },
   {
     "id": "ig-C_UeoR_A-Yj",
     "index": 973,
     "url": "https://www.instagram.com/p/C_UeoR_A-Yj/",
-    "title": "Guardado visual #973",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "4 webs para visualizar algoritmos y datos",
+    "summary": "Mejora en algoritmos y estructuras de datos usando visualizadores interactivos: Visualgo.net, Algorithm-visualizer.org, Toptal Sorting y cs.usfca.edu.",
+    "category": "tech",
+    "tags": [
+      "algoritmos",
+      "estructuras-datos",
+      "entrevistas"
+    ]
   },
   {
     "id": "ig-C_RqCawAYsZ",
     "index": 974,
     "url": "https://www.instagram.com/p/C_RqCawAYsZ/",
-    "title": "Guardado visual #974",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "4 herramientas clave para desarrollo Backend",
+    "summary": "Agiliza tu flujo backend con DB Diagram (diagramas ER con código), Regex101 (probar expresiones regulares), MailTrap (pruebas de correo) y Swagger UI (APIs).",
+    "category": "tech",
+    "tags": [
+      "backend",
+      "herramientas",
+      "dbdiagram"
+    ]
   },
   {
     "id": "ig-C_BEaZhgmzW",
     "index": 975,
     "url": "https://www.instagram.com/p/C_BEaZhgmzW/",
-    "title": "Guardado visual #975",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Rutas de aprendizaje para programación y JavaScript",
+    "summary": "Recomendación de rutas de estudio y repositorios estructurados (como Coding Latam en GitHub) para saber qué estudiar paso a paso en desarrollo web.",
+    "category": "tech",
+    "tags": [
+      "roadmap",
+      "javascript",
+      "aprendizaje"
+    ]
   },
   {
     "id": "ig-C_SQLGEv0h9",
     "index": 976,
     "url": "https://www.instagram.com/p/C_SQLGEv0h9/",
-    "title": "Guardado visual #976",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Formulario de login animado con HTML y CSS",
+    "summary": "Ejemplo visual y código base de un formulario Login y Registro dividido con transiciones y animaciones limpias en HTML, CSS y JavaScript.",
+    "category": "tech",
+    "tags": [
+      "css",
+      "ui",
+      "animaciones"
+    ]
   },
   {
     "id": "ig-C-1PkWDuZOS",
@@ -11633,19 +12085,27 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C_HuCRAAfnH",
     "index": 978,
     "url": "https://www.instagram.com/p/C_HuCRAAfnH/",
-    "title": "Guardado visual #978",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Habilidades técnicas según cada sector IT",
+    "summary": "Mapa rápido de lenguajes y tecnologías clave por área: Ingeniería de Software, Web, Móvil, Videojuegos, IA y Ciencia de Datos, y Ciberseguridad.",
+    "category": "tech",
+    "tags": [
+      "carrera-it",
+      "lenguajes",
+      "roadmap"
+    ]
   },
   {
     "id": "ig-C8KdJEctpZM",
     "index": 979,
     "url": "https://www.instagram.com/p/C8KdJEctpZM/",
-    "title": "Guardado visual #979",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Iconify: directorio masivo de íconos SVG y PNG",
+    "summary": "Usa icon-sets.iconify.design para buscar miles de íconos en SVG o PNG con ejemplos listos para React, Vue, Svelte o Astro y detalle de licencia de uso.",
+    "category": "tech",
+    "tags": [
+      "iconos",
+      "frontend",
+      "svg"
+    ]
   },
   {
     "id": "ig-C_O130MvHOn",
@@ -11660,19 +12120,27 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C8enAKwgzY2",
     "index": 981,
     "url": "https://www.instagram.com/p/C8enAKwgzY2/",
-    "title": "Guardado visual #981",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Atajos útiles de teclado en VS Code",
+    "summary": "Acelera tu edición en VS Code colapsando subregiones (Ctrl/Cmd + K, Ctrl/Cmd + [) y moviendo líneas arriba o abajo con Alt + Flecha.",
+    "category": "tech",
+    "tags": [
+      "vscode",
+      "atajos",
+      "productividad"
+    ]
   },
   {
     "id": "ig-C-IH9SRgBMO",
     "index": 982,
     "url": "https://www.instagram.com/p/C-IH9SRgBMO/",
-    "title": "Guardado visual #982",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Login con efecto de luz neón en CSS puro",
+    "summary": "Efecto interactivo de foco luminoso en un formulario de login usando CSS puro (:checked y box-shadow) activado mediante un interruptor ON/OFF.",
+    "category": "tech",
+    "tags": [
+      "css",
+      "login",
+      "efecto-neon"
+    ]
   },
   {
     "id": "ig-C-2f9VnSx8N",
@@ -11687,19 +12155,26 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C_HOMHSAyp7",
     "index": 984,
     "url": "https://www.instagram.com/p/C_HOMHSAyp7/",
-    "title": "Guardado visual #984",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Editor online para diseñar bases de datos",
+    "summary": "Herramienta web visual en modo oscuro para modelar tablas, tipos de datos y relaciones de bases de datos relacionales de forma rápida.",
+    "category": "tech",
+    "tags": [
+      "bases-de-datos",
+      "sql",
+      "diagramas"
+    ]
   },
   {
     "id": "ig-C_G65K6i3Td",
     "index": 985,
     "url": "https://www.instagram.com/p/C_G65K6i3Td/",
-    "title": "Guardado visual #985",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "OpenBootcamp: cursos completos gratis en YouTube",
+    "summary": "Canal @OpenBootcamp en YouTube con rutas completas y gratuitas de Java, React, Flutter, SQL, Python, .NET, PHP, MERN y testing.",
+    "category": "tech",
+    "tags": [
+      "programacion",
+      "bootcamp"
+    ]
   },
   {
     "id": "ig-C-3T6XcvM12",
@@ -11714,10 +12189,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C-u2T5xi22q",
     "index": 987,
     "url": "https://www.instagram.com/p/C-u2T5xi22q/",
-    "title": "Guardado visual #987",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Interruptor eléctrico 3D con HTML y CSS",
+    "summary": "Componente visual de interruptor eléctrico rojo con iluminación LED realista al pulsarlo, maquetado con HTML y CSS para interfaces web.",
+    "category": "tech",
+    "tags": [
+      "html",
+      "css",
+      "componentes"
+    ]
   },
   {
     "id": "ig-C-slikUtkZZ",
@@ -12009,10 +12488,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C-LCig6Oyxz",
     "index": 1010,
     "url": "https://www.instagram.com/p/C-LCig6Oyxz/",
-    "title": "Guardado visual #1010",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Stack gratuito para lanzar un negocio ($0)",
+    "summary": "Herramientas sin costo inicial: Namelix (nombre), Looka (logo), 10Web y Unbounce (web), Gamma (presentaciones), Notion (tareas), Mailerlite y WaSpeed.",
+    "category": "carrera",
+    "tags": [
+      "emprendimiento",
+      "herramientas",
+      "negocios"
+    ]
   },
   {
     "id": "ig-C6_yJQxNFFu",
@@ -12161,19 +12644,27 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C97dj-bO_NS",
     "index": 1022,
     "url": "https://www.instagram.com/p/C97dj-bO_NS/",
-    "title": "Guardado visual #1022",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "50 actividades para dejar de usar el celular",
+    "summary": "Lista práctica para reducir el tiempo de pantalla: leer, hacer ejercicio, meditar, cocinar, escribir un diario, aprender un idioma, caminar o pintar.",
+    "category": "bienestar",
+    "tags": [
+      "desconexion",
+      "habitos",
+      "bienestar"
+    ]
   },
   {
     "id": "ig-C9sSiGYCXiI",
     "index": 1023,
     "url": "https://www.instagram.com/p/C9sSiGYCXiI/",
-    "title": "Guardado visual #1023",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo estilizar un outfit básico (wearing vs styling)",
+    "summary": "Diferencia visual entre solo ponerse camiseta y pantalón blanco frente a estilizarlos ajustando el fajado, las mangas y las proporciones del conjunto.",
+    "category": "otros",
+    "tags": [
+      "estilo",
+      "outfits",
+      "moda-masculina"
+    ]
   },
   {
     "id": "ig-C92uUr6ACvI",
@@ -12283,10 +12774,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C9aI1_hCAQ4",
     "index": 1032,
     "url": "https://www.instagram.com/p/C9aI1_hCAQ4/",
-    "title": "Guardado visual #1032",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "7 hábitos para tu crecimiento personal",
+    "summary": "Haz ejercicio (ánimo), medita (claridad), lee (entiende el mundo), escribe (entiéndete), haz divertido aprender, sé consistente y ámate.",
+    "category": "mentalidad",
+    "tags": [
+      "habitos",
+      "crecimiento"
+    ]
   },
   {
     "id": "ig-C9p8tYfI2ZH",
@@ -12383,10 +12877,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C3S5GBRrSY3",
     "index": 1040,
     "url": "https://www.instagram.com/p/C3S5GBRrSY3/",
-    "title": "Guardado visual #1040",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Trucos prácticos de cocina y hogar diario",
+    "summary": "Compilado de consejos cotidianos para el hogar, como técnicas rápidas para cortar fruta y soluciones cuando la lavadora carga agua lentamente.",
+    "category": "otros",
+    "tags": [
+      "lifehacks",
+      "hogar",
+      "consejos"
+    ]
   },
   {
     "id": "ig-C8UU3j8vYpF",
@@ -12418,13 +12916,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C6OsPTQr-VO",
     "index": 1043,
     "url": "https://www.instagram.com/p/C6OsPTQr-VO/",
-    "title": "Estilos de cabello y cuidado personal masculino",
-    "summary": "Revisa tendencias de cortes de cabello y cuidado personal para mejorar tu apariencia fisica.",
-    "category": "visual",
+    "title": "Errores comunes al cortarse el cabello en casa",
+    "summary": "Evita arruinar tu corte o línea frontal al usar máquina recortadora o tijeras por tu cuenta; revisa técnicas básicas de cuidado y estilizado capilar.",
+    "category": "bienestar",
     "tags": [
+      "cuidado-personal",
       "cabello",
-      "estilo",
-      "cuidado"
+      "apariencia"
     ]
   },
   {
@@ -12483,13 +12981,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C9MCyJ0AGvL",
     "index": 1048,
     "url": "https://www.instagram.com/p/C9MCyJ0AGvL/",
-    "title": "Humor sobre programacion y desarrollo",
-    "summary": "Viñetas humoristicas sobre situaciones cotidianas en el ciclo de vida del desarrollo de software.",
-    "category": "visual",
+    "title": "Recurso y humor sobre explicar código paso a paso",
+    "summary": "Contenido para programadores sobre herramientas que explican la ejecución de código paso a paso, presentado con un toque de humor dev.",
+    "category": "tech",
     "tags": [
-      "humor",
-      "programador",
-      "memes"
+      "programacion",
+      "codigo",
+      "humor-dev"
     ]
   },
   {
@@ -12587,13 +13085,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C6WKWPiJlY4",
     "index": 1056,
     "url": "https://www.instagram.com/p/C6WKWPiJlY4/",
-    "title": "Velocidad de tecleo y ergonomia mecanica",
-    "summary": "Demostracion de velocidad de escritura en teclado mecanico con iluminacion RGB.",
-    "category": "visual",
+    "title": "Práctica de mecanografía rápida en Monkeytype",
+    "summary": "Demostración de escritura veloz con teclado mecánico en monkeytype.com, plataforma gratuita ideal para entrenar precisión y velocidad de tecleo.",
+    "category": "tech",
     "tags": [
-      "teclado",
-      "asmr",
-      "productividad"
+      "mecanografia",
+      "monkeytype",
+      "teclado"
     ]
   },
   {
@@ -12691,10 +13189,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C8HrkhfsBfX",
     "index": 1064,
     "url": "https://www.instagram.com/p/C8HrkhfsBfX/",
-    "title": "Guardado visual #1064",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo superar el desánimo y la procrastinación",
+    "summary": "Contraste entre la mentalidad de estancamiento por desánimo y la acción práctica para retomar hábitos, enfoque y disciplina diaria.",
+    "category": "mentalidad",
+    "tags": [
+      "disciplina",
+      "procrastinacion",
+      "habitos"
+    ]
   },
   {
     "id": "ig-C6dgxXRLLkM",
@@ -12726,10 +13228,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C8mQhaMKSEo",
     "index": 1067,
     "url": "https://www.instagram.com/p/C8mQhaMKSEo/",
-    "title": "Guardado visual #1067",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo fajar y llevar bien una camisa de vestir",
+    "summary": "Truco de estilo masculino para ajustar correctamente la camisa dentro del pantalón evitando pliegues sueltos en la cintura y logrando un calce limpio.",
+    "category": "otros",
+    "tags": [
+      "moda-masculina",
+      "camisa",
+      "estilo"
+    ]
   },
   {
     "id": "ig-C7JenSurfJ9",
@@ -13203,13 +13709,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C7zD4v8txDq",
     "index": 1104,
     "url": "https://www.instagram.com/p/C7zD4v8txDq/",
-    "title": "Desafios de codigo y retos frontend en HTML y CSS",
-    "summary": "Practica retos de maquetacion visual para mejorar tus habilidades de diseño web responsive.",
-    "category": "visual",
+    "title": "Proyectos y retos frontend en HTML, CSS y JS",
+    "summary": "Colección de mini proyectos descargables en Telegram (webguild) con código fuente HTML, CSS y JS para practicar widgets, botones y animaciones.",
+    "category": "tech",
     "tags": [
       "frontend",
-      "htmlcss",
-      "retos"
+      "html-css",
+      "proyectos"
     ]
   },
   {
@@ -13294,10 +13800,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C7CmdsFr2M5",
     "index": 1111,
     "url": "https://www.instagram.com/p/C7CmdsFr2M5/",
-    "title": "Guardado visual #1111",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Hix.ai para redactar y humanizar textos de estudio",
+    "summary": "Presenta Hix.ai / Hix Bypass como herramienta orientada a estudiantes para reescribir borradores de ChatGPT; úsala de apoyo manteniendo criterio propio.",
+    "category": "estudio",
+    "tags": [
+      "ia",
+      "estudio",
+      "herramientas"
+    ]
   },
   {
     "id": "ig-C5wDLyssn18",
@@ -13494,10 +14004,14 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C60xN_hvH0j",
     "index": 1127,
     "url": "https://www.instagram.com/p/C60xN_hvH0j/",
-    "title": "Guardado visual #1127",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cuidado cervical: qué evitar con la joroba de cuello",
+    "summary": "Advertencia sobre la joroba cervical (neck hump): evita golpes o manipulaciones bruscas en cuello y hombros y prioriza higiene postural segura.",
+    "category": "bienestar",
+    "tags": [
+      "postura",
+      "cervicales",
+      "salud"
+    ]
   },
   {
     "id": "ig-C7eJbODM66U",
@@ -13589,10 +14103,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C7j2dyvNiye",
     "index": 1135,
     "url": "https://www.instagram.com/p/C7j2dyvNiye/",
-    "title": "Guardado visual #1135",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Crea interfaces UI al instante con OpenUI",
+    "summary": "Usa openui.fly.dev para generar diseños UI de aplicaciones o páginas web en segundos a partir de descripciones.",
+    "category": "tech",
+    "tags": [
+      "ui",
+      "desarrollo-web"
+    ]
   },
   {
     "id": "ig-C7jcbIBtg2Y",
@@ -13622,10 +14139,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C7P5kjMJQH2",
     "index": 1138,
     "url": "https://www.instagram.com/p/C7P5kjMJQH2/",
-    "title": "Guardado visual #1138",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Crea mapas conceptuales gratis con ChatGPT",
+    "summary": "Genera mapas conceptuales para estudiar usando ChatGPT aunque al inicio indique que no puede dibujarlos directamente.",
+    "category": "estudio",
+    "tags": [
+      "mapas-conceptuales",
+      "chatgpt"
+    ]
   },
   {
     "id": "ig-C7P8T3SCflb",
@@ -13791,19 +14311,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C6r7cJ3tI2e",
     "index": 1152,
     "url": "https://www.instagram.com/p/C6r7cJ3tI2e/",
-    "title": "Guardado visual #1152",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Accede gratis a GPT-4 desde extensión web",
+    "summary": "Utiliza extensiones de barra lateral con IA para acceder a consultas gratuitas de GPT-4, Claude y otros modelos en el navegador.",
+    "category": "tech",
+    "tags": [
+      "ia",
+      "gpt4"
+    ]
   },
   {
     "id": "ig-C48X9obIHW2",
     "index": 1153,
     "url": "https://www.instagram.com/p/C48X9obIHW2/",
-    "title": "Guardado visual #1153",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Genera datos falsos de prueba con Faker",
+    "summary": "Usa la librería Faker en JavaScript o TypeScript para generar nombres, teléfonos y datos ficticios al instante al probar tus apps.",
+    "category": "tech",
+    "tags": [
+      "faker",
+      "testing"
+    ]
   },
   {
     "id": "ig-C7Jlzm5tM3t",
@@ -13854,11 +14380,11 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C5ytvggq97t",
     "index": 1158,
     "url": "https://www.instagram.com/p/C5ytvggq97t/",
-    "title": "Recursos y bancos de diseno grafico",
-    "summary": "Utiliza plataformas de vectores y plantillas visuales para acelerar la creacion de piezas graficas.",
-    "category": "visual",
+    "title": "Bancos y webs clave para diseño gráfico",
+    "summary": "Combina Freepik, Shutterstock, Envato, Vecteezy, Canva y eliminadores de marcas de agua para agilizar tus diseños.",
+    "category": "tech",
     "tags": [
-      "diseno",
+      "diseno-grafico",
       "recursos"
     ]
   },
@@ -13903,10 +14429,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C6WmJkKN-_N",
     "index": 1162,
     "url": "https://www.instagram.com/p/C6WmJkKN-_N/",
-    "title": "Guardado visual #1162",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Trucos y secretos ocultos del buscador Google",
+    "summary": "Descubre easter eggs interactivos escondidos en Google, como buscar \"katamari\" para jugar directamente en la pantalla.",
+    "category": "ocio",
+    "tags": [
+      "google",
+      "curiosidades"
+    ]
   },
   {
     "id": "ig-C6FM-uagXfr",
@@ -13985,19 +14514,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C2p1LJVRXWN",
     "index": 1169,
     "url": "https://www.instagram.com/p/C2p1LJVRXWN/",
-    "title": "Guardado visual #1169",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Sube de nivel tus diseños dejando Canva por PSD",
+    "summary": "Da el salto de diseños básicos en Canva a recursos profesionales en Photoshop usando packs editables, texturas y activos PSD.",
+    "category": "tech",
+    "tags": [
+      "photoshop",
+      "diseno"
+    ]
   },
   {
     "id": "ig-C4K2V7WhH-v",
     "index": 1170,
     "url": "https://www.instagram.com/p/C4K2V7WhH-v/",
-    "title": "Guardado visual #1170",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Vectoriza curvas fácilmente en Illustrator",
+    "summary": "Usa la herramienta Curvatura (Curvature Tool) en Adobe Illustrator para trazar y ajustar curvas limpias con menos nodos.",
+    "category": "tech",
+    "tags": [
+      "illustrator",
+      "vectorizacion"
+    ]
   },
   {
     "id": "ig-C4_kzpbvXDp",
@@ -14039,10 +14574,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C5AzKDXAVs-",
     "index": 1174,
     "url": "https://www.instagram.com/p/C5AzKDXAVs-/",
-    "title": "Guardado visual #1174",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Cómo activar tus 4 hormonas de la felicidad",
+    "summary": "Estimula dopamina, serotonina, oxitocina y endorfinas con hábitos diarios como ejercicio físico y disciplina personal.",
+    "category": "bienestar",
+    "tags": [
+      "bienestar",
+      "habitos"
+    ]
   },
   {
     "id": "ig-C4q_0CWtlQ9",
@@ -14229,10 +14767,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C2syLQWNyN9",
     "index": 1190,
     "url": "https://www.instagram.com/p/C2syLQWNyN9/",
-    "title": "Guardado visual #1190",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Adapta estampados a camisetas en Photoshop",
+    "summary": "Usa la herramienta Deformar (Warp) en Photoshop para ajustar gráficos y diseños a los pliegues y perspectiva de una prenda.",
+    "category": "tech",
+    "tags": [
+      "photoshop",
+      "mockup"
+    ]
   },
   {
     "id": "ig-C221xoetCNT",
@@ -14346,10 +14887,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C2k1sG0Jk46",
     "index": 1200,
     "url": "https://www.instagram.com/p/C2k1sG0Jk46/",
-    "title": "Guardado visual #1200",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Personaliza tu pantalla con ScreenStyler",
+    "summary": "Visita screenstyler.com para personalizar la apariencia y el estilo visual del escritorio en Windows, macOS o iPhone.",
+    "category": "tech",
+    "tags": [
+      "pc-tips",
+      "personalizacion"
+    ]
   },
   {
     "id": "ig-C2pTAacNx9o",
@@ -14367,12 +14911,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C2HF7q5xaBS",
     "index": 1202,
     "url": "https://www.instagram.com/p/C2HF7q5xaBS/",
-    "title": "Consejos y tecnicas de fotografia",
-    "summary": "Mejora tus composiciones fotograficas utilizando parametros de iluminacion y angulos creativos en camaras moviles.",
-    "category": "visual",
+    "title": "Supuesto truco de acceso a cámara por enlace",
+    "summary": "Video viral que muestra el envío de enlaces externos por mensajería para simular acceso remoto a la cámara desde el móvil.",
+    "category": "otros",
     "tags": [
-      "fotografia",
-      "diseno"
+      "ciberseguridad",
+      "enlaces"
     ]
   },
   {
@@ -14526,10 +15070,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C169718O0dk",
     "index": 1215,
     "url": "https://www.instagram.com/p/C169718O0dk/",
-    "title": "Guardado visual #1215",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Trucos prácticos del hogar para el día a día",
+    "summary": "Recopilación de consejos domésticos cotidianos, desde cortes prácticos en cocina hasta soluciones si la lavadora carga lento.",
+    "category": "otros",
+    "tags": [
+      "hogar",
+      "trucos-diarios"
+    ]
   },
   {
     "id": "ig-Cz0-WDlvSvb",
@@ -14717,10 +15264,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-C1dF6Mxo8hD",
     "index": 1231,
     "url": "https://www.instagram.com/p/C1dF6Mxo8hD/",
-    "title": "Guardado visual #1231",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Meme de gato celebrando Año Nuevo 2024",
+    "summary": "Video humorístico del meme del gato bailando con fuegos artificiales felicitando el año nuevo.",
+    "category": "ocio",
+    "tags": [
+      "meme",
+      "humor"
+    ]
   },
   {
     "id": "ig-C1XTeTeudDk",
@@ -14901,12 +15451,12 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Cy7cnXdJbvw",
     "index": 1246,
     "url": "https://www.instagram.com/p/Cy7cnXdJbvw/",
-    "title": "Inspiracion Visual Estetica",
-    "summary": "Fotografia con enfoque estetico y composicion natural minimalista.",
-    "category": "visual",
+    "title": "Video estético de campo floral y melancolía",
+    "summary": "Escena visual estética de un campo de flores amarillas con la frase reflexiva \"maybe in another life, huh!?\".",
+    "category": "ocio",
     "tags": [
-      "aesthetic",
-      "visual"
+      "estetica",
+      "naturaleza"
     ]
   },
   {
@@ -15101,19 +15651,25 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Cvzx_0bNxYi",
     "index": 1262,
     "url": "https://www.instagram.com/p/Cvzx_0bNxYi/",
-    "title": "Guardado visual #1262",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Colección de animaciones CSS listas para copiar",
+    "summary": "Usa generadores de animaciones CSS nativas para copiar y pegar transiciones sin necesidad de librerías externas.",
+    "category": "tech",
+    "tags": [
+      "css",
+      "animaciones"
+    ]
   },
   {
     "id": "ig-CyUVAR1tqu9",
     "index": 1263,
     "url": "https://www.instagram.com/p/CyUVAR1tqu9/",
-    "title": "Guardado visual #1263",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Resume y chatea con tus PDFs académicos con IA",
+    "summary": "Ahorra tiempo al estudiar o hacer tareas usando herramientas de IA para consultar y resumir documentos PDF largos en minutos.",
+    "category": "estudio",
+    "tags": [
+      "pdf",
+      "ia-estudio"
+    ]
   },
   {
     "id": "ig-CxbkOnUPmn2",
@@ -15144,46 +15700,61 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-CyWa3Fmtz_E",
     "index": 1266,
     "url": "https://www.instagram.com/p/CyWa3Fmtz_E/",
-    "title": "Guardado visual #1266",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Páginas web útiles para mapas mentales y estudio",
+    "summary": "Recomendación de herramientas web útiles para productividad, estudiantes y creación de mapas mentales en línea.",
+    "category": "tech",
+    "tags": [
+      "webs-utiles",
+      "productividad"
+    ]
   },
   {
     "id": "ig-CyV_K-VIuKt",
     "index": 1267,
     "url": "https://www.instagram.com/p/CyV_K-VIuKt/",
-    "title": "Guardado visual #1267",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Crea un USB multisistema con Ventoy",
+    "summary": "Instala Ventoy en una memoria USB para copiar múltiples imágenes ISO (Windows, Ubuntu, Manjaro) y arrancar cualquier sistema.",
+    "category": "tech",
+    "tags": [
+      "ventoy",
+      "usb-booteable"
+    ]
   },
   {
     "id": "ig-CvoG4N2AuBy",
     "index": 1268,
     "url": "https://www.instagram.com/p/CvoG4N2AuBy/",
-    "title": "Guardado visual #1268",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Directorio para descubrir herramientas de IA",
+    "summary": "Usa plataformas buscadoras y directorios de inteligencia artificial para encontrar rápidamente la mejor IA según tu necesidad.",
+    "category": "tech",
+    "tags": [
+      "ia",
+      "herramientas"
+    ]
   },
   {
     "id": "ig-CyHjDbjsC3D",
     "index": 1269,
     "url": "https://www.instagram.com/p/CyHjDbjsC3D/",
-    "title": "Guardado visual #1269",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Truco de pen spinning con bolígrafo luminoso",
+    "summary": "Demostración de habilidad y giro rápido de bolígrafo (pen spinning) para practicar coordinación y trucos manuales.",
+    "category": "ocio",
+    "tags": [
+      "pen-spinning",
+      "habilidad"
+    ]
   },
   {
     "id": "ig-Cu6_v_mPsYg",
     "index": 1270,
     "url": "https://www.instagram.com/p/Cu6_v_mPsYg/",
-    "title": "Guardado visual #1270",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Ideas de diseño web para practicar programación",
+    "summary": "Inspírate en galerías de diseño UI y landing pages reales para elegir proyectos prácticos y mejorar tu nivel de desarrollo web.",
+    "category": "tech",
+    "tags": [
+      "desarrollo-web",
+      "ui-ux"
+    ]
   },
   {
     "id": "ig-CxyiOcrMCYv",
@@ -15227,10 +15798,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Cuzo3nSODUT",
     "index": 1274,
     "url": "https://www.instagram.com/p/Cuzo3nSODUT/",
-    "title": "Guardado visual #1274",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Humaniza textos generados con ChatGPT",
+    "summary": "Usa herramientas de reescritura como Rewrite Article para parafrasear textos de IA y darles un tono más natural en trabajos.",
+    "category": "estudio",
+    "tags": [
+      "ia",
+      "redaccion"
+    ]
   },
   {
     "id": "ig-CvIzytgLk4N",
@@ -15249,10 +15823,13 @@ export const VAULT_BANK: VaultItem[] = [
     "id": "ig-Cx7vSDKvNT5",
     "index": 1276,
     "url": "https://www.instagram.com/p/Cx7vSDKvNT5/",
-    "title": "Guardado visual #1276",
-    "summary": "Reel o imagen guardada sin descripción de texto.",
-    "category": "visual",
-    "tags": []
+    "title": "Crea tu currículum profesional con Kickresume IA",
+    "summary": "Usa kickresume.com para diseñar y redactar un currículum vitae atractivo con plantillas e inteligencia artificial en minutos.",
+    "category": "carrera",
+    "tags": [
+      "cv",
+      "empleo"
+    ]
   },
   {
     "id": "ig-CxdJ-UntCg1",
