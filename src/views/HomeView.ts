@@ -113,13 +113,13 @@ export class HomeView {
         subtitle:
           arenaSnap.source !== 'none'
             ? `Nivel ${arenaSnap.level} · Radar ${arenaSnap.overallRating} · ${arenaSnap.totalRuns} partidas`
-            : '10 disciplinas de reflejos, lógica y 3D',
+            : '14 disciplinas de reflejos, lógica y 3D',
         category: 'entrenamiento',
         c1: '#1D4ED8',
         c2: '#60A5FA',
         icon: Icons.gamepad,
         externalUrl: resolveCompanionUrl('arena'),
-        badgeText: arenaSnap.source !== 'none' ? `Nv ${arenaSnap.level}` : '10 Juegos',
+        badgeText: arenaSnap.source !== 'none' ? `Nv ${arenaSnap.level}` : '14 Juegos',
       },
       {
         id: 'mod-reader',
@@ -294,6 +294,7 @@ export class HomeView {
     const dailyWord = VOCABULARY_DECK[dayIdx % VOCABULARY_DECK.length];
 
     const entries = this.buildDirectoryEntries(this.lastUmbralSnap, this.lastArenaSnap);
+    const atelierModCount = entries.filter((e) => e.category === 'atelier').length;
     const visibleEntries = entries.filter((e) => {
       if (!this.editMode && dir.hiddenIds.includes(e.id)) return false;
       if (dir.activeCategory !== 'all' && e.category !== dir.activeCategory) return false;
@@ -379,7 +380,7 @@ export class HomeView {
         <section class="al-dir-toolbar">
           <div class="al-seg-tabs" role="tablist" aria-label="Filtrar módulos del ecosistema">
             <button type="button" class="al-seg-btn ${dir.activeCategory === 'all' ? 'is-active' : ''}" data-dcat="all">Todo el ecosistema</button>
-            <button type="button" class="al-seg-btn ${dir.activeCategory === 'atelier' ? 'is-active' : ''}" data-dcat="atelier">Atelier Diario (8)</button>
+            <button type="button" class="al-seg-btn ${dir.activeCategory === 'atelier' ? 'is-active' : ''}" data-dcat="atelier">Atelier Diario (${atelierModCount})</button>
             <button type="button" class="al-seg-btn ${dir.activeCategory === 'universidad' ? 'is-active' : ''}" data-dcat="universidad">Universidad</button>
             <button type="button" class="al-seg-btn ${dir.activeCategory === 'entrenamiento' ? 'is-active' : ''}" data-dcat="entrenamiento">Entrenamiento</button>
             <button type="button" class="al-seg-btn ${dir.activeCategory === 'personal' ? 'is-active' : ''}" data-dcat="personal">Mis Accesos</button>
@@ -390,11 +391,6 @@ export class HomeView {
             <button type="button" class="al-btn ${this.editMode ? 'al-btn-primary' : ''}" id="al-dir-edit-toggle">
               ${Icons.sliders(15)}<span>${this.editMode ? 'Listo' : 'Personalizar'}</span>
             </button>
-            ${
-              openModal
-                ? `<button type="button" class="al-btn" id="al-dir-open-cloud">${Icons.cloud(15)}<span>Respaldo Supabase</span></button>`
-                : ''
-            }
           </div>
         </section>
 
@@ -527,10 +523,6 @@ export class HomeView {
     container.querySelector('#al-add-link-close')?.addEventListener('click', () => {
       this.addLinkOpen = false;
       this.render(container, navigate, openModal);
-    });
-
-    container.querySelector('#al-dir-open-cloud')?.addEventListener('click', () => {
-      openModal?.('cloud');
     });
 
     container.querySelector('#al-add-link-form')?.addEventListener('submit', (e) => {

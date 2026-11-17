@@ -117,7 +117,7 @@ function renderApp(): void {
     <div class="al-shell">
       <header class="al-topbar">
         <div class="al-topbar-main">
-          <div class="al-brand" id="al-brand-home" role="button" tabindex="0" title="Ir al Directorio">
+          <div class="al-brand">
             <span class="al-brand-emblem">
               <span class="al-brand-emblem-core">${Icons.grid(18)}</span>
             </span>
@@ -136,8 +136,6 @@ function renderApp(): void {
               ${Icons.cloud(15)}
               <span>${cloudLabel}</span>
             </button>
-
-            <button type="button" class="al-sos-btn" id="al-quick-sos">${Icons.wind(15)}<span>SOS Calma</span></button>
 
             <button type="button" class="al-icon-btn" id="al-theme-toggle" title="${theme === 'day' ? 'Cambiar a modo noche' : 'Cambiar a modo día'}">
               ${theme === 'day' ? Icons.moon(17) : Icons.sun(17)}
@@ -159,7 +157,7 @@ function renderApp(): void {
             ? `
           <div class="al-subnav-bar">
             <button type="button" class="al-back-dir-btn" data-route="home">
-              ${Icons.grid(15)}<span>Inicio Atelier</span>
+              ${Icons.home(15)}<span>Inicio Atelier</span>
             </button>
             <nav class="al-nav" aria-label="Estudios principales">
               ${NAV_ITEMS.filter((i) => i.id !== 'home')
@@ -182,8 +180,6 @@ function renderApp(): void {
     </div>
   `;
 
-  root.querySelector('#al-brand-home')!.addEventListener('click', () => navigate('home'));
-  root.querySelector('#al-quick-sos')!.addEventListener('click', () => navigate('calm'));
   root.querySelector('#al-open-cloud')!.addEventListener('click', () => modals.open('cloud'));
   root.querySelector('#al-open-profile')!.addEventListener('click', () => modals.open('profile'));
 
