@@ -40,9 +40,9 @@ const FILTER_TABS: { id: VaultFilterCategory; label: string; optional?: boolean 
   { id: 'favs', label: 'Favoritos' },
   { id: 'applied', label: 'Aplicados' },
   { id: 'custom', label: 'Añadidos' },
+  { id: 'all', label: 'Todos' },
   { id: 'visual', label: 'Por revisar (visual)', optional: true },
   { id: 'ocio', label: 'Ocio / Anime', optional: true },
-  { id: 'all', label: 'Todos (1,290+)', optional: true },
 ];
 
 const PHRASE_CAT_MAP: Record<VaultCategory, PhraseItem['category']> = {
@@ -70,6 +70,12 @@ function normalizeUrl(raw: string): string {
   return raw.trim().split('?')[0];
 }
 
+function buildInstagramEmbedUrl(rawUrl: string): string | null {
+  const m = rawUrl.match(/instagram\.com\/(p|reel|tv)\/([A-Za-z0-9_-]+)/i);
+  if (!m) return null;
+  return `https://www.instagram.com/${m[1].toLowerCase()}/${m[2]}/embed/`;
+}
+
 export class VaultView {
   private addFormOpen = false;
   private addMode: 'single' | 'batch' = 'single';
@@ -77,6 +83,7 @@ export class VaultView {
   private visibleLimit = 30;
   private feedbackMsg = '';
   private openNoteId: string | null = null;
+  private previewItemId: string | null = null;
   private promotedIds = new Set<string>();
 
   private getAllItems(): VaultItem[] {
@@ -152,6 +159,11 @@ export class VaultView {
                 ${status !== 'pending' ? `<span class="al-vault-status is-${status}">${STATUS_LABELS[status]}</span>` : ''}
               </div>
               <div class="al-tool-group">
+                ${
+                  buildInstagramEmbedUrl(item.url)
+                    ? `<button type="button" class="al-icon-btn" data-vault-preview="${esc(item.id)}" title="Ver publicación aquí sin salir">${Icons.eye(14)}</button>`
+                    : ''
+                }
                 <a class="al-icon-btn" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer" title="Abrir publicación original">${Icons.arrowUpRight(14)}</a>
                 ${
                   item.isCustom
@@ -253,6 +265,13 @@ export class VaultView {
       this.visibleLimit += 30;
       this.refreshResults(container);
     });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-vault-preview]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.previewItemId = btn.dataset.vaultPreview!;
+        this.render(container);
+      });
+    });
   }
 
   private refreshResults(container: HTMLElement): void {
@@ -295,6 +314,10 @@ export class VaultView {
     const visibleTabs = FILTER_TABS.filter(
       (t) => !t.optional || this.showOptionalTabs || prefs.category === t.id
     );
+    const previewItem = this.previewItemId
+      ? allItems.find((x) => x.id === this.previewItemId) ?? null
+      : null;
+    const previewEmbedUrl = previewItem ? buildInstagramEmbedUrl(previewItem.url) : null;
 
     container.innerHTML = `
       <div class="al-page">
@@ -394,7 +417,8 @@ export class VaultView {
           <div class="al-seg-tabs">
             ${visibleTabs
               .map(
-                (t) => `<button type="button" class="al-seg-btn ${prefs.category === t.id ? 'is-active' : ''}" data-vcat="${t.id}">${t.label}</button>`
+                (t) =>
+                  `<button type="button" class="al-seg-btn ${prefs.category === t.id ? 'is-active' : ''}" data-vcat="${t.id}">${t.id === 'all' ? `Todos (${allItems.length})` : t.label}</button>`
               )
               .join('')}
             <button type="button" class="al-seg-btn" id="al-vault-toggle-opt">
@@ -430,6 +454,32 @@ export class VaultView {
           }
         </div>
       </div>
+      ${
+        previewItem
+          ? `
+        <div class="al-modal-backdrop" id="al-vault-preview-backdrop">
+          <div class="al-panel al-modal-dialog al-vault-preview-modal" role="dialog" aria-modal="true" aria-label="Vista previa de publicación">
+            <div class="al-card-head">
+              <div>
+                <span class="al-mono-pill">${CAT_LABELS[previewItem.category]}${previewItem.index ? ` · #${previewItem.index}` : ''}</span>
+                <h3>${esc(previewItem.title)}</h3>
+                <p class="al-muted">${esc(previewItem.summary)}</p>
+              </div>
+              <button type="button" class="al-icon-btn" id="al-vault-preview-close" aria-label="Cerrar">&times;</button>
+            </div>
+            ${
+              previewEmbedUrl
+                ? `<div class="al-vault-embed-wrap"><iframe class="al-vault-embed-frame" src="${esc(previewEmbedUrl)}" loading="lazy" allowtransparency="true" allowfullscreen></iframe></div>`
+                : ''
+            }
+            <div class="al-tool-group">
+              <a class="al-btn al-btn-primary" href="${esc(previewItem.url)}" target="_blank" rel="noopener noreferrer">${Icons.arrowUpRight(15)}<span>Abrir en Instagram</span></a>
+            </div>
+          </div>
+        </div>
+      `
+          : ''
+      }
     `;
 
     container.querySelector('#al-vault-add-btn')?.addEventListener('click', () => {
@@ -557,6 +607,18 @@ export class VaultView {
         searchQuery: (e.target as HTMLInputElement).value,
       });
       this.refreshResults(container);
+    });
+
+    container.querySelector('#al-vault-preview-close')?.addEventListener('click', () => {
+      this.previewItemId = null;
+      this.render(container);
+    });
+
+    container.querySelector('#al-vault-preview-backdrop')?.addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        this.previewItemId = null;
+        this.render(container);
+      }
     });
 
     this.bindGridEvents(container, allItems);
