@@ -179,3 +179,120 @@ export async function exportAnnotatedPdf(
 
   return pdf.save();
 }
+
+export interface BookSection {
+  heading: string;
+  text: string;
+}
+
+const WIN_ANSI_EXTRA = new Set('€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ');
+
+/** Standard PDF fonts only encode WinAnsi; map common typography and drop the rest. */
+function toWinAnsi(raw: string): string {
+  const mapped = raw
+    .replace(/[\u2018\u2019\u201B]/g, "'")
+    .replace(/[\u201C\u201D\u201F]/g, '"')
+    .replace(/[\u2013\u2014\u2015]/g, '-')
+    .replace(/\u2026/g, '...')
+    .replace(/[\u00A0\u2000-\u200B\u202F]/g, ' ')
+    .replace(/\t/g, '  ');
+  let out = '';
+  for (const ch of mapped) {
+    const code = ch.codePointAt(0) ?? 0;
+    if ((code >= 0x20 && code <= 0x7e) || (code >= 0xa1 && code <= 0xff) || WIN_ANSI_EXTRA.has(ch)) out += ch;
+    else if (code === 0x0a) out += '\n';
+  }
+  return out;
+}
+
+/**
+ * Builds a readable PDF from online public-domain text (e.g. Wikisource), with the same
+ * aspect ratio as the notebook board so annotations line up perfectly.
+ */
+export async function buildBookPdf(
+  title: string,
+  sections: BookSection[],
+  sourceNote: string,
+  maxPages = 400
+): Promise<{ bytes: ArrayBuffer; pages: number; truncated: boolean }> {
+  const pdf = await PDFDocument.create();
+  pdf.setTitle(title);
+  const body = await pdf.embedFont(StandardFonts.TimesRoman);
+  const bold = await pdf.embedFont(StandardFonts.TimesRomanBold);
+  const italic = await pdf.embedFont(StandardFonts.TimesRomanItalic);
+
+  const W = 540;
+  const H = (W * BOARD_LOGICAL_H) / BOARD_LOGICAL_W;
+  const M = 54;
+  const maxW = W - M * 2;
+  const ink = rgb(0.06, 0.13, 0.1);
+  let truncated = false;
+
+  let page = pdf.addPage([W, H]);
+  let y = H - M;
+
+  const newPage = (): boolean => {
+    if (pdf.getPageCount() >= maxPages) {
+      truncated = true;
+      return false;
+    }
+    page = pdf.addPage([W, H]);
+    y = H - M;
+    return true;
+  };
+
+  const wrap = (text: string, font: typeof body, size: number): string[] => {
+    const lines: string[] = [];
+    for (const para of text.split('\n')) {
+      const words = para.split(/\s+/).filter(Boolean);
+      let line = '';
+      for (const w of words) {
+        const test = line ? `${line} ${w}` : w;
+        if (font.widthOfTextAtSize(test, size) <= maxW) line = test;
+        else {
+          if (line) lines.push(line);
+          line = w;
+        }
+      }
+      lines.push(line);
+    }
+    return lines;
+  };
+
+  const write = (text: string, font: typeof body, size: number, gapAfter: number): boolean => {
+    const lh = size * 1.45;
+    for (const line of wrap(toWinAnsi(text), font, size)) {
+      if (y - lh < M) {
+        if (!newPage()) return false;
+      }
+      y -= lh;
+      if (line) page.drawText(line, { x: M, y, size, font, color: ink });
+    }
+    y -= gapAfter;
+    return true;
+  };
+
+  // Cover
+  y = H * 0.62;
+  write(title, bold, 26, 14);
+  write(sourceNote, italic, 11, 0);
+  page.drawText('Atelier Diario', { x: M, y: M, size: 9, font: italic, color: rgb(0.4, 0.45, 0.42) });
+
+  outer: for (const sec of sections) {
+    if (!newPage()) break;
+    if (sec.heading && !write(sec.heading, bold, 16, 10)) break;
+    for (const para of sec.text.split(/\n{2,}/)) {
+      const clean = para.replace(/\n/g, ' ').trim();
+      if (!clean) continue;
+      const isHeading = /^=+\s*.+\s*=+$/.test(clean);
+      const ok = isHeading
+        ? write(clean.replace(/=/g, '').trim(), bold, 13, 6)
+        : write(clean, body, 12, 7);
+      if (!ok) break outer;
+    }
+  }
+
+  const saved = await pdf.save();
+  const bytes = saved.buffer.slice(saved.byteOffset, saved.byteOffset + saved.byteLength) as ArrayBuffer;
+  return { bytes, pages: pdf.getPageCount(), truncated };
+}

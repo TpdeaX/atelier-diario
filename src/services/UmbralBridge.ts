@@ -1,3 +1,5 @@
+import { directoryStore } from '../state/DirectoryStore';
+
 export interface UmbralClassItem {
   id?: string | number;
   materia?: string;
@@ -12,6 +14,7 @@ export interface UmbralTaskItem {
   id?: string | number;
   titulo?: string;
   fecha_entrega?: string;
+  fecha_limite?: string;
   importancia?: number;
   completada?: boolean;
 }
@@ -23,18 +26,34 @@ export interface UmbralFreeGap {
 }
 
 export interface UmbralSnapshot {
-  source: 'indexeddb' | 'json' | 'none';
+  source: 'indexeddb' | 'supabase' | 'json' | 'none';
   updatedAt: number;
   todayClassesCount: number;
+  coursesCount: number;
   freeGaps: UmbralFreeGap[];
   criticalTasks: UmbralTaskItem[];
   pendingCount: number;
 }
 
+export interface ArenaSnapshot {
+  source: 'local' | 'supabase' | 'none';
+  level: number;
+  xp: number;
+  overallRating: number;
+  streak: number;
+  totalRuns: number;
+}
+
 const SNAPSHOT_KEY = 'atelier_umbral_snapshot_v1';
+const ARENA_LOCAL_KEY = 'omni_arena_profile_v1';
+const ARENA_CLOUD_CACHE_KEY = 'atelier_arena_snapshot_v1';
 const DAY_NAMES = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
 
 export function resolveCompanionUrl(app: 'atelier' | 'unumbral' | 'arena'): string {
+  const custom = directoryStore.get().companionUrls;
+  if (app === 'unumbral' && custom.unumbral) return custom.unumbral;
+  if (app === 'arena' && custom.arena) return custom.arena;
+
   const host = window.location.hostname;
   if (host.endsWith('github.io')) {
     if (app === 'atelier') return '../atelier-diario/';
@@ -85,7 +104,9 @@ function isSameDay(diaVal: string | number | undefined, jsDay: number): boolean 
 function computeSnapshot(
   clases: UmbralClassItem[],
   tareas: UmbralTaskItem[],
-  source: UmbralSnapshot['source']
+  coursesCount: number,
+  source: UmbralSnapshot['source'],
+  updatedAt = Date.now()
 ): UmbralSnapshot {
   const jsDay = new Date().getDay();
   const todayClasses = clases
@@ -119,8 +140,9 @@ function computeSnapshot(
 
   return {
     source,
-    updatedAt: Date.now(),
+    updatedAt,
     todayClassesCount: todayClasses.length,
+    coursesCount,
     freeGaps,
     criticalTasks: critical,
     pendingCount: pending.length,
@@ -141,8 +163,72 @@ async function readStore(db: IDBDatabase, storeName: string): Promise<unknown[]>
   });
 }
 
+export function cacheRemoteUmbralBackup(payload: unknown, updatedAt = Date.now()): void {
+  if (!payload || typeof payload !== 'object') return;
+  try {
+    localStorage.setItem(
+      SNAPSHOT_KEY,
+      JSON.stringify({ ...(payload as Record<string, unknown>), _source: 'supabase', _updatedAt: updatedAt })
+    );
+  } catch {
+    // Ignore storage error
+  }
+}
+
+export function cacheRemoteArenaProfile(payload: unknown): void {
+  if (!payload || typeof payload !== 'object') return;
+  try {
+    localStorage.setItem(ARENA_CLOUD_CACHE_KEY, JSON.stringify(payload));
+  } catch {
+    // Ignore storage error
+  }
+}
+
+export function loadArenaSnapshot(): ArenaSnapshot {
+  const tryParse = (raw: string | null, source: 'local' | 'supabase'): ArenaSnapshot | null => {
+    if (!raw) return null;
+    try {
+      const p = JSON.parse(raw) as {
+        level?: number;
+        xp?: number;
+        dailyStreak?: number;
+        ratings?: Record<string, number>;
+        playCounts?: Record<string, number>;
+      };
+      if (!p || typeof p !== 'object') return null;
+      const ratingVals = Object.values(p.ratings ?? {});
+      const overall = ratingVals.length
+        ? Math.round(ratingVals.reduce((a, b) => a + b, 0) / ratingVals.length)
+        : 300;
+      const totalRuns = Object.values(p.playCounts ?? {}).reduce((a, b) => a + b, 0);
+      return {
+        source,
+        level: p.level ?? 1,
+        xp: p.xp ?? 0,
+        overallRating: overall,
+        streak: p.dailyStreak ?? 0,
+        totalRuns,
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  return (
+    tryParse(localStorage.getItem(ARENA_LOCAL_KEY), 'local') ??
+    tryParse(localStorage.getItem(ARENA_CLOUD_CACHE_KEY), 'supabase') ?? {
+      source: 'none',
+      level: 1,
+      xp: 0,
+      overallRating: 300,
+      streak: 0,
+      totalRuns: 0,
+    }
+  );
+}
+
 export async function loadUmbralSnapshot(): Promise<UmbralSnapshot> {
-  // 1. Try reading live IndexedDB UmbralDB if it already exists on this origin (e.g. shared github.io)
+  // 1. Live IndexedDB UmbralDB on shared origin
   try {
     if ('databases' in indexedDB) {
       const dbs = await indexedDB.databases();
@@ -154,15 +240,17 @@ export async function loadUmbralSnapshot(): Promise<UmbralSnapshot> {
           req.onerror = () => resolve(null);
         });
         if (db) {
-          const [clases, tareas] = await Promise.all([
+          const [clases, tareas, cursos] = await Promise.all([
             readStore(db, 'clases'),
             readStore(db, 'tareas'),
+            readStore(db, 'cursos'),
           ]);
           db.close();
-          if (clases.length > 0 || tareas.length > 0) {
+          if (clases.length > 0 || tareas.length > 0 || cursos.length > 0) {
             return computeSnapshot(
               clases as UmbralClassItem[],
               tareas as UmbralTaskItem[],
+              cursos.length,
               'indexeddb'
             );
           }
@@ -170,18 +258,27 @@ export async function loadUmbralSnapshot(): Promise<UmbralSnapshot> {
       }
     }
   } catch {
-    // Fallback to imported JSON snapshot
+    // Fallback to Supabase/JSON snapshot
   }
 
-  // 2. Fallback to manually imported JSON backup
+  // 2. Supabase-synced or manually imported JSON snapshot
   try {
     const raw = localStorage.getItem(SNAPSHOT_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as {
         clases?: UmbralClassItem[];
         tareas?: UmbralTaskItem[];
+        cursos?: unknown[];
+        _source?: 'supabase' | 'json';
+        _updatedAt?: number;
       };
-      return computeSnapshot(parsed.clases ?? [], parsed.tareas ?? [], 'json');
+      return computeSnapshot(
+        parsed.clases ?? [],
+        parsed.tareas ?? [],
+        Array.isArray(parsed.cursos) ? parsed.cursos.length : 0,
+        parsed._source === 'supabase' ? 'supabase' : 'json',
+        parsed._updatedAt || Date.now()
+      );
     }
   } catch {
     // Ignore corrupt JSON
@@ -191,6 +288,7 @@ export async function loadUmbralSnapshot(): Promise<UmbralSnapshot> {
     source: 'none',
     updatedAt: Date.now(),
     todayClassesCount: 0,
+    coursesCount: 0,
     freeGaps: [],
     criticalTasks: [],
     pendingCount: 0,
@@ -201,10 +299,15 @@ export function importUmbralBackupJson(rawText: string): UmbralSnapshot {
   const parsed = JSON.parse(rawText) as {
     clases?: UmbralClassItem[];
     tareas?: UmbralTaskItem[];
-    data?: { clases?: UmbralClassItem[]; tareas?: UmbralTaskItem[] };
+    cursos?: unknown[];
+    data?: { clases?: UmbralClassItem[]; tareas?: UmbralTaskItem[]; cursos?: unknown[] };
   };
   const clases = parsed.clases ?? parsed.data?.clases ?? [];
   const tareas = parsed.tareas ?? parsed.data?.tareas ?? [];
-  localStorage.setItem(SNAPSHOT_KEY, JSON.stringify({ clases, tareas }));
-  return computeSnapshot(clases, tareas, 'json');
+  const cursos = parsed.cursos ?? parsed.data?.cursos ?? [];
+  localStorage.setItem(
+    SNAPSHOT_KEY,
+    JSON.stringify({ clases, tareas, cursos, _source: 'json', _updatedAt: Date.now() })
+  );
+  return computeSnapshot(clases, tareas, cursos.length, 'json');
 }

@@ -37,6 +37,60 @@ const DRILLS = [
     notes: [69, 69, 69],
     tip: 'Intenta sostener «Aaaa» o «Mmmm» manteniendo la aguja en el centro (±15 cents).',
   },
+  {
+    id: 'lipTrill',
+    title: 'Vibración de labios (Do-Mi-Sol-Mi-Do)',
+    notes: [60, 64, 67, 64, 60],
+    tip: 'Haz «brrr» con los labios sueltos; si se corta el aire, apoya suavemente los dedos en las mejillas.',
+  },
+  {
+    id: 'thirds',
+    title: 'Terceras (Do-Mi-Re-Fa-Mi-Sol)',
+    notes: [60, 64, 62, 65, 64, 67, 65, 62, 60],
+    tip: 'Piensa cada salto antes de cantarlo; el oído guía a la voz.',
+  },
+  {
+    id: 'octave',
+    title: 'Salto de octava (Do4-Do5)',
+    notes: [60, 72, 60, 72, 60],
+    tip: 'Sube sin empujar ni levantar el mentón; imagina que la nota aguda «cae» desde arriba.',
+  },
+  {
+    id: 'humSol',
+    title: 'Zumbido suave en Sol4',
+    notes: [67, 67, 67],
+    tip: 'Canta «Mmmm» con los labios cerrados y siente la vibración en la nariz y los labios.',
+  },
+  {
+    id: 'descending',
+    title: 'Escala descendente (Sol-Fa-Mi-Re-Do)',
+    notes: [67, 65, 64, 62, 60],
+    tip: 'Al bajar, mantén el mismo brillo y apoyo de aire; no dejes caer la energía.',
+  },
+  {
+    id: 'minor5',
+    title: 'Escala menor 5 notas (Do-Re-Re#-Fa-Sol)',
+    notes: [60, 62, 63, 65, 67, 65, 63, 62, 60],
+    tip: 'Fíjate en el semitono entre Re y Re#: esa nota da el color melancólico de lo menor.',
+  },
+  {
+    id: 'staccato',
+    title: 'Picado de arpegio (Do-Mi-Sol)',
+    notes: [60, 60, 64, 64, 67, 67, 64, 60],
+    tip: 'Notas cortas con «ja-ja-ja»: el impulso viene del abdomen, no de la garganta.',
+  },
+  {
+    id: 'fullScale',
+    title: 'Escala mayor completa (Do4-Do5)',
+    notes: [60, 62, 64, 65, 67, 69, 71, 72, 71, 69, 67, 65, 64, 62, 60],
+    tip: 'Respira antes de empezar y dosifica el aire para llegar al final sin apretar.',
+  },
+  {
+    id: 'siren',
+    title: 'Quinta ida y vuelta (Do-Sol-Do)',
+    notes: [60, 67, 60, 67, 60],
+    tip: 'Practica el intervalo de quinta con «u» cerrada para afinar el salto con suavidad.',
+  },
 ];
 
 export class SingingView {
@@ -50,13 +104,20 @@ export class SingingView {
     this.containerRef = container;
     const isMicOn = voiceStudio.isMicActive();
     const profile = lifeStore.get();
+    const lastDrillId = profile.modulePrefs.singing.lastDrillId;
 
     container.innerHTML = `
       <div class="al-page al-singing-page">
-        <div class="al-page-head">
-          <div>
-            <h1>Estudio de Canto y Afinación</h1>
-            <p>Practica afinación en vivo con el micrófono o entrena tu oído con el piano de referencia y las escalas guiadas.</p>
+        <div class="al-module-hero" style="--mod-c1: #6D28D9; --mod-c2: #A78BFA;">
+          <div class="al-module-hero-id">
+            <div class="al-diamond-emblem is-sm" style="--em-c1: #6D28D9; --em-c2: #A78BFA;">
+              <span class="al-diamond-ring"></span>
+              <span class="al-diamond-core">${Icons.mic(20)}</span>
+            </div>
+            <div>
+              <h1>Estudio de Canto y Afinación</h1>
+              <p>Practica afinación en vivo con el micrófono o entrena tu oído con el piano de referencia y 12 rutinas guiadas.</p>
+            </div>
           </div>
           <div class="al-mono-pill">Mejor precisión: ${profile.stats.singingBestCents !== null ? `±${profile.stats.singingBestCents} cents` : '--'}</div>
         </div>
@@ -94,11 +155,11 @@ export class SingingView {
           </section>
 
           <section class="al-panel">
-            <h2>Rutinas de práctica guiada</h2>
+            <h2>Rutinas de práctica guiada (${DRILLS.length})</h2>
             <div class="al-drills-list">
               ${DRILLS.map(
                 (d) => `
-                <div class="al-drill-item">
+                <div class="al-drill-item ${lastDrillId === d.id ? 'is-selected' : ''}">
                   <div>
                     <strong>${d.title}</strong>
                     <p>${d.tip}</p>
@@ -164,10 +225,12 @@ export class SingingView {
       btn.addEventListener('click', () => {
         const drill = DRILLS.find((d) => d.id === btn.dataset.drill);
         if (!drill) return;
+        lifeStore.updateModulePrefs('singing', { lastDrillId: drill.id });
         lifeStore.markHabit('singing');
         drill.notes.forEach((midi, idx) => {
           voiceStudio.playPianoNote(midiToFreq(midi), 0.55, idx * 0.62);
         });
+        this.render(container);
       });
     });
   }
@@ -214,7 +277,6 @@ export class SingingView {
       needleEl.style.opacity = '0.35';
     }
 
-    // Draw rolling stability trace
     const w = canvas.clientWidth || 360;
     const h = 92;
     if (canvas.width !== w) {
@@ -226,7 +288,6 @@ export class SingingView {
     g.fillStyle = isNight ? '#0D1513' : '#EEF2F0';
     g.fillRect(0, 0, w, h);
 
-    // Center tuned band
     g.fillStyle = isNight ? 'rgba(52, 211, 153, 0.14)' : 'rgba(20, 125, 88, 0.12)';
     g.fillRect(0, h / 2 - 12, w, 24);
     g.strokeStyle = isNight ? 'rgba(52, 211, 153, 0.45)' : 'rgba(20, 125, 88, 0.45)';
@@ -236,7 +297,7 @@ export class SingingView {
     g.stroke();
 
     if (this.historyCents.length > 1) {
-      g.strokeStyle = '#2D5BFF';
+      g.strokeStyle = '#6D28D9';
       g.lineWidth = 2.5;
       g.beginPath();
       this.historyCents.forEach((c, idx) => {

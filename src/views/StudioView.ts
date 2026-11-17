@@ -1,5 +1,5 @@
 import { Icons } from '../icons';
-import { cloudSync, SUPABASE_SETUP_SQL } from '../services/CloudSync';
+import { cloudSync } from '../services/CloudSync';
 import {
   deleteNotebook,
   getPdfBytes,
@@ -8,8 +8,16 @@ import {
   savePdfBytes,
 } from '../services/NotebookStore';
 import {
+  fetchWikisourceFullText,
+  OnlineBookResult,
+  resolveArchivePdfUrl,
+  searchOnlineBooks,
+  tryFetchPdf,
+} from '../services/OnlineApi';
+import {
   BOARD_LOGICAL_H,
   BOARD_LOGICAL_W,
+  buildBookPdf,
   exportAnnotatedPdf,
   openPdfBytes,
   PdfJsDoc,
@@ -33,6 +41,10 @@ const PALETTE = [
   { name: 'Cian', hex: '#22D3EE' },
 ];
 
+export interface StudioRenderOpts {
+  onOpenCloudModal?: () => void;
+}
+
 export class StudioView {
   private docs: NotebookDoc[] = [];
   private activeId = '';
@@ -52,19 +64,43 @@ export class StudioView {
   private activeShape: BoardShapeElement | null = null;
   private pendingTextPos: { x: number; y: number } | null = null;
 
-  private cloudModalOpen = false;
-  private cloudFeedback = '';
-  private syncStatusLabel = 'Solo local';
+  private syncStatusLabel = 'Solo local (IndexedDB)';
   private pushTimer = 0;
   private containerRef: HTMLElement | null = null;
   private resizeObs: ResizeObserver | null = null;
   private lastStageWidth = 0;
+  private renderOpts?: StudioRenderOpts;
 
-  public async render(container: HTMLElement): Promise<void> {
+  private booksModalOpen = false;
+  private bookQuery = '';
+  private bookStatus = '';
+  private bookResults: OnlineBookResult[] = [];
+  private bookFallbackUrl = '';
+
+  public async render(container: HTMLElement, opts?: StudioRenderOpts): Promise<void> {
     this.containerRef = container;
+    this.renderOpts = opts;
+
+    const prefs = lifeStore.get().modulePrefs.studio;
+    this.tool = prefs.tool;
+    this.color = prefs.color;
+    this.strokeWidth = prefs.strokeWidth;
+    if (prefs.activeId) this.activeId = prefs.activeId;
+    if (prefs.currentPage > 0) this.currentPage = prefs.currentPage;
+
     await this.bootstrapDocs();
     this.paintShell(container);
     this.setupCloudRealtime();
+  }
+
+  private saveStudioPrefs(): void {
+    lifeStore.updateModulePrefs('studio', {
+      activeId: this.activeId,
+      currentPage: this.currentPage,
+      tool: this.tool,
+      color: this.color,
+      strokeWidth: this.strokeWidth,
+    });
   }
 
   private async bootstrapDocs(): Promise<void> {
@@ -143,21 +179,26 @@ export class StudioView {
   private paintShell(container: HTMLElement): void {
     const doc = this.activeDoc();
     this.currentPage = Math.max(1, Math.min(doc.pageCount, this.currentPage));
-    const cfg = cloudSync.getConfig();
 
     container.innerHTML = `
       <div class="al-page al-studio-page">
-        <div class="al-page-head">
-          <div>
-            <h1>Cuaderno Digital y Editor PDF</h1>
-            <p>Dibuja diagramas, subraya libros PDF, anota con calma y sincroniza en vivo entre PC, laptop y celular.</p>
+        <div class="al-module-hero" style="--mod-c1: #2A4359; --mod-c2: #8FA8BE;">
+          <div class="al-module-hero-id">
+            <div class="al-diamond-emblem is-sm" style="--em-c1: #2A4359; --em-c2: #8FA8BE;">
+              <span class="al-diamond-ring"></span>
+              <span class="al-diamond-core">${Icons.tablet(20)}</span>
+            </div>
+            <div>
+              <h1>Cuaderno Digital y Editor PDF</h1>
+              <p>Dibuja diagramas, subraya libros PDF, busca obras en línea y sincroniza en vivo con Supabase.</p>
+            </div>
           </div>
           <div class="al-tool-group">
-            <span class="al-mono-pill ${cloudSync.isConfigured() ? 'is-synced' : ''}" id="al-sync-pill">
+            <button type="button" class="al-mono-pill ${cloudSync.isConfigured() ? 'is-synced' : ''}" id="al-sync-pill" title="Abrir centro de Supabase">
               ${Icons.cloud(14)} <span>${this.syncStatusLabel}</span>
-            </span>
-            <button type="button" class="al-btn" id="al-btn-cloud">${Icons.cloud(15)}<span>Nube / Compartir</span></button>
+            </button>
             <button type="button" class="al-btn" id="al-btn-new-nb">${Icons.plus(15)}<span>Cuaderno</span></button>
+            <button type="button" class="al-btn" id="al-btn-books">${Icons.search(15)}<span>Buscar libro</span></button>
             <label class="al-btn al-btn-primary">
               ${Icons.upload(15)}<span>Subir PDF</span>
               <input type="file" id="al-pdf-upload" accept="application/pdf,.pdf" style="display:none" />
@@ -174,6 +215,11 @@ export class StudioView {
                 ${d.kind === 'pdf' ? Icons.book(14) : Icons.tablet(14)}
                 <span>${d.title}</span>
               </button>
+              ${
+                d.id === doc.id
+                  ? `<button type="button" class="al-doc-del" id="al-doc-rename" title="Renombrar">${Icons.edit(12)}</button>`
+                  : ''
+              }
               ${
                 this.docs.length > 1
                   ? `<button type="button" class="al-doc-del" data-del-doc="${d.id}" title="Eliminar">×</button>`
@@ -230,6 +276,7 @@ export class StudioView {
               }
               <button type="button" class="al-btn" id="al-board-undo">${Icons.undo(14)}<span>Deshacer</span></button>
               <button type="button" class="al-btn" id="al-board-clear">${Icons.trash(14)}<span>Limpiar</span></button>
+              <button type="button" class="al-btn" id="al-export-json" title="Respaldo rápido de este cuaderno">${Icons.download(14)}<span>.json</span></button>
               <button type="button" class="al-btn al-btn-primary" id="al-export-pdf">${Icons.download(15)}<span>Exportar PDF</span></button>
             </div>
           </div>
@@ -246,49 +293,7 @@ export class StudioView {
             </div>
           </div>
         </div>
-
-        <div class="al-cloud-modal-backdrop ${this.cloudModalOpen ? '' : 'is-hidden'}" id="al-cloud-modal">
-          <div class="al-cloud-modal al-panel">
-            <div class="al-card-head">
-              <h2>Sincronización en vivo y Compartir</h2>
-              <button type="button" class="al-icon-btn" id="al-cloud-close">×</button>
-            </div>
-            <p class="al-muted">Conecta tu propio proyecto gratuito de <strong>Supabase</strong> para ver los mismos cuadernos y PDFs en tu PC, laptop y celular en tiempo real (o comparte tu código de espacio con un amigo).</p>
-
-            <form class="al-reframe-form" id="al-cloud-form">
-              <label>
-                <span>Supabase Project URL</span>
-                <input type="url" id="al-sb-url" value="${cfg.supabaseUrl}" placeholder="https://tuproyecto.supabase.co" />
-              </label>
-              <label>
-                <span>Supabase Anon Public Key</span>
-                <input type="text" id="al-sb-key" value="${cfg.supabaseAnonKey}" placeholder="eyJhbGciOi..." />
-              </label>
-              <label>
-                <span>Código de espacio compartido (ej. joseph-estudio)</span>
-                <input type="text" id="al-sb-space" value="${cfg.spaceCode}" placeholder="mi-espacio" />
-              </label>
-              <div class="al-tool-group">
-                <button type="submit" class="al-btn al-btn-primary">Guardar y conectar en vivo</button>
-                <button type="button" class="al-btn" id="al-sb-sync-now">${Icons.refresh(15)}<span>Sincronizar ahora</span></button>
-                <button type="button" class="al-btn" id="al-copy-sql">Copiar SQL de Supabase</button>
-              </div>
-            </form>
-
-            ${this.cloudFeedback ? `<p class="al-muted" id="al-cloud-fb"><strong>${this.cloudFeedback}</strong></p>` : '<p class="al-muted" id="al-cloud-fb"></p>'}
-
-            <div class="al-cloud-backup-row">
-              <span>Respaldo manual sin nube:</span>
-              <div class="al-tool-group">
-                <button type="button" class="al-btn" id="al-export-json">${Icons.download(14)}<span>Exportar cuaderno .json</span></button>
-                <label class="al-btn">
-                  ${Icons.upload(14)}<span>Importar .json</span>
-                  <input type="file" id="al-import-json" accept=".json,application/json" style="display:none" />
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
+        ${this.renderBooksModal()}
       </div>
     `;
 
@@ -310,6 +315,162 @@ export class StudioView {
       }
     });
     this.resizeObs.observe(this.stageBox);
+  }
+
+  private async importPdfBytes(bytes: ArrayBuffer, title: string, container: HTMLElement): Promise<void> {
+    const pdfDoc = await openPdfBytes(bytes);
+    const id = `pdf-${Date.now()}`;
+    await savePdfBytes(id, bytes);
+    this.pdfCache.set(id, pdfDoc);
+
+    let storagePath: string | undefined;
+    if (cloudSync.isConfigured()) {
+      storagePath = (await cloudSync.uploadPdf(id, bytes)) ?? undefined;
+    }
+
+    const nb: NotebookDoc = {
+      id,
+      title: title.slice(0, 80) || 'Libro',
+      kind: 'pdf',
+      paper: 'pdf',
+      pageCount: pdfDoc.numPages,
+      pages: {},
+      pdfStoragePath: storagePath,
+      updatedAt: Date.now(),
+    };
+    this.docs.unshift(nb);
+    this.activeId = id;
+    this.currentPage = 1;
+    this.saveStudioPrefs();
+    await saveNotebook(nb);
+    void cloudSync.pushNotebook(nb);
+    this.paintShell(container);
+  }
+
+  private renderBooksModal(): string {
+    const esc = (s: string) =>
+      s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+    const results = this.bookResults
+      .map(
+        (b, i) => `
+        <div class="al-result-item is-static al-book-result">
+          <strong>${esc(b.title)}</strong>
+          <span>${b.source === 'wikisource' ? 'Wikisource · texto completo' : 'Internet Archive · PDF'}${
+            b.author && b.source === 'archive' ? ` · ${esc(b.author)}` : ''
+          }${b.detail ? ` · ${esc(b.detail)}` : ''}</span>
+          <div class="al-tool-group">
+            <button type="button" class="al-btn al-btn-primary" data-book-open="${i}">Abrir en el cuaderno</button>
+            <a class="al-btn" href="${b.url}" target="_blank" rel="noopener">Ver fuente</a>
+          </div>
+        </div>`
+      )
+      .join('');
+    const fallback = this.bookFallbackUrl
+      ? `<p class="al-muted">Internet Archive no deja que la app descargue este PDF directamente.
+           <a class="al-btn" href="${this.bookFallbackUrl}" target="_blank" rel="noopener">${Icons.download(14)}<span>Descargar PDF</span></a>
+           y luego súbelo con <strong>Subir PDF</strong>.</p>`
+      : '';
+    return `
+      <div class="al-modal-backdrop ${this.booksModalOpen ? '' : 'is-hidden'}" id="al-books-modal">
+        <div class="al-modal-dialog al-panel">
+          <div class="al-card-head">
+            <h2>Buscar libro en línea</h2>
+            <button type="button" class="al-icon-btn" id="al-books-close">×</button>
+          </div>
+          <p class="al-muted">Libros gratuitos y legales: <strong>Wikisource</strong> (clásicos en español, se convierten en PDF para subrayar) e <strong>Internet Archive</strong> (PDF escaneados de dominio público).</p>
+          <form class="al-search-form" id="al-books-form">
+            <input type="search" id="al-books-q" value="${esc(this.bookQuery)}" placeholder="Ej. Don Quijote, Bécquer, Lazarillo..." />
+            <button type="submit" class="al-btn al-btn-primary">${Icons.search(15)}<span>Buscar</span></button>
+          </form>
+          <p class="al-muted" id="al-books-status">${esc(this.bookStatus)}</p>
+          ${fallback}
+          <div class="al-results-list al-books-results">${results}</div>
+        </div>
+      </div>`;
+  }
+
+  private bindBookSearch(container: HTMLElement): void {
+    container.querySelector('#al-btn-books')?.addEventListener('click', () => {
+      this.booksModalOpen = true;
+      this.paintShell(container);
+      container.querySelector<HTMLInputElement>('#al-books-q')?.focus();
+    });
+    container.querySelector('#al-books-close')?.addEventListener('click', () => {
+      this.booksModalOpen = false;
+      this.paintShell(container);
+    });
+    container.querySelector('#al-books-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      this.bookQuery = container.querySelector<HTMLInputElement>('#al-books-q')!.value.trim();
+      if (!this.bookQuery) return;
+      this.bookFallbackUrl = '';
+      this.setBookStatus(container, 'Buscando en Wikisource e Internet Archive...');
+      this.bookResults = await searchOnlineBooks(this.bookQuery).catch(() => []);
+      this.bookStatus = this.bookResults.length
+        ? `${this.bookResults.length} resultados para «${this.bookQuery}».`
+        : 'Sin resultados. Prueba con el título o el autor.';
+      this.paintShell(container);
+    });
+    container.querySelectorAll<HTMLButtonElement>('[data-book-open]').forEach((btn) => {
+      btn.addEventListener('click', () => void this.openOnlineBook(Number(btn.dataset.bookOpen), container));
+    });
+  }
+
+  private setBookStatus(container: HTMLElement, msg: string): void {
+    this.bookStatus = msg;
+    const el = container.querySelector('#al-books-status');
+    if (el) el.textContent = msg;
+  }
+
+  private async openOnlineBook(index: number, container: HTMLElement): Promise<void> {
+    const book = this.bookResults[index];
+    if (!book) return;
+    container.querySelectorAll<HTMLButtonElement>('[data-book-open]').forEach((b) => (b.disabled = true));
+    this.bookFallbackUrl = '';
+    try {
+      if (book.source === 'wikisource') {
+        this.setBookStatus(container, `Descargando «${book.title}» desde Wikisource...`);
+        const full = await fetchWikisourceFullText(book.id, 40, (done, total) =>
+          this.setBookStatus(container, `Descargando capítulos ${done + 1}/${total}...`)
+        );
+        if (full.sections.every((s) => s.text.length < 40)) {
+          this.setBookStatus(container, 'Esta página no tiene texto suficiente. Prueba otro resultado.');
+          this.paintShell(container);
+          return;
+        }
+        this.setBookStatus(container, 'Armando el PDF...');
+        const note =
+          full.chaptersTotal > full.chaptersLoaded
+            ? `Fuente: es.wikisource.org (dominio público) · primeros ${full.chaptersLoaded} de ${full.chaptersTotal} capítulos`
+            : 'Fuente: es.wikisource.org (dominio público)';
+        const { bytes } = await buildBookPdf(full.title, full.sections, note);
+        this.booksModalOpen = false;
+        this.bookStatus = '';
+        await this.importPdfBytes(bytes, full.title, container);
+        return;
+      }
+
+      this.setBookStatus(container, `Buscando el PDF de «${book.title}»...`);
+      const pdfUrl = await resolveArchivePdfUrl(book.id);
+      if (!pdfUrl) {
+        this.setBookStatus(container, 'Este libro no tiene PDF descargable. Prueba otro resultado.');
+        this.paintShell(container);
+        return;
+      }
+      const bytes = await tryFetchPdf(pdfUrl);
+      if (bytes) {
+        this.booksModalOpen = false;
+        this.bookStatus = '';
+        await this.importPdfBytes(bytes, book.title, container);
+        return;
+      }
+      this.bookFallbackUrl = pdfUrl;
+      this.bookStatus = 'Descarga directa bloqueada por Internet Archive.';
+      this.paintShell(container);
+    } catch {
+      this.setBookStatus(container, 'No se pudo abrir el libro (revisa tu conexión).');
+      this.paintShell(container);
+    }
   }
 
   private toolBtn(id: BoardTool, icon: string, title: string): string {
@@ -511,13 +672,27 @@ export class StudioView {
   }
 
   private bindEvents(container: HTMLElement): void {
-    // Tools, swatches, paper & pages
+    container.querySelector('#al-sync-pill')?.addEventListener('click', () => {
+      this.renderOpts?.onOpenCloudModal?.();
+    });
+
+    container.querySelector('#al-doc-rename')?.addEventListener('click', () => {
+      const doc = this.activeDoc();
+      const nextName = window.prompt('Nuevo nombre del cuaderno o PDF:', doc.title);
+      if (nextName && nextName.trim()) {
+        doc.title = nextName.trim().slice(0, 80);
+        this.persistActiveDoc();
+        this.paintShell(container);
+      }
+    });
+
     container.querySelectorAll<HTMLButtonElement>('[data-btool]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.tool = btn.dataset.btool as BoardTool;
         if (this.tool === 'highlighter' && (this.color === '#10211B' || this.color === '#2D5BFF')) {
           this.color = '#FACC15';
         }
+        this.saveStudioPrefs();
         this.paintShell(container);
       });
     });
@@ -525,12 +700,14 @@ export class StudioView {
     container.querySelectorAll<HTMLButtonElement>('[data-color]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.color = btn.dataset.color!;
+        this.saveStudioPrefs();
         this.paintShell(container);
       });
     });
 
     container.querySelector<HTMLSelectElement>('#al-stroke-size')?.addEventListener('change', (e) => {
       this.strokeWidth = parseFloat((e.target as HTMLSelectElement).value) || 4;
+      this.saveStudioPrefs();
     });
 
     container.querySelector<HTMLSelectElement>('#al-paper-style')?.addEventListener('change', (e) => {
@@ -543,6 +720,7 @@ export class StudioView {
     container.querySelector('#al-page-prev')?.addEventListener('click', () => {
       if (this.currentPage > 1) {
         this.currentPage -= 1;
+        this.saveStudioPrefs();
         this.paintShell(container);
       }
     });
@@ -551,6 +729,7 @@ export class StudioView {
       const doc = this.activeDoc();
       if (this.currentPage < doc.pageCount) {
         this.currentPage += 1;
+        this.saveStudioPrefs();
         this.paintShell(container);
       }
     });
@@ -560,6 +739,7 @@ export class StudioView {
       doc.pageCount += 1;
       doc.pages[doc.pageCount] = [];
       this.currentPage = doc.pageCount;
+      this.saveStudioPrefs();
       this.persistActiveDoc();
       this.paintShell(container);
     });
@@ -581,6 +761,17 @@ export class StudioView {
       this.redrawFg();
     });
 
+    container.querySelector('#al-export-json')?.addEventListener('click', () => {
+      const doc = this.activeDoc();
+      const blob = new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${doc.title.replace(/[^a-z0-9_-]+/gi, '_')}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
     container.querySelector('#al-export-pdf')?.addEventListener('click', async () => {
       const doc = this.activeDoc();
       const base = doc.kind === 'pdf' ? await getPdfBytes(doc.id) : null;
@@ -594,11 +785,11 @@ export class StudioView {
       URL.revokeObjectURL(url);
     });
 
-    // Document switcher, creation, PDF upload
     container.querySelectorAll<HTMLButtonElement>('[data-doc-id]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.activeId = btn.dataset.docId!;
         this.currentPage = 1;
+        this.saveStudioPrefs();
         this.paintShell(container);
       });
     });
@@ -613,6 +804,7 @@ export class StudioView {
           this.activeId = this.docs[0].id;
           this.currentPage = 1;
         }
+        this.saveStudioPrefs();
         this.paintShell(container);
       });
     });
@@ -631,6 +823,7 @@ export class StudioView {
       this.docs.unshift(nb);
       this.activeId = nb.id;
       this.currentPage = 1;
+      this.saveStudioPrefs();
       await saveNotebook(nb);
       void cloudSync.pushNotebook(nb);
       this.paintShell(container);
@@ -640,35 +833,11 @@ export class StudioView {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
       const bytes = await file.arrayBuffer();
-      const pdfDoc = await openPdfBytes(bytes);
-      const id = `pdf-${Date.now()}`;
-      await savePdfBytes(id, bytes);
-      this.pdfCache.set(id, pdfDoc);
-
-      let storagePath: string | undefined;
-      if (cloudSync.isConfigured()) {
-        storagePath = (await cloudSync.uploadPdf(id, bytes)) ?? undefined;
-      }
-
-      const nb: NotebookDoc = {
-        id,
-        title: file.name.replace(/\.pdf$/i, ''),
-        kind: 'pdf',
-        paper: 'pdf',
-        pageCount: pdfDoc.numPages,
-        pages: {},
-        pdfStoragePath: storagePath,
-        updatedAt: Date.now(),
-      };
-      this.docs.unshift(nb);
-      this.activeId = id;
-      this.currentPage = 1;
-      await saveNotebook(nb);
-      void cloudSync.pushNotebook(nb);
-      this.paintShell(container);
+      await this.importPdfBytes(bytes, file.name.replace(/\.pdf$/i, ''), container);
     });
 
-    // Canvas drawing pointer events
+    this.bindBookSearch(container);
+
     const textPop = container.querySelector<HTMLDivElement>('#al-text-popover')!;
     const textInput = container.querySelector<HTMLInputElement>('#al-text-box-input')!;
 
@@ -789,87 +958,6 @@ export class StudioView {
     container.querySelector('#al-text-box-cancel')?.addEventListener('click', () => {
       this.pendingTextPos = null;
       textPop.classList.add('is-hidden');
-    });
-
-    // Cloud Sync Modal events
-    container.querySelector('#al-btn-cloud')?.addEventListener('click', () => {
-      this.cloudModalOpen = true;
-      this.paintShell(container);
-    });
-    container.querySelector('#al-cloud-close')?.addEventListener('click', () => {
-      this.cloudModalOpen = false;
-      this.paintShell(container);
-    });
-
-    container.querySelector('#al-cloud-form')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const url = container.querySelector<HTMLInputElement>('#al-sb-url')!.value;
-      const key = container.querySelector<HTMLInputElement>('#al-sb-key')!.value;
-      const space = container.querySelector<HTMLInputElement>('#al-sb-space')!.value;
-      cloudSync.saveConfig({ supabaseUrl: url, supabaseAnonKey: key, spaceCode: space, autoSync: true });
-      const res = await cloudSync.testConnection();
-      this.cloudFeedback = res.message;
-      if (res.ok) {
-        this.syncStatusLabel = `En vivo · ${cloudSync.getConfig().spaceCode}`;
-        await cloudSync.pushNotebook(this.activeDoc());
-        await this.bootstrapDocs();
-        this.setupCloudRealtime();
-      }
-      this.paintShell(container);
-    });
-
-    container.querySelector('#al-sb-sync-now')?.addEventListener('click', async () => {
-      if (!cloudSync.isConfigured()) {
-        this.cloudFeedback = 'Primero guarda tu Supabase URL y Anon Key.';
-        this.paintShell(container);
-        return;
-      }
-      await cloudSync.pushNotebook(this.activeDoc());
-      await this.bootstrapDocs();
-      this.cloudFeedback = 'Sincronización completada.';
-      this.paintShell(container);
-    });
-
-    container.querySelector('#al-copy-sql')?.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(SUPABASE_SETUP_SQL);
-        this.cloudFeedback = 'Script SQL copiado al portapapeles. Pégalo en Supabase -> SQL Editor -> Run.';
-      } catch {
-        this.cloudFeedback = 'Revisa el archivo supabase_setup.sql en la raíz del repositorio.';
-      }
-      const fb = container.querySelector('#al-cloud-fb');
-      if (fb) fb.textContent = this.cloudFeedback;
-    });
-
-    container.querySelector('#al-export-json')?.addEventListener('click', () => {
-      const doc = this.activeDoc();
-      const blob = new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${doc.title.replace(/[^a-z0-9_-]+/gi, '_')}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-
-    container.querySelector<HTMLInputElement>('#al-import-json')?.addEventListener('change', async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      try {
-        const parsed = JSON.parse(await file.text()) as NotebookDoc;
-        if (!parsed.id || !parsed.title) throw new Error('invalid');
-        parsed.updatedAt = Date.now();
-        await saveNotebook(parsed);
-        this.activeId = parsed.id;
-        this.currentPage = 1;
-        this.cloudModalOpen = false;
-        this.docs = await listNotebooks();
-        void cloudSync.pushNotebook(parsed);
-        this.paintShell(container);
-      } catch {
-        this.cloudFeedback = 'El archivo .json no corresponde a un cuaderno válido.';
-        this.paintShell(container);
-      }
     });
   }
 

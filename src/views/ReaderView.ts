@@ -1,7 +1,10 @@
 import { CLASSIC_WIKISOURCE_SUGGESTIONS } from '../data/KnowledgeBank';
 import { Icons } from '../icons';
+import { cloudSync } from '../services/CloudSync';
+import { saveNotebook, savePdfBytes } from '../services/NotebookStore';
 import {
   fetchRandomWikiSummary,
+  fetchWikisourceFullText,
   fetchWikisourcePage,
   lookupWiktionary,
   OpenLibraryBook,
@@ -10,21 +13,35 @@ import {
   WikisourceArticle,
   WikisourceSearchItem,
 } from '../services/OnlineApi';
+import { buildBookPdf } from '../services/PdfTools';
 import { lifeStore } from '../state/LifeStore';
+import { NotebookDoc } from '../types';
+
+export interface ReaderRenderOpts {
+  onOpenStudio?: () => void;
+}
 
 export class ReaderView {
-  private sourceTab: 'wikisource' | 'wikipedia' | 'openlibrary' = 'wikisource';
   private searchResults: WikisourceSearchItem[] = [];
   private openLibResults: OpenLibraryBook[] = [];
   private activeArticle: WikisourceArticle | null = null;
   private dictWord = '';
   private dictResult: { found: boolean; lines: string[] } | null = null;
-  private statusText = 'Elige un clásico o busca cualquier libro/tema arriba.';
+  private statusText = 'Elige un clásico o busca cualquier libro o tema en español.';
+  private pdfBusy = false;
+  private autoLoadedLast = false;
 
-  public render(container: HTMLElement): void {
+  public render(container: HTMLElement, opts?: ReaderRenderOpts): void {
     const profile = lifeStore.get();
+    const prefs = profile.modulePrefs.reader;
+
+    if (!this.autoLoadedLast && !this.activeArticle && prefs.lastArticleTitle && prefs.sourceTab === 'wikisource') {
+      this.autoLoadedLast = true;
+      void this.openWikisource(prefs.lastArticleTitle, container, opts);
+    }
+
     const bookmarksHtml = profile.bookmarks
-      .slice(0, 4)
+      .slice(0, 6)
       .map(
         (b) =>
           `<button type="button" class="al-chip-btn" data-open-ws="${b.title.replace(/"/g, '&quot;')}">${Icons.bookmark(13)}<span>${b.title}</span></button>`
@@ -33,10 +50,16 @@ export class ReaderView {
 
     container.innerHTML = `
       <div class="al-page al-reader-page">
-        <div class="al-page-head">
-          <div>
-            <h1>Biblioteca y Lector Online</h1>
-            <p>Lee textos completos en español desde Wikisource, descubre temas de Wikipedia y consulta palabras al instante en Wikcionario.</p>
+        <div class="al-module-hero" style="--mod-c1: #C2591D; --mod-c2: #F4A261;">
+          <div class="al-module-hero-id">
+            <div class="al-diamond-emblem is-sm" style="--em-c1: #C2591D; --em-c2: #F4A261;">
+              <span class="al-diamond-ring"></span>
+              <span class="al-diamond-core">${Icons.book(20)}</span>
+            </div>
+            <div>
+              <h1>Biblioteca y Lector Online</h1>
+              <p>Lee textos completos en español desde Wikisource, explora Wikipedia y consulta palabras al doble clic.</p>
+            </div>
           </div>
           <div class="al-reader-controls">
             <button type="button" class="al-icon-btn" id="al-font-dec" title="Reducir texto">A-</button>
@@ -48,9 +71,9 @@ export class ReaderView {
 
         <div class="al-search-bar-row">
           <div class="al-seg-tabs">
-            <button type="button" class="al-seg-btn ${this.sourceTab === 'wikisource' ? 'is-active' : ''}" data-src="wikisource">Wikisource (Textos)</button>
-            <button type="button" class="al-seg-btn ${this.sourceTab === 'wikipedia' ? 'is-active' : ''}" data-src="wikipedia">Wikipedia (Curiosidades)</button>
-            <button type="button" class="al-seg-btn ${this.sourceTab === 'openlibrary' ? 'is-active' : ''}" data-src="openlibrary">Open Library (Catálogo)</button>
+            <button type="button" class="al-seg-btn ${prefs.sourceTab === 'wikisource' ? 'is-active' : ''}" data-src="wikisource">Wikisource (Textos)</button>
+            <button type="button" class="al-seg-btn ${prefs.sourceTab === 'wikipedia' ? 'is-active' : ''}" data-src="wikipedia">Wikipedia (Curiosidades)</button>
+            <button type="button" class="al-seg-btn ${prefs.sourceTab === 'openlibrary' ? 'is-active' : ''}" data-src="openlibrary">Open Library (Catálogo)</button>
           </div>
           <form class="al-search-form" id="al-reader-search-form">
             <input type="search" id="al-reader-query" placeholder="Buscar libro, autor o tema en español..." />
@@ -75,14 +98,14 @@ export class ReaderView {
 
             ${
               bookmarksHtml
-                ? `<div class="al-panel"><h2>Tus marcadores</h2><div class="al-chip-wrap">${bookmarksHtml}</div></div>`
+                ? `<div class="al-panel"><h2>Tus marcadores (${profile.bookmarks.length})</h2><div class="al-chip-wrap">${bookmarksHtml}</div></div>`
                 : ''
             }
 
             <div class="al-panel">
               <h2>Diccionario en vivo (Wikcionario)</h2>
               <form class="al-dict-form" id="al-dict-form">
-                <input type="text" id="al-dict-input" value="${this.dictWord}" placeholder="Escribe o selecciona una palabra..." />
+                <input type="text" id="al-dict-input" value="${this.dictWord}" placeholder="Escribe o haz doble clic en una palabra..." />
                 <button type="submit" class="al-btn">Definir</button>
               </form>
               <div id="al-dict-output" class="al-dict-output">
@@ -101,19 +124,19 @@ export class ReaderView {
       </div>
     `;
 
-    this.bindEvents(container);
-    this.renderResultsStrip(container);
+    this.bindEvents(container, opts);
+    this.renderResultsStrip(container, opts);
   }
 
   private renderDictHtml(): string {
     if (!this.dictWord) {
-      return '<p class="al-muted">Consejo: haz doble clic sobre cualquier palabra mientras lees para buscar su significado.</p>';
+      return '<p class="al-muted">Consejo: haz doble clic sobre cualquier palabra mientras lees para definirla al instante.</p>';
     }
     if (!this.dictResult) {
       return `<p class="al-muted">Consultando «${this.dictWord}»...</p>`;
     }
     if (!this.dictResult.found) {
-      return `<p class="al-muted">No se encontró definición directa para «${this.dictWord}». Prueba con la palabra en singular o infinitivo.</p>`;
+      return `<p class="al-muted">No se encontró definición directa para «${this.dictWord}». Prueba en singular o infinitivo.</p>`;
     }
     return `
       <div class="al-dict-head">
@@ -125,6 +148,7 @@ export class ReaderView {
   }
 
   private renderArticleHtml(): string {
+    const sourceTab = lifeStore.get().modulePrefs.reader.sourceTab;
     if (!this.activeArticle) {
       return `
         <div class="al-empty-reader">
@@ -137,10 +161,10 @@ export class ReaderView {
     const subHtml = this.activeArticle.subpages.length
       ? `
       <div class="al-chapters-bar">
-        <span>Capítulos / Secciones relacionadas:</span>
+        <span>Capítulos y secciones relacionadas:</span>
         <div class="al-chip-wrap">
           ${this.activeArticle.subpages
-            .slice(0, 12)
+            .slice(0, 14)
             .map((sp) => `<button type="button" class="al-chip-btn" data-open-ws="${sp.replace(/"/g, '&quot;')}">${sp.split('/').pop()}</button>`)
             .join('')}
         </div>
@@ -154,16 +178,24 @@ export class ReaderView {
     return `
       <div class="al-article-top">
         <h2>${this.activeArticle.title}</h2>
-        <button type="button" class="al-btn" id="al-save-bookmark">${Icons.bookmark(15)}<span>Guardar marcador</span></button>
+        <div class="al-tool-group">
+          ${
+            sourceTab === 'wikisource'
+              ? `<button type="button" class="al-btn" id="al-send-to-studio" ${this.pdfBusy ? 'disabled' : ''}>${Icons.tablet(15)}<span>${this.pdfBusy ? 'Generando PDF...' : 'Pasar a Cuaderno PDF'}</span></button>`
+              : ''
+          }
+          <button type="button" class="al-btn al-btn-primary" id="al-save-bookmark">${Icons.bookmark(15)}<span>Guardar marcador</span></button>
+        </div>
       </div>
       ${subHtml}
       <div class="al-article-body">${bodyHtml}</div>
     `;
   }
 
-  private renderResultsStrip(container: HTMLElement): void {
+  private renderResultsStrip(container: HTMLElement, opts?: ReaderRenderOpts): void {
     const strip = container.querySelector<HTMLDivElement>('#al-results-strip')!;
-    if (this.sourceTab === 'wikisource' && this.searchResults.length > 0) {
+    const sourceTab = lifeStore.get().modulePrefs.reader.sourceTab;
+    if (sourceTab === 'wikisource' && this.searchResults.length > 0) {
       strip.innerHTML = `
         <div class="al-results-list">
           ${this.searchResults
@@ -178,7 +210,7 @@ export class ReaderView {
             .join('')}
         </div>
       `;
-    } else if (this.sourceTab === 'openlibrary' && this.openLibResults.length > 0) {
+    } else if (sourceTab === 'openlibrary' && this.openLibResults.length > 0) {
       strip.innerHTML = `
         <div class="al-results-list">
           ${this.openLibResults
@@ -187,6 +219,11 @@ export class ReaderView {
             <div class="al-result-item is-static">
               <strong>${b.title}</strong>
               <span>${b.author}${b.year ? ` (${b.year})` : ''}${b.subject ? ` · ${b.subject}` : ''}</span>
+              ${
+                b.readUrl
+                  ? `<a class="al-btn al-btn-primary" href="${b.readUrl}" target="_blank" rel="noopener">Leer gratis</a>`
+                  : ''
+              }
             </div>`
             )
             .join('')}
@@ -197,21 +234,22 @@ export class ReaderView {
     }
 
     strip.querySelectorAll<HTMLElement>('[data-open-ws]').forEach((btn) => {
-      btn.addEventListener('click', () => void this.openWikisource(btn.dataset.openWs!, container));
+      btn.addEventListener('click', () => void this.openWikisource(btn.dataset.openWs!, container, opts));
     });
   }
 
-  private async openWikisource(title: string, container: HTMLElement): Promise<void> {
+  private async openWikisource(title: string, container: HTMLElement, opts?: ReaderRenderOpts): Promise<void> {
     this.statusText = `Cargando «${title}»...`;
-    const paper = container.querySelector<HTMLElement>('#al-book-paper')!;
-    paper.innerHTML = `<p class="al-muted">${this.statusText}</p>`;
+    const paper = container.querySelector<HTMLElement>('#al-book-paper');
+    if (paper) paper.innerHTML = `<p class="al-muted">${this.statusText}</p>`;
     try {
       this.activeArticle = await fetchWikisourcePage(title);
+      lifeStore.updateModulePrefs('reader', { sourceTab: 'wikisource', lastArticleTitle: this.activeArticle.title });
       lifeStore.markHabit('read');
-      this.render(container);
+      this.render(container, opts);
     } catch {
       this.statusText = 'No se pudo cargar ese texto. Verifica tu conexión e intenta de nuevo.';
-      paper.innerHTML = `<p class="al-muted">${this.statusText}</p>`;
+      if (paper) paper.innerHTML = `<p class="al-muted">${this.statusText}</p>`;
     }
   }
 
@@ -239,14 +277,14 @@ export class ReaderView {
     });
   }
 
-  private bindEvents(container: HTMLElement): void {
+  private bindEvents(container: HTMLElement, opts?: ReaderRenderOpts): void {
     container.querySelector('#al-font-dec')?.addEventListener('click', () => {
       lifeStore.setReaderFontSize(lifeStore.get().readerFontSize - 1);
-      this.render(container);
+      this.render(container, opts);
     });
     container.querySelector('#al-font-inc')?.addEventListener('click', () => {
       lifeStore.setReaderFontSize(lifeStore.get().readerFontSize + 1);
-      this.render(container);
+      this.render(container, opts);
     });
     container.querySelector('#al-mark-read')?.addEventListener('click', () => {
       lifeStore.markHabit('read');
@@ -256,11 +294,12 @@ export class ReaderView {
 
     container.querySelectorAll<HTMLButtonElement>('[data-src]').forEach((btn) => {
       btn.addEventListener('click', async () => {
-        this.sourceTab = btn.dataset.src as typeof this.sourceTab;
-        if (this.sourceTab === 'wikipedia') {
+        const nextTab = btn.dataset.src as 'wikisource' | 'wikipedia' | 'openlibrary';
+        lifeStore.updateModulePrefs('reader', { sourceTab: nextTab });
+        if (nextTab === 'wikipedia') {
           this.statusText = 'Obteniendo artículo aleatorio de Wikipedia...';
           this.activeArticle = null;
-          this.render(container);
+          this.render(container, opts);
           try {
             const sum = await fetchRandomWikiSummary();
             this.activeArticle = {
@@ -273,7 +312,7 @@ export class ReaderView {
             this.statusText = 'No se pudo consultar Wikipedia ahora.';
           }
         }
-        this.render(container);
+        this.render(container, opts);
       });
     });
 
@@ -282,39 +321,82 @@ export class ReaderView {
       const input = container.querySelector<HTMLInputElement>('#al-reader-query')!;
       const q = input.value.trim();
       if (!q) return;
-      if (this.sourceTab === 'openlibrary') {
+      const tab = lifeStore.get().modulePrefs.reader.sourceTab;
+      if (tab === 'openlibrary') {
         this.openLibResults = await searchOpenLibrary(q).catch(() => []);
       } else {
-        this.sourceTab = 'wikisource';
+        lifeStore.updateModulePrefs('reader', { sourceTab: 'wikisource' });
         this.searchResults = await searchWikisource(q).catch(() => []);
       }
-      this.render(container);
+      this.render(container, opts);
     });
 
     container.querySelectorAll<HTMLButtonElement>('[data-suggest]').forEach((btn) => {
       btn.addEventListener('click', async () => {
-        this.sourceTab = 'wikisource';
+        lifeStore.updateModulePrefs('reader', { sourceTab: 'wikisource' });
         this.searchResults = await searchWikisource(btn.dataset.suggest!).catch(() => []);
         if (this.searchResults.length > 0) {
-          await this.openWikisource(this.searchResults[0].title, container);
+          await this.openWikisource(this.searchResults[0].title, container, opts);
         } else {
-          this.render(container);
+          this.render(container, opts);
         }
       });
     });
 
     container.querySelectorAll<HTMLElement>('[data-open-ws]').forEach((btn) => {
-      btn.addEventListener('click', () => void this.openWikisource(btn.dataset.openWs!, container));
+      btn.addEventListener('click', () => void this.openWikisource(btn.dataset.openWs!, container, opts));
     });
 
     container.querySelector('#al-save-bookmark')?.addEventListener('click', () => {
       if (!this.activeArticle) return;
+      const tab = lifeStore.get().modulePrefs.reader.sourceTab;
       lifeStore.saveBookmark({
-        source: this.sourceTab === 'wikipedia' ? 'wikipedia' : 'wikisource',
+        source: tab === 'wikipedia' ? 'wikipedia' : 'wikisource',
         title: this.activeArticle.title,
         excerpt: this.activeArticle.paragraphs[0]?.slice(0, 120) ?? '',
       });
-      this.render(container);
+      this.render(container, opts);
+    });
+
+    container.querySelector('#al-send-to-studio')?.addEventListener('click', async () => {
+      if (!this.activeArticle || this.pdfBusy) return;
+      this.pdfBusy = true;
+      this.render(container, opts);
+      try {
+        const full = await fetchWikisourceFullText(this.activeArticle.title, 40);
+        const sections = full.sections.length
+          ? full.sections
+          : [{ heading: this.activeArticle.title, text: this.activeArticle.paragraphs.join('\n\n') }];
+        const { bytes, pages } = await buildBookPdf(
+          full.title || this.activeArticle.title,
+          sections,
+          'Wikisource en español · Generado para subrayar en Atelier Diario'
+        );
+        const id = `pdf-${Date.now()}`;
+        await savePdfBytes(id, bytes);
+        let storagePath: string | undefined;
+        if (cloudSync.isConfigured()) {
+          storagePath = (await cloudSync.uploadPdf(id, bytes)) ?? undefined;
+        }
+        const doc: NotebookDoc = {
+          id,
+          title: (full.title || this.activeArticle.title).slice(0, 80),
+          kind: 'pdf',
+          paper: 'pdf',
+          pageCount: pages,
+          pages: {},
+          pdfStoragePath: storagePath,
+          updatedAt: Date.now(),
+        };
+        await saveNotebook(doc);
+        lifeStore.updateModulePrefs('studio', { activeId: id, currentPage: 1 });
+        void cloudSync.pushNotebook(doc);
+        this.pdfBusy = false;
+        opts?.onOpenStudio?.();
+      } catch {
+        this.pdfBusy = false;
+        this.render(container, opts);
+      }
     });
 
     container.querySelector('#al-dict-form')?.addEventListener('submit', (e) => {
@@ -323,7 +405,6 @@ export class ReaderView {
       void this.runDictLookup(w, container);
     });
 
-    // Double-click any word in the reader paper to look it up on Wiktionary!
     container.querySelector('#al-book-paper')?.addEventListener('dblclick', () => {
       const sel = window.getSelection()?.toString().trim() ?? '';
       if (sel && !sel.includes(' ')) {

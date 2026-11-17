@@ -47,30 +47,42 @@ const GROUNDING_STEPS = [
   'Toca 4 texturas físicas (la mesa, tu ropa, tus manos, el suelo bajo tus pies).',
   'Identifica 3 sonidos distintos que escuches en este instante.',
   'Nota 2 olores del ambiente o respira aire fresco.',
+  'Nota 1 sabor en tu boca o toma un sorbo de agua despacio.',
   'Di una verdad amable y realista: «Esto es incómodo ahora, pero pasará; solo atiendo este minuto».',
+  'Apoya bien los pies en el suelo y siente el peso de tu cuerpo sobre la silla.',
+  'Suelta los hombros, afloja la mandíbula y abre las manos sobre tus piernas.',
+  'Elige un objeto cercano y descríbelo en voz baja: color, forma, tamaño y textura.',
+  'Cuenta hacia atrás desde 20 de tres en tres sin prisa (20, 17, 14…).',
+  'Piensa en un lugar donde te sientas a salvo y nombra tres detalles de él.',
+  'Decide un solo próximo paso pequeño y realista para los siguientes 5 minutos.',
 ];
 
 export class CalmView {
-  private patternId: BreathPatternId = '478';
   private breathingRunning = false;
   private phaseIdx = 0;
   private phaseRemaining = 4;
   private cyclesDone = 0;
-  private soundCue = true;
   private timerId = 0;
-  private groundingIdx = 0;
 
   public render(container: HTMLElement): void {
     const profile = lifeStore.get();
-    const pat = BREATH_PATTERNS[this.patternId];
+    const prefs = profile.modulePrefs.calm;
+    const pat = BREATH_PATTERNS[prefs.patternId];
     const currentPhase = pat.phases[this.phaseIdx % pat.phases.length];
+    const gIdx = prefs.groundingIdx % GROUNDING_STEPS.length;
 
     container.innerHTML = `
       <div class="al-page al-calm-page">
-        <div class="al-page-head">
-          <div>
-            <h1>Centro de Calma y Mente Positiva</h1>
-            <p>Cuando todo parezca salir mal, no tienes que resolver tu vida hoy. Baja el ritmo físico primero y ordena un solo paso.</p>
+        <div class="al-module-hero" style="--mod-c1: #0F766E; --mod-c2: #5EEAD4;">
+          <div class="al-module-hero-id">
+            <div class="al-diamond-emblem is-sm" style="--em-c1: #0F766E; --em-c2: #5EEAD4;">
+              <span class="al-diamond-ring"></span>
+              <span class="al-diamond-core">${Icons.wind(20)}</span>
+            </div>
+            <div>
+              <h1>Centro de Calma y Mente Positiva</h1>
+              <p>Cuando todo parezca salir mal, baja el ritmo físico primero y ordena un solo paso.</p>
+            </div>
           </div>
           <div class="al-mono-pill">Sesiones de calma: ${profile.stats.calmSessions}</div>
         </div>
@@ -80,16 +92,16 @@ export class CalmView {
             <div class="al-card-head">
               <h2>${pat.name}</h2>
               <label class="al-inline-check">
-                <input type="checkbox" id="al-breath-sound" ${this.soundCue ? 'checked' : ''} />
+                <input type="checkbox" id="al-breath-sound" ${prefs.soundCue ? 'checked' : ''} />
                 <span>Tono suave</span>
               </label>
             </div>
             <p class="al-muted">${pat.desc}</p>
 
             <div class="al-seg-tabs">
-              <button type="button" class="al-seg-btn ${this.patternId === '478' ? 'is-active' : ''}" data-bpat="478">4-7-8 (Ansiedad)</button>
-              <button type="button" class="al-seg-btn ${this.patternId === 'box' ? 'is-active' : ''}" data-bpat="box">Caja 4-4-4-4</button>
-              <button type="button" class="al-seg-btn ${this.patternId === 'sigh' ? 'is-active' : ''}" data-bpat="sigh">Alivio rápido</button>
+              <button type="button" class="al-seg-btn ${prefs.patternId === '478' ? 'is-active' : ''}" data-bpat="478">4-7-8 (Ansiedad)</button>
+              <button type="button" class="al-seg-btn ${prefs.patternId === 'box' ? 'is-active' : ''}" data-bpat="box">Caja 4-4-4-4</button>
+              <button type="button" class="al-seg-btn ${prefs.patternId === 'sigh' ? 'is-active' : ''}" data-bpat="sigh">Alivio rápido</button>
             </div>
 
             <div class="al-breath-stage">
@@ -110,9 +122,9 @@ export class CalmView {
 
             <div class="al-grounding-box">
               <h3>Aterrizaje sensorial (5-4-3-2-1)</h3>
-              <p>${GROUNDING_STEPS[this.groundingIdx]}</p>
+              <p>${GROUNDING_STEPS[gIdx]}</p>
               <div class="al-tool-group">
-                <button type="button" class="al-btn" id="al-ground-next">Siguiente paso (${this.groundingIdx + 1}/5)</button>
+                <button type="button" class="al-btn" id="al-ground-next">Siguiente paso (${gIdx + 1}/${GROUNDING_STEPS.length})</button>
               </div>
             </div>
           </section>
@@ -141,9 +153,9 @@ export class CalmView {
               <h3>Tus reencuadres anteriores (${profile.reframeLog.length})</h3>
               ${
                 profile.reframeLog.length === 0
-                  ? '<p class="al-muted">Aún no escribiste ninguno. Quedan guardados solo en este dispositivo.</p>'
+                  ? '<p class="al-muted">Aún no escribiste ninguno. Se guardan localmente y se sincronizan en Supabase.</p>'
                   : profile.reframeLog
-                      .slice(0, 4)
+                      .slice(0, 5)
                       .map(
                         (r) => `
                     <div class="al-reframe-item">
@@ -167,15 +179,16 @@ export class CalmView {
     container.querySelectorAll<HTMLButtonElement>('[data-bpat]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.stopBreathing();
-        this.patternId = btn.dataset.bpat as BreathPatternId;
+        const nextPat = btn.dataset.bpat as BreathPatternId;
+        lifeStore.updateModulePrefs('calm', { patternId: nextPat });
         this.phaseIdx = 0;
-        this.phaseRemaining = BREATH_PATTERNS[this.patternId].phases[0].sec;
+        this.phaseRemaining = BREATH_PATTERNS[nextPat].phases[0].sec;
         this.render(container);
       });
     });
 
     container.querySelector<HTMLInputElement>('#al-breath-sound')?.addEventListener('change', (e) => {
-      this.soundCue = (e.target as HTMLInputElement).checked;
+      lifeStore.updateModulePrefs('calm', { soundCue: (e.target as HTMLInputElement).checked });
     });
 
     container.querySelector('#al-breath-toggle')?.addEventListener('click', () => {
@@ -188,8 +201,9 @@ export class CalmView {
     });
 
     container.querySelector('#al-ground-next')?.addEventListener('click', () => {
-      this.groundingIdx = (this.groundingIdx + 1) % GROUNDING_STEPS.length;
-      if (this.groundingIdx === 0) {
+      const nextIdx = (lifeStore.get().modulePrefs.calm.groundingIdx + 1) % GROUNDING_STEPS.length;
+      lifeStore.updateModulePrefs('calm', { groundingIdx: nextIdx });
+      if (nextIdx === 0) {
         lifeStore.recordCalmSession();
       }
       this.render(container);
@@ -211,18 +225,20 @@ export class CalmView {
   }
 
   private startBreathing(container: HTMLElement): void {
+    const prefs = lifeStore.get().modulePrefs.calm;
     this.breathingRunning = true;
     this.phaseIdx = 0;
-    const pat = BREATH_PATTERNS[this.patternId];
+    const pat = BREATH_PATTERNS[prefs.patternId];
     this.phaseRemaining = pat.phases[0].sec;
-    if (this.soundCue) voiceStudio.playCalmChime(396);
+    if (prefs.soundCue) voiceStudio.playCalmChime(396);
     this.render(container);
 
     window.clearInterval(this.timerId);
     this.timerId = window.setInterval(() => {
       if (!this.breathingRunning) return;
       this.phaseRemaining -= 1;
-      const p = BREATH_PATTERNS[this.patternId];
+      const currPrefs = lifeStore.get().modulePrefs.calm;
+      const p = BREATH_PATTERNS[currPrefs.patternId];
       if (this.phaseRemaining <= 0) {
         this.phaseIdx += 1;
         if (this.phaseIdx % p.phases.length === 0) {
@@ -231,7 +247,7 @@ export class CalmView {
         }
         const nextPhase = p.phases[this.phaseIdx % p.phases.length];
         this.phaseRemaining = nextPhase.sec;
-        if (this.soundCue) {
+        if (currPrefs.soundCue) {
           voiceStudio.playCalmChime(this.phaseIdx % 2 === 0 ? 432 : 340);
         }
       }

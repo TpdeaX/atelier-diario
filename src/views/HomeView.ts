@@ -2,43 +2,347 @@ import { PHRASES_BANK, VOCABULARY_DECK } from '../data/KnowledgeBank';
 import { Icons } from '../icons';
 import { fetchRandomWikiSummary, WikiSummary } from '../services/OnlineApi';
 import {
+  ArenaSnapshot,
   importUmbralBackupJson,
+  loadArenaSnapshot,
   loadUmbralSnapshot,
   resolveCompanionUrl,
   UmbralSnapshot,
 } from '../services/UmbralBridge';
+import { directoryStore } from '../state/DirectoryStore';
 import { lifeStore } from '../state/LifeStore';
-import { HabitKey, ModuleId } from '../types';
+import { DirectoryCategory, HabitKey, ModuleId } from '../types';
+
+export interface DirectoryEntry {
+  id: string;
+  title: string;
+  prefix: string;
+  subtitle: string;
+  category: DirectoryCategory;
+  c1: string;
+  c2: string;
+  icon: (s?: number) => string;
+  route?: ModuleId;
+  externalUrl?: string;
+  badgeText?: string;
+  isCustom?: boolean;
+}
 
 const HABIT_LABELS: { key: HabitKey; label: string; target: ModuleId }[] = [
   { key: 'read', label: 'Lectura online', target: 'reader' },
   { key: 'studio', label: 'Cuaderno y PDF', target: 'studio' },
   { key: 'calligraphy', label: 'Caligrafía', target: 'calligraphy' },
-  { key: 'typing', label: 'Escritura rápida', target: 'typing' },
+  { key: 'typing', label: 'Mecanografía', target: 'typing' },
   { key: 'language', label: 'Ortografía y léxico', target: 'language' },
   { key: 'mindset', label: 'Frases e ideas', target: 'mindset' },
-  { key: 'singing', label: 'Práctica de canto', target: 'singing' },
+  { key: 'singing', label: 'Canto y afinación', target: 'singing' },
   { key: 'calm', label: 'Calma y respiración', target: 'calm' },
 ];
+
+const CUSTOM_COLORS: { label: string; c1: string; c2: string }[] = [
+  { label: 'Naranja Terracota', c1: '#E06B2B', c2: '#F4A261' },
+  { label: 'Azul Cobalto', c1: '#2563EB', c2: '#60A5FA' },
+  { label: 'Pizarra Grafito', c1: '#334155', c2: '#94A3B8' },
+  { label: 'Turquesa Mar', c1: '#0D9488', c2: '#5EEAD4' },
+  { label: 'Verde Bosque', c1: '#15803D', c2: '#4ADE80' },
+  { label: 'Índigo Estudio', c1: '#4F46E5', c2: '#818CF8' },
+];
+
+function iconForKey(key: string): (s?: number) => string {
+  switch (key) {
+    case 'graduation':
+      return Icons.graduation;
+    case 'gamepad':
+      return Icons.gamepad;
+    case 'book':
+      return Icons.book;
+    case 'tablet':
+      return Icons.tablet;
+    case 'pen':
+      return Icons.pen;
+    case 'keyboard':
+      return Icons.keyboard;
+    case 'spell':
+      return Icons.spell;
+    case 'bulb':
+      return Icons.bulb;
+    case 'mic':
+      return Icons.mic;
+    case 'wind':
+      return Icons.wind;
+    default:
+      return Icons.link;
+  }
+}
 
 export class HomeView {
   private wikiCache: WikiSummary | null = null;
   private wikiLoading = false;
   private wikiError = '';
+  private editMode = false;
+  private addLinkOpen = false;
+  private lastUmbralSnap: UmbralSnapshot | null = null;
+  private lastArenaSnap: ArenaSnapshot = loadArenaSnapshot();
 
-  public render(container: HTMLElement, navigate: (id: ModuleId) => void): void {
+  private buildDirectoryEntries(umbralSnap: UmbralSnapshot | null, arenaSnap: ArenaSnapshot): DirectoryEntry[] {
     const profile = lifeStore.get();
+    const dir = directoryStore.get();
+
+    const base: DirectoryEntry[] = [
+      {
+        id: 'app-unumbral',
+        prefix: 'App',
+        title: 'UNUmbral Académico',
+        subtitle:
+          umbralSnap && umbralSnap.source !== 'none'
+            ? `${umbralSnap.todayClassesCount} clases hoy · ${umbralSnap.pendingCount} tareas`
+            : 'Horario 12h, cursos, notas y asistencias',
+        category: 'universidad',
+        c1: '#167C4D',
+        c2: '#6BD49E',
+        icon: Icons.graduation,
+        externalUrl: resolveCompanionUrl('unumbral'),
+        badgeText: umbralSnap && umbralSnap.source !== 'none' ? `${umbralSnap.coursesCount} cursos` : 'Universidad',
+      },
+      {
+        id: 'app-arena',
+        prefix: 'App',
+        title: 'OMNI ARENA 2D/3D',
+        subtitle:
+          arenaSnap.source !== 'none'
+            ? `Nivel ${arenaSnap.level} · Radar ${arenaSnap.overallRating} · ${arenaSnap.totalRuns} partidas`
+            : '10 disciplinas de reflejos, lógica y 3D',
+        category: 'entrenamiento',
+        c1: '#1D4ED8',
+        c2: '#60A5FA',
+        icon: Icons.gamepad,
+        externalUrl: resolveCompanionUrl('arena'),
+        badgeText: arenaSnap.source !== 'none' ? `Nv ${arenaSnap.level}` : '10 Juegos',
+      },
+      {
+        id: 'mod-reader',
+        prefix: 'Módulo',
+        title: 'Biblioteca y Lector',
+        subtitle:
+          profile.bookmarks.length > 0
+            ? `${profile.bookmarks.length} marcadores · ${profile.readerFontSize}px`
+            : 'Wikisource, Open Library y diccionario',
+        category: 'atelier',
+        c1: '#C2591D',
+        c2: '#F4A261',
+        icon: Icons.book,
+        route: 'reader',
+        badgeText: profile.todayHabits.read ? 'Hecho hoy' : 'Lectura',
+      },
+      {
+        id: 'mod-studio',
+        prefix: 'Módulo',
+        title: 'Cuaderno y PDF',
+        subtitle: 'Anotaciones tipo tablet y libros a PDF',
+        category: 'atelier',
+        c1: '#2A4359',
+        c2: '#8FA8BE',
+        icon: Icons.tablet,
+        route: 'studio',
+        badgeText: profile.todayHabits.studio ? 'Hecho hoy' : 'Sincronizado',
+      },
+      {
+        id: 'mod-calligraphy',
+        prefix: 'Módulo',
+        title: 'Taller de Caligrafía',
+        subtitle: `${profile.stats.calligraphySheets} hojas practicadas · Pauta 55°`,
+        category: 'atelier',
+        c1: '#0D7A72',
+        c2: '#4FD1C5',
+        icon: Icons.pen,
+        route: 'calligraphy',
+        badgeText: profile.todayHabits.calligraphy ? 'Hecho hoy' : 'Trazos',
+      },
+      {
+        id: 'mod-typing',
+        prefix: 'Módulo',
+        title: 'Mecanografía',
+        subtitle: `Récord PC ${profile.stats.bestWpmPc} · Móvil ${profile.stats.bestWpmMobile} PPM`,
+        category: 'atelier',
+        c1: '#4338CA',
+        c2: '#818CF8',
+        icon: Icons.keyboard,
+        route: 'typing',
+        badgeText: profile.todayHabits.typing ? 'Hecho hoy' : 'Velocidad',
+      },
+      {
+        id: 'mod-language',
+        prefix: 'Módulo',
+        title: 'Ortografía y Léxico',
+        subtitle: `${profile.stats.orthographyCorrect}/${profile.stats.orthographyTotal} aciertos · ${profile.savedWords.length} palabras`,
+        category: 'atelier',
+        c1: '#B45309',
+        c2: '#FBBF24',
+        icon: Icons.spell,
+        route: 'language',
+        badgeText: profile.todayHabits.language ? 'Hecho hoy' : 'Idioma',
+      },
+      {
+        id: 'mod-mindset',
+        prefix: 'Módulo',
+        title: 'Frases y Criterio',
+        subtitle: `${profile.favoritePhraseIds.length} favoritas · ${profile.customPhrases.length} propias`,
+        category: 'atelier',
+        c1: '#9D174D',
+        c2: '#F472B6',
+        icon: Icons.bulb,
+        route: 'mindset',
+        badgeText: profile.todayHabits.mindset ? 'Hecho hoy' : 'Ideas',
+      },
+      {
+        id: 'mod-singing',
+        prefix: 'Módulo',
+        title: 'Estudio de Canto',
+        subtitle:
+          profile.stats.singingBestCents !== null
+            ? `Mejor afinación ±${profile.stats.singingBestCents} cents · 12 rutinas`
+            : 'Afinador vocal en vivo y piano guía',
+        category: 'atelier',
+        c1: '#6D28D9',
+        c2: '#A78BFA',
+        icon: Icons.mic,
+        route: 'singing',
+        badgeText: profile.todayHabits.singing ? 'Hecho hoy' : 'Voz',
+      },
+      {
+        id: 'mod-calm',
+        prefix: 'Módulo',
+        title: 'Centro de Calma',
+        subtitle: `${profile.stats.calmSessions} sesiones · ${profile.reframeLog.length} reencuadres`,
+        category: 'atelier',
+        c1: '#0F766E',
+        c2: '#5EEAD4',
+        icon: Icons.wind,
+        route: 'calm',
+        badgeText: 'SOS Calma',
+      },
+    ];
+
+    const custom: DirectoryEntry[] = dir.customLinks.map((c) => {
+      const palette = CUSTOM_COLORS.find((x) => x.c1 === c.color) ?? { c1: c.color || '#2563EB', c2: '#93C5FD' };
+      return {
+        id: c.id,
+        prefix: 'Acceso',
+        title: c.title,
+        subtitle: c.subtitle || c.url,
+        category: c.category,
+        c1: palette.c1,
+        c2: palette.c2,
+        icon: iconForKey(c.iconKey),
+        externalUrl: c.url,
+        badgeText: 'Personal',
+        isCustom: true,
+      };
+    });
+
+    const map = new Map([...base, ...custom].map((e) => [e.id, e]));
+    const ordered: DirectoryEntry[] = [];
+    for (const id of dir.order) {
+      const found = map.get(id);
+      if (found) {
+        ordered.push(found);
+        map.delete(id);
+      }
+    }
+    for (const rest of map.values()) ordered.push(rest);
+    return ordered;
+  }
+
+  public render(
+    container: HTMLElement,
+    navigate: (id: ModuleId) => void,
+    openModal?: (m: 'cloud' | 'profile') => void
+  ): void {
+    const profile = lifeStore.get();
+    const dir = directoryStore.get();
+    this.lastArenaSnap = loadArenaSnapshot();
     const doneCount = Object.values(profile.todayHabits).filter(Boolean).length;
 
     const dayIdx = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
     const dailyPhrase = PHRASES_BANK[dayIdx % PHRASES_BANK.length];
     const dailyWord = VOCABULARY_DECK[dayIdx % VOCABULARY_DECK.length];
 
+    const entries = this.buildDirectoryEntries(this.lastUmbralSnap, this.lastArenaSnap);
+    const visibleEntries = entries.filter((e) => {
+      if (!this.editMode && dir.hiddenIds.includes(e.id)) return false;
+      if (dir.activeCategory !== 'all' && e.category !== dir.activeCategory) return false;
+      return true;
+    });
+
+    // Put pinned items first when not in edit mode
+    const sortedEntries = this.editMode
+      ? visibleEntries
+      : [...visibleEntries].sort((a, b) => {
+          const ap = dir.pinnedIds.includes(a.id) ? 0 : 1;
+          const bp = dir.pinnedIds.includes(b.id) ? 0 : 1;
+          return ap - bp;
+        });
+
+    const tilesHtml = sortedEntries
+      .map((item) => {
+        const isPinned = dir.pinnedIds.includes(item.id);
+        const isHidden = dir.hiddenIds.includes(item.id);
+
+        const emblem = `
+          <div class="al-diamond-emblem" style="--em-c1: ${item.c1}; --em-c2: ${item.c2}">
+            <span class="al-diamond-ring"></span>
+            <span class="al-diamond-core">${item.icon(26)}</span>
+          </div>
+        `;
+
+        const inner = `
+          ${isPinned && !this.editMode ? `<span class="al-tile-pin" title="Fijado">${Icons.star(12)}</span>` : ''}
+          ${emblem}
+          <div class="al-tile-title">
+            <span class="al-tile-prefix">${item.prefix}</span>
+            <strong>${item.title}</strong>
+          </div>
+          <p class="al-tile-sub">${item.subtitle}</p>
+          ${item.badgeText ? `<span class="al-tile-badge">${item.badgeText}</span>` : ''}
+        `;
+
+        const editControls = this.editMode
+          ? `
+            <div class="al-tile-editbar">
+              <button type="button" class="al-mini-ctrl ${isPinned ? 'is-on' : ''}" data-pin="${item.id}" title="Fijar">${Icons.star(13)}</button>
+              <button type="button" class="al-mini-ctrl" data-move="${item.id}:-1" title="Mover antes">${Icons.arrowUp(13)}</button>
+              <button type="button" class="al-mini-ctrl" data-move="${item.id}:1" title="Mover después">${Icons.arrowDown(13)}</button>
+              <button type="button" class="al-mini-ctrl ${isHidden ? 'is-off' : ''}" data-hide="${item.id}" title="${isHidden ? 'Mostrar' : 'Ocultar'}">
+                ${isHidden ? Icons.eye(13) : Icons.eyeOff(13)}
+              </button>
+              ${item.isCustom ? `<button type="button" class="al-mini-ctrl is-del" data-del-custom="${item.id}" title="Eliminar acceso">${Icons.trash(13)}</button>` : ''}
+            </div>
+          `
+          : '';
+
+        if (this.editMode) {
+          return `<div class="al-dir-card ${isHidden ? 'is-dimmed' : ''}">${inner}${editControls}</div>`;
+        }
+
+        if (item.externalUrl) {
+          return `
+            <a class="al-dir-card" href="${item.externalUrl}">
+              ${inner}
+            </a>`;
+        }
+
+        return `
+          <button type="button" class="al-dir-card" data-nav="${item.route}">
+            ${inner}
+          </button>`;
+      })
+      .join('');
+
     const habitChips = HABIT_LABELS.map((h) => {
       const done = profile.todayHabits[h.key];
       return `
         <button type="button" class="al-habit-chip ${done ? 'is-done' : ''}" data-nav="${h.target}">
-          <span class="al-habit-check">${done ? Icons.check(14) : ''}</span>
+          <span class="al-habit-check">${done ? Icons.check(13) : ''}</span>
           <span>${h.label}</span>
         </button>
       `;
@@ -46,17 +350,71 @@ export class HomeView {
 
     container.innerHTML = `
       <div class="al-page al-home">
-        <section class="al-welcome-row">
-          <div class="al-welcome-card">
-            <h1>Un espacio tranquilo para crecer un poco cada día</h1>
-            <p>Sin prisa y sin competir contra nadie. Lee un capítulo, afina la voz, cuida tu letra o frena la ansiedad cuando el día se ponga pesado.</p>
-            <div class="al-welcome-actions">
-              <button type="button" class="al-btn al-btn-calm" data-nav="calm">${Icons.wind(18)}<span>Necesito calmarme ahora (SOS)</span></button>
-              <button type="button" class="al-btn al-btn-primary" data-nav="reader">${Icons.book(18)}<span>Abrir biblioteca</span></button>
-            </div>
+        <section class="al-dir-toolbar">
+          <div class="al-seg-tabs" role="tablist" aria-label="Filtrar módulos del ecosistema">
+            <button type="button" class="al-seg-btn ${dir.activeCategory === 'all' ? 'is-active' : ''}" data-dcat="all">Todo el ecosistema</button>
+            <button type="button" class="al-seg-btn ${dir.activeCategory === 'atelier' ? 'is-active' : ''}" data-dcat="atelier">Atelier Diario (8)</button>
+            <button type="button" class="al-seg-btn ${dir.activeCategory === 'universidad' ? 'is-active' : ''}" data-dcat="universidad">Universidad</button>
+            <button type="button" class="al-seg-btn ${dir.activeCategory === 'entrenamiento' ? 'is-active' : ''}" data-dcat="entrenamiento">Entrenamiento</button>
+            <button type="button" class="al-seg-btn ${dir.activeCategory === 'personal' ? 'is-active' : ''}" data-dcat="personal">Mis Accesos</button>
           </div>
 
-          <aside class="al-habits-card">
+          <div class="al-tool-group">
+            <button type="button" class="al-btn" id="al-dir-add-link">${Icons.plus(15)}<span>Nuevo acceso</span></button>
+            <button type="button" class="al-btn ${this.editMode ? 'al-btn-primary' : ''}" id="al-dir-edit-toggle">
+              ${Icons.sliders(15)}<span>${this.editMode ? 'Listo' : 'Personalizar'}</span>
+            </button>
+            ${
+              openModal
+                ? `<button type="button" class="al-btn" id="al-dir-open-cloud">${Icons.cloud(15)}<span>Respaldo Supabase</span></button>`
+                : ''
+            }
+          </div>
+        </section>
+
+        ${
+          this.addLinkOpen
+            ? `
+          <form class="al-panel al-add-link-bar" id="al-add-link-form">
+            <div class="al-card-head">
+              <h2>Agregar acceso directo al Directorio (se guarda en Supabase)</h2>
+              <button type="button" class="al-icon-btn" id="al-add-link-close">×</button>
+            </div>
+            <div class="al-form-grid-3">
+              <label><span>Nombre del módulo o enlace</span><input type="text" id="al-cl-title" placeholder="Ej. Intranet UNU" required /></label>
+              <label><span>URL destino</span><input type="url" id="al-cl-url" placeholder="https://intranet.unu.edu.pe/" required /></label>
+              <label><span>Descripción corta</span><input type="text" id="al-cl-sub" placeholder="Portal universitario" /></label>
+            </div>
+            <div class="al-form-grid-3">
+              <label>
+                <span>Categoría</span>
+                <select id="al-cl-cat">
+                  <option value="personal">Mis Accesos</option>
+                  <option value="universidad">Universidad</option>
+                  <option value="atelier">Atelier Diario</option>
+                  <option value="entrenamiento">Entrenamiento</option>
+                </select>
+              </label>
+              <label>
+                <span>Color del rombo</span>
+                <select id="al-cl-color">
+                  ${CUSTOM_COLORS.map((c) => `<option value="${c.c1}">${c.label}</option>`).join('')}
+                </select>
+              </label>
+              <div class="al-add-link-submit">
+                <button type="submit" class="al-btn al-btn-primary">${Icons.check(15)}<span>Guardar en Directorio</span></button>
+              </div>
+            </div>
+          </form>`
+            : ''
+        }
+
+        <section class="al-dir-grid" aria-label="Directorio de módulos">
+          ${tilesHtml || '<div class="al-panel al-muted">No hay módulos visibles en esta categoría. Activa «Personalizar» para mostrar ocultos o agrega un acceso nuevo.</div>'}
+        </section>
+
+        <section class="al-pulse-row">
+          <div class="al-panel al-habits-card">
             <div class="al-card-head">
               <h2>Tu ritmo de hoy (${doneCount}/8)</h2>
               <span class="al-streak-badge">${profile.dailyStreak === 1 ? '1 día seguido' : `${profile.dailyStreak} días seguidos`}</span>
@@ -67,7 +425,24 @@ export class HomeView {
               <div><span>Tipeo PC / Móvil</span><strong>${profile.stats.bestWpmPc} / ${profile.stats.bestWpmMobile}</strong></div>
               <div><span>Calma</span><strong>${profile.stats.calmSessions}</strong></div>
             </div>
-          </aside>
+          </div>
+
+          <section class="al-panel al-umbral-bridge" id="al-umbral-bridge">
+            <div class="al-card-head">
+              <div>
+                <h2>Pulso académico (UNUmbral)</h2>
+                <p class="al-muted" id="al-umbral-status">Sincronizando horario y tareas...</p>
+              </div>
+              <div class="al-tool-group">
+                <label class="al-btn" title="Importar respaldo JSON exportado desde UNUmbral">
+                  <span>Importar JSON</span>
+                  <input type="file" id="al-umbral-file" accept=".json,application/json" style="display:none" />
+                </label>
+                <a class="al-btn al-btn-primary" href="${resolveCompanionUrl('unumbral')}">Abrir UNUmbral</a>
+              </div>
+            </div>
+            <div id="al-umbral-body" class="al-umbral-grid"></div>
+          </section>
         </section>
 
         <section class="al-capsules-grid">
@@ -99,67 +474,86 @@ export class HomeView {
             <div id="al-wiki-slot"></div>
           </article>
         </section>
-
-        <section class="al-panel al-umbral-bridge" id="al-umbral-bridge">
-          <div class="al-card-head">
-            <div>
-              <h2>Ecosistema académico (UNUmbral + OMNI ARENA)</h2>
-              <p class="al-muted" id="al-umbral-status">Sincronizando horario y tareas locales de UNUmbral...</p>
-            </div>
-            <div class="al-tool-group">
-              <label class="al-btn" title="Importar respaldo JSON exportado desde UNUmbral">
-                <span>Importar JSON</span>
-                <input type="file" id="al-umbral-file" accept=".json,application/json" style="display:none" />
-              </label>
-              <a class="al-btn" href="${resolveCompanionUrl('unumbral')}">Abrir UNUmbral</a>
-              <a class="al-btn al-btn-primary" href="${resolveCompanionUrl('arena')}">Abrir OMNI ARENA</a>
-            </div>
-          </div>
-          <div id="al-umbral-body" class="al-umbral-grid"></div>
-        </section>
-
-        <section class="al-studios-sec">
-          <h2>Estudios disponibles</h2>
-          <div class="al-studios-grid">
-            <button type="button" class="al-studio-tile" data-nav="reader">
-              <span class="al-studio-icon">${Icons.book(20)}</span>
-              <div><h3>Biblioteca y Lector</h3><p>Libros completos de Wikisource, Open Library y diccionario al tacto.</p></div>
-            </button>
-            <button type="button" class="al-studio-tile" data-nav="studio">
-              <span class="al-studio-icon">${Icons.tablet(20)}</span>
-              <div><h3>Cuaderno y Editor PDF</h3><p>Subraya libros PDF, dibuja diagramas tipo tablet y sincroniza en vivo.</p></div>
-            </button>
-            <button type="button" class="al-studio-tile" data-nav="calligraphy">
-              <span class="al-studio-icon">${Icons.pen(20)}</span>
-              <div><h3>Taller de Caligrafía</h3><p>Pautas guiadas, trazos, cursiva e imprenta sobre lienzo sensible.</p></div>
-            </button>
-            <button type="button" class="al-studio-tile" data-nav="typing">
-              <span class="al-studio-icon">${Icons.keyboard(20)}</span>
-              <div><h3>Escritura Rápida</h3><p>Modo PC (mecanografía y dedos guía) o Celular (pulgares y sprint 30s).</p></div>
-            </button>
-            <button type="button" class="al-studio-tile" data-nav="language">
-              <span class="al-studio-icon">${Icons.spell(20)}</span>
-              <div><h3>Ortografía y Vocabulario</h3><p>Reglas explicadas, sustitución de muletillas y Wikcionario en vivo.</p></div>
-            </button>
-            <button type="button" class="al-studio-tile" data-nav="mindset">
-              <span class="al-studio-icon">${Icons.bulb(20)}</span>
-              <div><h3>Frases y Criterio</h3><p>Modelos mentales claros para conversar mejor y decidir con calma.</p></div>
-            </button>
-            <button type="button" class="al-studio-tile" data-nav="singing">
-              <span class="al-studio-icon">${Icons.mic(20)}</span>
-              <div><h3>Estudio de Canto</h3><p>Afinador vocal en tiempo real con micrófono, piano guía y escalas.</p></div>
-            </button>
-            <button type="button" class="al-studio-tile" data-nav="calm">
-              <span class="al-studio-icon">${Icons.heart(20)}</span>
-              <div><h3>Calma y Reencuadre</h3><p>Respiración 4-7-8, aterrizaje 5-4-3-2-1 y diario positivo guiado.</p></div>
-            </button>
-          </div>
-        </section>
       </div>
     `;
 
     container.querySelectorAll<HTMLElement>('[data-nav]').forEach((el) => {
       el.addEventListener('click', () => navigate(el.dataset.nav as ModuleId));
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-dcat]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        directoryStore.setCategory(btn.dataset.dcat as 'all' | DirectoryCategory);
+        this.render(container, navigate, openModal);
+      });
+    });
+
+    container.querySelector('#al-dir-edit-toggle')?.addEventListener('click', () => {
+      this.editMode = !this.editMode;
+      this.render(container, navigate, openModal);
+    });
+
+    container.querySelector('#al-dir-add-link')?.addEventListener('click', () => {
+      this.addLinkOpen = !this.addLinkOpen;
+      this.render(container, navigate, openModal);
+    });
+
+    container.querySelector('#al-add-link-close')?.addEventListener('click', () => {
+      this.addLinkOpen = false;
+      this.render(container, navigate, openModal);
+    });
+
+    container.querySelector('#al-dir-open-cloud')?.addEventListener('click', () => {
+      openModal?.('cloud');
+    });
+
+    container.querySelector('#al-add-link-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = container.querySelector<HTMLInputElement>('#al-cl-title')!.value.trim();
+      const url = container.querySelector<HTMLInputElement>('#al-cl-url')!.value.trim();
+      const subtitle = container.querySelector<HTMLInputElement>('#al-cl-sub')!.value.trim();
+      const category = container.querySelector<HTMLSelectElement>('#al-cl-cat')!.value as DirectoryCategory;
+      const color = container.querySelector<HTMLSelectElement>('#al-cl-color')!.value;
+      if (!title || !url) return;
+      directoryStore.addCustomLink({
+        title,
+        url,
+        subtitle,
+        category,
+        color,
+        iconKey: 'link',
+      });
+      this.addLinkOpen = false;
+      this.render(container, navigate, openModal);
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-pin]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        directoryStore.togglePin(btn.dataset.pin!);
+        this.render(container, navigate, openModal);
+      });
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-hide]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        directoryStore.toggleHide(btn.dataset.hide!);
+        this.render(container, navigate, openModal);
+      });
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-move]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const [id, dirStr] = btn.dataset.move!.split(':');
+        directoryStore.moveItem(id, dirStr === '-1' ? -1 : 1);
+        this.render(container, navigate, openModal);
+      });
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-del-custom]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        directoryStore.removeCustomLink(btn.dataset.delCustom!);
+        this.render(container, navigate, openModal);
+      });
     });
 
     const wikiSlot = container.querySelector<HTMLDivElement>('#al-wiki-slot')!;
@@ -173,7 +567,7 @@ export class HomeView {
       } else if (this.wikiCache) {
         wikiSlot.innerHTML = `
           <div class="al-wiki-title">${this.wikiCache.title}</div>
-          <p class="al-capsule-text">${this.wikiCache.extract.slice(0, 210)}${this.wikiCache.extract.length > 210 ? '…' : ''}</p>
+          <p class="al-capsule-text">${this.wikiCache.extract.slice(0, 200)}${this.wikiCache.extract.length > 200 ? '…' : ''}</p>
         `;
       }
     };
@@ -204,20 +598,24 @@ export class HomeView {
     const fileInput = container.querySelector<HTMLInputElement>('#al-umbral-file')!;
 
     const paintUmbral = (snap: UmbralSnapshot) => {
+      this.lastUmbralSnap = snap;
       if (snap.source === 'none') {
         umbralStatus.textContent =
-          'Cuando uses UNUmbral en tu cuenta de GitHub Pages (o importes su respaldo .json), verás aquí tus huecos libres y tareas críticas.';
+          'Conecta Supabase o abre UNUmbral para ver aquí tus huecos libres, clases de hoy y tareas críticas.';
         umbralBody.innerHTML = '';
         return;
       }
-      umbralStatus.textContent =
+      const originLabel =
         snap.source === 'indexeddb'
-          ? `Conectado en vivo con UmbralDB · ${snap.todayClassesCount} clases hoy · ${snap.pendingCount} tareas pendientes`
-          : `Respaldo de UNUmbral cargado · ${snap.todayClassesCount} clases hoy · ${snap.pendingCount} tareas pendientes`;
+          ? 'En vivo desde UmbralDB'
+          : snap.source === 'supabase'
+            ? 'Sincronizado desde Supabase'
+            : 'Respaldo JSON cargado';
+      umbralStatus.textContent = `${originLabel} · ${snap.todayClassesCount} clases hoy · ${snap.pendingCount} tareas pendientes`;
 
       const gapHtml = snap.freeGaps.length
         ? snap.freeGaps
-            .slice(0, 3)
+            .slice(0, 2)
             .map(
               (g) => `
           <div class="al-umbral-chip">
@@ -230,6 +628,7 @@ export class HomeView {
 
       const taskHtml = snap.criticalTasks.length
         ? snap.criticalTasks
+            .slice(0, 2)
             .map(
               (t) => `
           <div class="al-umbral-chip is-critical">

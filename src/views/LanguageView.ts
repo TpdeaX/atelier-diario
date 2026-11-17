@@ -4,44 +4,48 @@ import { lookupWiktionary } from '../services/OnlineApi';
 import { lifeStore } from '../state/LifeStore';
 
 export class LanguageView {
-  private tab: 'ortho' | 'vocab' | 'dict' = 'ortho';
-  private orthoIdx = 0;
   private orthoPicked: number | null = null;
-  private vocabIdx = 0;
   private dictQuery = '';
   private dictLines: string[] = [];
   private dictStatus = 'Busca cualquier palabra en español y consulta su definición real en Wikcionario.';
 
   public render(container: HTMLElement): void {
     const profile = lifeStore.get();
+    const prefs = profile.modulePrefs.language;
     const acc =
       profile.stats.orthographyTotal > 0
         ? Math.round((profile.stats.orthographyCorrect / profile.stats.orthographyTotal) * 100)
         : 100;
 
     let bodyHtml = '';
-    if (this.tab === 'ortho') {
-      bodyHtml = this.renderOrthoHtml();
-    } else if (this.tab === 'vocab') {
-      bodyHtml = this.renderVocabHtml();
+    if (prefs.tab === 'ortho') {
+      bodyHtml = this.renderOrthoHtml(prefs.orthoIdx);
+    } else if (prefs.tab === 'vocab') {
+      bodyHtml = this.renderVocabHtml(prefs.vocabIdx);
     } else {
       bodyHtml = this.renderDictHtml();
     }
 
     container.innerHTML = `
       <div class="al-page">
-        <div class="al-page-head">
-          <div>
-            <h1>Ortografía, Vocabulario y Elocuencia</h1>
-            <p>Domina tildes y dudas frecuentes, enriquece tu forma de hablar y guarda palabras nuevas desde Wikcionario.</p>
+        <div class="al-module-hero" style="--mod-c1: #B45309; --mod-c2: #FBBF24;">
+          <div class="al-module-hero-id">
+            <div class="al-diamond-emblem is-sm" style="--em-c1: #B45309; --em-c2: #FBBF24;">
+              <span class="al-diamond-ring"></span>
+              <span class="al-diamond-core">${Icons.spell(20)}</span>
+            </div>
+            <div>
+              <h1>Ortografía, Vocabulario y Elocuencia</h1>
+              <p>Domina tildes y dudas frecuentes, reemplaza muletillas y guarda palabras en tu glosario sincronizado.</p>
+            </div>
           </div>
           <div class="al-mono-pill">Aciertos: ${profile.stats.orthographyCorrect}/${profile.stats.orthographyTotal} (${acc}%)</div>
         </div>
 
         <div class="al-seg-tabs">
-          <button type="button" class="al-seg-btn ${this.tab === 'ortho' ? 'is-active' : ''}" data-ltab="ortho">Reto de ortografía</button>
-          <button type="button" class="al-seg-btn ${this.tab === 'vocab' ? 'is-active' : ''}" data-ltab="vocab">Vocabulario útil (${VOCABULARY_DECK.length})</button>
-          <button type="button" class="al-seg-btn ${this.tab === 'dict' ? 'is-active' : ''}" data-ltab="dict">Diccionario vivo y Glosario (${profile.savedWords.length})</button>
+          <button type="button" class="al-seg-btn ${prefs.tab === 'ortho' ? 'is-active' : ''}" data-ltab="ortho">Reto de ortografía</button>
+          <button type="button" class="al-seg-btn ${prefs.tab === 'vocab' ? 'is-active' : ''}" data-ltab="vocab">Vocabulario útil (${VOCABULARY_DECK.length})</button>
+          <button type="button" class="al-seg-btn ${prefs.tab === 'dict' ? 'is-active' : ''}" data-ltab="dict">Diccionario vivo y Glosario (${profile.savedWords.length})</button>
         </div>
 
         ${bodyHtml}
@@ -51,8 +55,8 @@ export class LanguageView {
     this.bindEvents(container);
   }
 
-  private renderOrthoHtml(): string {
-    const q = ORTHOGRAPHY_BANK[this.orthoIdx % ORTHOGRAPHY_BANK.length];
+  private renderOrthoHtml(orthoIdx: number): string {
+    const q = ORTHOGRAPHY_BANK[orthoIdx % ORTHOGRAPHY_BANK.length];
     const answered = this.orthoPicked !== null;
     const isCorrect = answered && this.orthoPicked === q.correctIndex;
 
@@ -70,7 +74,7 @@ export class LanguageView {
     return `
       <div class="al-panel al-quiz-card">
         <div class="al-card-head">
-          <span class="al-mono-pill">Pregunta ${(this.orthoIdx % ORTHOGRAPHY_BANK.length) + 1} / ${ORTHOGRAPHY_BANK.length}</span>
+          <span class="al-mono-pill">Pregunta ${(orthoIdx % ORTHOGRAPHY_BANK.length) + 1} / ${ORTHOGRAPHY_BANK.length}</span>
         </div>
         <p class="al-quiz-sentence">${q.sentence.replace('___', '<span class="al-blank">______</span>')}</p>
         <div class="al-quiz-options">${optionsHtml}</div>
@@ -88,8 +92,8 @@ export class LanguageView {
     `;
   }
 
-  private renderVocabHtml(): string {
-    const item = VOCABULARY_DECK[this.vocabIdx % VOCABULARY_DECK.length];
+  private renderVocabHtml(vocabIdx: number): string {
+    const item = VOCABULARY_DECK[vocabIdx % VOCABULARY_DECK.length];
     const alreadySaved = lifeStore
       .get()
       .savedWords.some((w) => w.word.toLowerCase() === item.word.toLowerCase());
@@ -97,7 +101,7 @@ export class LanguageView {
     return `
       <div class="al-panel al-vocab-card">
         <div class="al-card-head">
-          <span class="al-mono-pill">Tarjeta ${(this.vocabIdx % VOCABULARY_DECK.length) + 1} / ${VOCABULARY_DECK.length}</span>
+          <span class="al-mono-pill">Tarjeta ${(vocabIdx % VOCABULARY_DECK.length) + 1} / ${VOCABULARY_DECK.length}</span>
           ${item.replaces ? `<span class="al-muted">Eleva expresiones como: «${item.replaces}»</span>` : ''}
         </div>
         <h2 class="al-vocab-word">${item.word}</h2>
@@ -161,7 +165,9 @@ export class LanguageView {
   private bindEvents(container: HTMLElement): void {
     container.querySelectorAll<HTMLButtonElement>('[data-ltab]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        this.tab = btn.dataset.ltab as typeof this.tab;
+        lifeStore.updateModulePrefs('language', {
+          tab: btn.dataset.ltab as 'ortho' | 'vocab' | 'dict',
+        });
         this.render(container);
       });
     });
@@ -170,29 +176,38 @@ export class LanguageView {
       btn.addEventListener('click', () => {
         const idx = parseInt(btn.dataset.opt!, 10);
         this.orthoPicked = idx;
-        const q = ORTHOGRAPHY_BANK[this.orthoIdx % ORTHOGRAPHY_BANK.length];
+        const orthoIdx = lifeStore.get().modulePrefs.language.orthoIdx;
+        const q = ORTHOGRAPHY_BANK[orthoIdx % ORTHOGRAPHY_BANK.length];
         lifeStore.recordOrthography(idx === q.correctIndex);
         this.render(container);
       });
     });
 
     container.querySelector('#al-ortho-next')?.addEventListener('click', () => {
-      this.orthoIdx += 1;
+      const orthoIdx = lifeStore.get().modulePrefs.language.orthoIdx;
+      lifeStore.updateModulePrefs('language', { orthoIdx: (orthoIdx + 1) % ORTHOGRAPHY_BANK.length });
       this.orthoPicked = null;
       this.render(container);
     });
 
     container.querySelector('#al-vocab-prev')?.addEventListener('click', () => {
-      this.vocabIdx = (this.vocabIdx - 1 + VOCABULARY_DECK.length) % VOCABULARY_DECK.length;
+      const vocabIdx = lifeStore.get().modulePrefs.language.vocabIdx;
+      lifeStore.updateModulePrefs('language', {
+        vocabIdx: (vocabIdx - 1 + VOCABULARY_DECK.length) % VOCABULARY_DECK.length,
+      });
       this.render(container);
     });
     container.querySelector('#al-vocab-next')?.addEventListener('click', () => {
-      this.vocabIdx = (this.vocabIdx + 1) % VOCABULARY_DECK.length;
+      const vocabIdx = lifeStore.get().modulePrefs.language.vocabIdx;
+      lifeStore.updateModulePrefs('language', {
+        vocabIdx: (vocabIdx + 1) % VOCABULARY_DECK.length,
+      });
       lifeStore.markHabit('language');
       this.render(container);
     });
     container.querySelector('#al-vocab-save')?.addEventListener('click', () => {
-      const item = VOCABULARY_DECK[this.vocabIdx % VOCABULARY_DECK.length];
+      const vocabIdx = lifeStore.get().modulePrefs.language.vocabIdx;
+      const item = VOCABULARY_DECK[vocabIdx % VOCABULARY_DECK.length];
       lifeStore.saveWord(item.word, item.meaning);
       this.render(container);
     });

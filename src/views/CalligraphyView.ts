@@ -9,24 +9,42 @@ interface StrokePt {
   t: number;
 }
 
+const INK_SWATCHES = [
+  { name: 'Verde Atelier', hex: '#147D58' },
+  { name: 'Azul Tinta', hex: '#1D4ED8' },
+  { name: 'Carbón', hex: '#10211B' },
+  { name: 'Terracota', hex: '#B45309' },
+  { name: 'Ciruela', hex: '#6D28D9' },
+];
+
 const TEMPLATES: Record<DrillMode, string[]> = {
-  trazos: ['|  |  |  |  |', 'O  O  O  O', '/ / / / / /', 'uuu   nnn   mmm'],
-  imprenta: ['A a  B b  C c', 'E e  G g  R r', 'M m  S s  Z z', 'La letra clara ordena la mente.'],
-  cursiva: ['ele  ala  olo', 'fluidez y ritmo', 'serenidad', 'Paso firme cada día'],
-  frase: ['Respira hondo.', 'Un paso hoy.', 'Mente serena.', 'Todo mejora paso a paso.'],
+  trazos: [
+    '|  |  |  |  |', 'O  O  O  O', '/ / / / / /', 'uuu   nnn   mmm',
+    '\\ \\ \\ \\ \\ \\', 'o o o o o o', 'c c c c c c', 'l l l l l l',
+    'iii   uuu   www', 'eee   lll   eee', 'vvv   www   vvv', 'mmm   nnn   uuu',
+  ],
+  imprenta: [
+    'A a  B b  C c', 'E e  G g  R r', 'M m  S s  Z z', 'La letra clara ordena la mente.',
+    'D d  F f  H h', 'I i  J j  K k', 'L l  N n  Ñ ñ', 'O o  P p  Q q',
+    'T t  U u  V v', 'W w  X x  Y y', 'á é í ó ú ü', '¿Qué? ¡Sí! «Ya»',
+  ],
+  cursiva: [
+    'ele  ala  olo', 'fluidez y ritmo', 'serenidad', 'Paso firme cada día',
+    'mar  mano  menta', 'bello  llama  lluvia', 'ñandú  niño  año', 'gracia  guiño',
+    'armonía', 'constancia', 'quietud y luz', 'Querida libreta',
+  ],
+  frase: [
+    'Respira hondo.', 'Un paso hoy.', 'Mente serena.', 'Todo mejora paso a paso.',
+    'Hoy elijo la calma.', 'Poco a poco se llega.', 'Hecho es mejor que perfecto.',
+    'La calma también es fuerza.', 'Lento, pero sin pausa.', 'Aprendo de cada error.',
+    'Sé amable contigo.', 'El jamón y el kiwi añejo.',
+  ],
 };
 
 export class CalligraphyView {
-  private mode: DrillMode = 'trazos';
-  private sampleIdx = 0;
-  private showGuidelines = true;
-  private showSlant = true;
-  private inkColor = '#147D58';
-  private nibSize = 4;
-
   private strokes: StrokePt[][] = [];
   private activeStroke: StrokePt[] | null = null;
-  private feedbackMsg = 'Dibuja despacio siguiendo la pauta guía. Busca regularidad más que velocidad.';
+  private feedbackMsg = 'Dibuja despacio siguiendo la pauta guía. Tu configuración queda guardada en Supabase.';
 
   private canvas!: HTMLCanvasElement;
   private g!: CanvasRenderingContext2D;
@@ -36,36 +54,53 @@ export class CalligraphyView {
 
   public render(container: HTMLElement): void {
     const profile = lifeStore.get();
-    const currentText = TEMPLATES[this.mode][this.sampleIdx % TEMPLATES[this.mode].length];
+    const prefs = profile.modulePrefs.calligraphy;
+    const list = TEMPLATES[prefs.mode];
+    const currentText = list[prefs.sampleIdx % list.length];
 
     container.innerHTML = `
       <div class="al-page al-calligraphy-page">
-        <div class="al-page-head">
-          <div>
-            <h1>Taller de Caligrafía</h1>
-            <p>Practica pulso, altura uniforme e inclinación constante sobre pauta profesional.</p>
+        <div class="al-module-hero" style="--mod-c1: #0D7A72; --mod-c2: #4FD1C5;">
+          <div class="al-module-hero-id">
+            <div class="al-diamond-emblem is-sm" style="--em-c1: #0D7A72; --em-c2: #4FD1C5;">
+              <span class="al-diamond-ring"></span>
+              <span class="al-diamond-core">${Icons.pen(20)}</span>
+            </div>
+            <div>
+              <h1>Taller de Caligrafía</h1>
+              <p>Practica pulso, altura uniforme e inclinación constante sobre pauta profesional.</p>
+            </div>
           </div>
           <div class="al-mono-pill">Hojas completadas: ${profile.stats.calligraphySheets}</div>
         </div>
 
         <div class="al-toolbar">
           <div class="al-seg-tabs">
-            <button type="button" class="al-seg-btn ${this.mode === 'trazos' ? 'is-active' : ''}" data-cmode="trazos">Trazos base</button>
-            <button type="button" class="al-seg-btn ${this.mode === 'imprenta' ? 'is-active' : ''}" data-cmode="imprenta">Imprenta</button>
-            <button type="button" class="al-seg-btn ${this.mode === 'cursiva' ? 'is-active' : ''}" data-cmode="cursiva">Cursiva</button>
-            <button type="button" class="al-seg-btn ${this.mode === 'frase' ? 'is-active' : ''}" data-cmode="frase">Frases</button>
+            <button type="button" class="al-seg-btn ${prefs.mode === 'trazos' ? 'is-active' : ''}" data-cmode="trazos">Trazos base</button>
+            <button type="button" class="al-seg-btn ${prefs.mode === 'imprenta' ? 'is-active' : ''}" data-cmode="imprenta">Imprenta</button>
+            <button type="button" class="al-seg-btn ${prefs.mode === 'cursiva' ? 'is-active' : ''}" data-cmode="cursiva">Cursiva</button>
+            <button type="button" class="al-seg-btn ${prefs.mode === 'frase' ? 'is-active' : ''}" data-cmode="frase">Frases</button>
           </div>
 
           <div class="al-tool-group">
             <button type="button" class="al-btn" id="al-cal-next">Siguiente muestra</button>
-            <button type="button" class="al-btn ${this.showGuidelines ? 'is-toggled' : ''}" id="al-cal-guides">Renglones</button>
-            <button type="button" class="al-btn ${this.showSlant ? 'is-toggled' : ''}" id="al-cal-slant">Inclinación 55°</button>
-            <label class="al-inline-range">Plumín <input type="range" id="al-cal-nib" min="2" max="9" value="${this.nibSize}" /></label>
+            <button type="button" class="al-btn ${prefs.showGuidelines ? 'is-toggled' : ''}" id="al-cal-guides">Renglones</button>
+            <button type="button" class="al-btn ${prefs.showSlant ? 'is-toggled' : ''}" id="al-cal-slant">Inclinación 55°</button>
+            <div class="al-tool-group" aria-label="Color de tinta">
+              ${INK_SWATCHES.map(
+                (s) =>
+                  `<button type="button" class="al-swatch ${prefs.inkColor === s.hex ? 'is-active' : ''}" data-ink="${s.hex}" title="${s.name}" style="background:${s.hex}"></button>`
+              ).join('')}
+            </div>
+            <label class="al-inline-range">Plumín <input type="range" id="al-cal-nib" min="2" max="9" value="${prefs.nibSize}" /></label>
           </div>
         </div>
 
         <div class="al-panel al-canvas-panel">
-          <div class="al-cal-sample-label">Modelo: <strong>${currentText}</strong></div>
+          <div class="al-cal-sample-label">
+            <span>Modelo ${(prefs.sampleIdx % list.length) + 1}/${list.length}:</span>
+            <strong>${currentText}</strong>
+          </div>
           <canvas id="al-cal-canvas" class="al-cal-canvas"></canvas>
           <div class="al-cal-foot">
             <span id="al-cal-feedback" class="al-muted">${this.feedbackMsg}</span>
@@ -98,9 +133,11 @@ export class CalligraphyView {
 
   private redraw(): void {
     const g = this.g;
-    const isNight = lifeStore.get().theme === 'night';
+    const prof = lifeStore.get();
+    const prefs = prof.modulePrefs.calligraphy;
+    const isNight = prof.theme === 'night';
     const bg = isNight ? '#111A17' : '#FFFFFF';
-    const ink = isNight ? '#34D399' : this.inkColor;
+    const ink = isNight && prefs.inkColor === '#10211B' ? '#34D399' : prefs.inkColor;
     const guideMain = isNight ? 'rgba(130, 175, 160, 0.25)' : 'rgba(20, 125, 88, 0.24)';
     const guideSub = isNight ? 'rgba(130, 175, 160, 0.14)' : 'rgba(20, 125, 88, 0.12)';
     const ghostColor = isNight ? 'rgba(230, 239, 234, 0.12)' : 'rgba(16, 33, 27, 0.11)';
@@ -113,7 +150,7 @@ export class CalligraphyView {
     const baseY = 205;
     const descY = 265;
 
-    if (this.showGuidelines) {
+    if (prefs.showGuidelines) {
       g.lineWidth = 1;
       for (const [y, dashed, col] of [
         [ascY, true, guideSub],
@@ -131,7 +168,7 @@ export class CalligraphyView {
       g.setLineDash([]);
     }
 
-    if (this.showSlant) {
+    if (prefs.showSlant) {
       g.strokeStyle = guideSub;
       g.lineWidth = 1;
       for (let x = -120; x < this.width + 120; x += 48) {
@@ -142,17 +179,16 @@ export class CalligraphyView {
       }
     }
 
-    // Ghost text template
-    const sample = TEMPLATES[this.mode][this.sampleIdx % TEMPLATES[this.mode].length];
+    const list = TEMPLATES[prefs.mode];
+    const sample = list[prefs.sampleIdx % list.length];
     g.fillStyle = ghostColor;
-    const fontStyle = this.mode === 'cursiva' ? 'italic ' : '';
+    const fontStyle = prefs.mode === 'cursiva' ? 'italic ' : '';
     const fontSize = sample.length > 20 ? 44 : 58;
     g.font = `${fontStyle}600 ${fontSize}px "Literata", Georgia, serif`;
     g.textAlign = 'center';
     g.textBaseline = 'alphabetic';
     g.fillText(sample, this.width / 2, baseY - 2);
 
-    // Draw all user strokes with smooth quadratic interpolation
     const allStrokes = this.activeStroke ? [...this.strokes, this.activeStroke] : this.strokes;
     g.strokeStyle = ink;
     g.lineCap = 'round';
@@ -163,7 +199,7 @@ export class CalligraphyView {
         if (stroke.length === 1) {
           g.fillStyle = ink;
           g.beginPath();
-          g.arc(stroke[0].x, stroke[0].y, this.nibSize / 2, 0, Math.PI * 2);
+          g.arc(stroke[0].x, stroke[0].y, prefs.nibSize / 2, 0, Math.PI * 2);
           g.fill();
         }
         continue;
@@ -175,8 +211,10 @@ export class CalligraphyView {
         const dist = Math.hypot(curr.x - prev.x, curr.y - prev.y);
         const dt = Math.max(1, curr.t - prev.t);
         const speed = dist / dt;
-        // Slower deliberate strokes render slightly fuller like fountain ink
-        const dynamicW = Math.max(1.8, Math.min(this.nibSize * 1.4, this.nibSize * (1.25 - speed * 0.2)));
+        const dynamicW = Math.max(
+          1.8,
+          Math.min(prefs.nibSize * 1.4, prefs.nibSize * (1.25 - speed * 0.2))
+        );
         g.lineWidth = dynamicW;
         g.beginPath();
         g.moveTo(prev.x, prev.y);
@@ -209,7 +247,7 @@ export class CalligraphyView {
     }
     const zonePct = totalPts > 0 ? Math.round((inZone / totalPts) * 100) : 0;
     lifeStore.recordCalligraphySheet();
-    return `Hoja guardada (${this.strokes.length} trazos · ${zonePct}% dentro de la pauta). Sigue priorizando trazos constantes.`;
+    return `Hoja guardada en tu progreso (${this.strokes.length} trazos · ${zonePct}% dentro de la pauta).`;
   }
 
   private bindEvents(container: HTMLElement): void {
@@ -238,31 +276,44 @@ export class CalligraphyView {
 
     container.querySelectorAll<HTMLButtonElement>('[data-cmode]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        this.mode = btn.dataset.cmode as DrillMode;
-        this.sampleIdx = 0;
+        lifeStore.updateModulePrefs('calligraphy', {
+          mode: btn.dataset.cmode as DrillMode,
+          sampleIdx: 0,
+        });
         this.strokes = [];
         this.render(container);
       });
     });
 
     container.querySelector('#al-cal-next')?.addEventListener('click', () => {
-      this.sampleIdx += 1;
+      const prefs = lifeStore.get().modulePrefs.calligraphy;
+      lifeStore.updateModulePrefs('calligraphy', { sampleIdx: prefs.sampleIdx + 1 });
       this.strokes = [];
       this.render(container);
     });
 
     container.querySelector('#al-cal-guides')?.addEventListener('click', () => {
-      this.showGuidelines = !this.showGuidelines;
+      const prefs = lifeStore.get().modulePrefs.calligraphy;
+      lifeStore.updateModulePrefs('calligraphy', { showGuidelines: !prefs.showGuidelines });
       this.render(container);
     });
 
     container.querySelector('#al-cal-slant')?.addEventListener('click', () => {
-      this.showSlant = !this.showSlant;
+      const prefs = lifeStore.get().modulePrefs.calligraphy;
+      lifeStore.updateModulePrefs('calligraphy', { showSlant: !prefs.showSlant });
       this.render(container);
     });
 
+    container.querySelectorAll<HTMLButtonElement>('[data-ink]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        lifeStore.updateModulePrefs('calligraphy', { inkColor: btn.dataset.ink! });
+        this.render(container);
+      });
+    });
+
     container.querySelector<HTMLInputElement>('#al-cal-nib')?.addEventListener('input', (e) => {
-      this.nibSize = parseInt((e.target as HTMLInputElement).value, 10) || 4;
+      const val = parseInt((e.target as HTMLInputElement).value, 10) || 4;
+      lifeStore.updateModulePrefs('calligraphy', { nibSize: val });
       this.redraw();
     });
 
@@ -278,8 +329,7 @@ export class CalligraphyView {
 
     container.querySelector('#al-cal-save')?.addEventListener('click', () => {
       this.feedbackMsg = this.evaluatePractice();
-      const fb = container.querySelector('#al-cal-feedback');
-      if (fb) fb.textContent = this.feedbackMsg;
+      this.render(container);
     });
   }
 }

@@ -23,6 +23,10 @@ export type ThemeMode = 'day' | 'night';
 
 export type DeviceProfile = 'auto' | 'pc' | 'mobile';
 
+export type BoardTool = 'pen' | 'highlighter' | 'rect' | 'circle' | 'arrow' | 'text' | 'eraser';
+
+export type PaperStyle = 'dotted' | 'grid' | 'lined' | 'blank' | 'pdf';
+
 export interface SavedWord {
   word: string;
   definition: string;
@@ -44,6 +48,62 @@ export interface BookBookmark {
   updatedAt: number;
 }
 
+export interface PhraseItem {
+  id: string;
+  category: 'mente' | 'hablar' | 'decisiones' | 'calma';
+  quote: string;
+  author: string;
+  meaning: string;
+  whenToUse: string;
+  dailyAction: string;
+  isCustom?: boolean;
+}
+
+export interface ModulePreferences {
+  reader: {
+    sourceTab: 'wikisource' | 'wikipedia' | 'openlibrary';
+    lastArticleTitle: string;
+  };
+  studio: {
+    activeId: string;
+    currentPage: number;
+    tool: BoardTool;
+    color: string;
+    strokeWidth: number;
+  };
+  calligraphy: {
+    mode: 'trazos' | 'imprenta' | 'cursiva' | 'frase';
+    sampleIdx: number;
+    showGuidelines: boolean;
+    showSlant: boolean;
+    inkColor: string;
+    nibSize: number;
+  };
+  typing: {
+    pcDrill: 'accents' | 'speed' | 'classic';
+    mobileDrill: 'agile' | 'orthowords' | 'sprint30';
+    sampleIdx: number;
+    showFingerGuide: boolean;
+  };
+  language: {
+    tab: 'ortho' | 'vocab' | 'dict';
+    orthoIdx: number;
+    vocabIdx: number;
+  };
+  mindset: {
+    category: 'all' | 'favs' | PhraseItem['category'];
+    searchQuery: string;
+  };
+  singing: {
+    lastDrillId: string;
+  };
+  calm: {
+    patternId: '478' | 'box' | 'sigh';
+    soundCue: boolean;
+    groundingIdx: number;
+  };
+}
+
 export interface LifeProfile {
   theme: ThemeMode;
   deviceMode: DeviceProfile;
@@ -52,6 +112,7 @@ export interface LifeProfile {
   lastActiveDay: string;
   todayHabits: Record<HabitKey, boolean>;
   favoritePhraseIds: string[];
+  customPhrases: PhraseItem[];
   savedWords: SavedWord[];
   reframeLog: ReframeEntry[];
   bookmarks: BookBookmark[];
@@ -64,16 +125,8 @@ export interface LifeProfile {
     bestWpmPc: number;
     bestWpmMobile: number;
   };
-}
-
-export interface PhraseItem {
-  id: string;
-  category: 'mente' | 'hablar' | 'decisiones' | 'calma';
-  quote: string;
-  author: string;
-  meaning: string;
-  whenToUse: string;
-  dailyAction: string;
+  modulePrefs: ModulePreferences;
+  updatedAt: number;
 }
 
 export interface OrthographyQuestion {
@@ -90,10 +143,6 @@ export interface VocabPair {
   example: string;
   replaces?: string;
 }
-
-export type BoardTool = 'pen' | 'highlighter' | 'rect' | 'circle' | 'arrow' | 'text' | 'eraser';
-
-export type PaperStyle = 'dotted' | 'grid' | 'lined' | 'blank' | 'pdf';
 
 export interface BoardStrokeElement {
   id: string;
@@ -146,3 +195,38 @@ export interface CloudSyncConfig {
   autoSync: boolean;
 }
 
+export type EcosystemScope =
+  | 'directory_config'
+  | 'atelier_profile'
+  | 'unumbral_backup'
+  | 'arena_profile';
+
+export type DirectoryCategory = 'atelier' | 'universidad' | 'entrenamiento' | 'personal';
+
+export interface CustomDirectoryLink {
+  id: string;
+  title: string;
+  subtitle: string;
+  url: string;
+  category: DirectoryCategory;
+  color: string;
+  iconKey: string;
+}
+
+export interface DirectoryConfig {
+  userName: string;
+  userSubtitle: string;
+  userInitials: string;
+  ecosystemTitle: string;
+  ecosystemSubtitle: string;
+  activeCategory: 'all' | DirectoryCategory;
+  pinnedIds: string[];
+  hiddenIds: string[];
+  order: string[];
+  customLinks: CustomDirectoryLink[];
+  companionUrls: {
+    unumbral: string;
+    arena: string;
+  };
+  updatedAt: number;
+}

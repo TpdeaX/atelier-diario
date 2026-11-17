@@ -1,8 +1,11 @@
+import { cloudSync } from '../services/CloudSync';
 import {
   BookBookmark,
   DeviceProfile,
   HabitKey,
   LifeProfile,
+  ModulePreferences,
+  PhraseItem,
   ReframeEntry,
   SavedWord,
   ThemeMode,
@@ -28,6 +31,53 @@ function emptyHabits(): Record<HabitKey, boolean> {
   };
 }
 
+export function defaultModulePrefs(): ModulePreferences {
+  return {
+    reader: {
+      sourceTab: 'wikisource',
+      lastArticleTitle: '',
+    },
+    studio: {
+      activeId: '',
+      currentPage: 1,
+      tool: 'pen',
+      color: '#10211B',
+      strokeWidth: 4,
+    },
+    calligraphy: {
+      mode: 'trazos',
+      sampleIdx: 0,
+      showGuidelines: true,
+      showSlant: true,
+      inkColor: '#147D58',
+      nibSize: 4,
+    },
+    typing: {
+      pcDrill: 'accents',
+      mobileDrill: 'agile',
+      sampleIdx: 0,
+      showFingerGuide: true,
+    },
+    language: {
+      tab: 'ortho',
+      orthoIdx: 0,
+      vocabIdx: 0,
+    },
+    mindset: {
+      category: 'all',
+      searchQuery: '',
+    },
+    singing: {
+      lastDrillId: 'major5',
+    },
+    calm: {
+      patternId: '478',
+      soundCue: true,
+      groundingIdx: 0,
+    },
+  };
+}
+
 function defaultProfile(): LifeProfile {
   return {
     theme: 'day',
@@ -37,6 +87,7 @@ function defaultProfile(): LifeProfile {
     lastActiveDay: '',
     todayHabits: emptyHabits(),
     favoritePhraseIds: [],
+    customPhrases: [],
     savedWords: [],
     reframeLog: [],
     bookmarks: [],
@@ -49,12 +100,43 @@ function defaultProfile(): LifeProfile {
       bestWpmPc: 0,
       bestWpmMobile: 0,
     },
+    modulePrefs: defaultModulePrefs(),
+    updatedAt: 0,
+  };
+}
+
+function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifeProfile {
+  const base = defaultProfile();
+  if (!raw || typeof raw !== 'object') return base;
+  const mp = raw.modulePrefs ?? ({} as Partial<ModulePreferences>);
+  return {
+    ...base,
+    ...raw,
+    todayHabits: { ...base.todayHabits, ...(raw.todayHabits ?? {}) },
+    stats: { ...base.stats, ...(raw.stats ?? {}) },
+    favoritePhraseIds: Array.isArray(raw.favoritePhraseIds) ? raw.favoritePhraseIds : [],
+    customPhrases: Array.isArray(raw.customPhrases) ? raw.customPhrases : [],
+    savedWords: Array.isArray(raw.savedWords) ? raw.savedWords : [],
+    reframeLog: Array.isArray(raw.reframeLog) ? raw.reframeLog : [],
+    bookmarks: Array.isArray(raw.bookmarks) ? raw.bookmarks : [],
+    modulePrefs: {
+      reader: { ...base.modulePrefs.reader, ...(mp.reader ?? {}) },
+      studio: { ...base.modulePrefs.studio, ...(mp.studio ?? {}) },
+      calligraphy: { ...base.modulePrefs.calligraphy, ...(mp.calligraphy ?? {}) },
+      typing: { ...base.modulePrefs.typing, ...(mp.typing ?? {}) },
+      language: { ...base.modulePrefs.language, ...(mp.language ?? {}) },
+      mindset: { ...base.modulePrefs.mindset, ...(mp.mindset ?? {}) },
+      singing: { ...base.modulePrefs.singing, ...(mp.singing ?? {}) },
+      calm: { ...base.modulePrefs.calm, ...(mp.calm ?? {}) },
+    },
+    updatedAt: Number(raw.updatedAt) || 0,
   };
 }
 
 class LifeStore {
   private profile: LifeProfile;
   private listeners = new Set<() => void>();
+  private pushTimer = 0;
 
   constructor() {
     this.profile = this.load();
@@ -65,33 +147,55 @@ class LifeStore {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return defaultProfile();
-      const parsed = JSON.parse(raw) as Partial<LifeProfile>;
-      const base = defaultProfile();
-      return {
-        ...base,
-        ...parsed,
-        todayHabits: { ...base.todayHabits, ...(parsed.todayHabits ?? {}) },
-        stats: { ...base.stats, ...(parsed.stats ?? {}) },
-        favoritePhraseIds: Array.isArray(parsed.favoritePhraseIds) ? parsed.favoritePhraseIds : [],
-        savedWords: Array.isArray(parsed.savedWords) ? parsed.savedWords : [],
-        reframeLog: Array.isArray(parsed.reframeLog) ? parsed.reframeLog : [],
-        bookmarks: Array.isArray(parsed.bookmarks) ? parsed.bookmarks : [],
-      };
+      return normalizeProfile(JSON.parse(raw) as Partial<LifeProfile>);
     } catch {
       return defaultProfile();
     }
   }
 
-  private save(): void {
+  private save(syncCloud = true): void {
+    this.profile.updatedAt = Date.now();
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.profile));
+      localStorage.setItem('umbral-theme', this.profile.theme === 'night' ? 'dark' : 'light');
     } catch {
       // Ignore storage quota issues
     }
     this.listeners.forEach((fn) => fn());
+    if (syncCloud && cloudSync.isConfigured()) {
+      window.clearTimeout(this.pushTimer);
+      this.pushTimer = window.setTimeout(() => {
+        void cloudSync.pushScope('atelier_profile', this.profile, this.profile.updatedAt);
+      }, 650);
+    }
   }
 
-  private rolloverDay(): void {
+  public async pushNow(): Promise<boolean> {
+    if (!cloudSync.isConfigured()) return false;
+    return cloudSync.pushScope('atelier_profile', this.profile, this.profile.updatedAt || Date.now());
+  }
+
+  public applyRemote(raw: Partial<LifeProfile>, remoteUpdatedAt: number, force = false): boolean {
+    const clean = normalizeProfile({ ...raw, updatedAt: remoteUpdatedAt || raw.updatedAt });
+    if (!force && clean.updatedAt <= this.profile.updatedAt) return false;
+    this.profile = clean;
+    this.rolloverDay(false);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.profile));
+      localStorage.setItem('umbral-theme', this.profile.theme === 'night' ? 'dark' : 'light');
+    } catch {
+      // Ignore storage quota issues
+    }
+    this.listeners.forEach((fn) => fn());
+    return true;
+  }
+
+  public replaceAll(raw: Partial<LifeProfile>): void {
+    this.profile = normalizeProfile(raw);
+    this.save(true);
+  }
+
+  private rolloverDay(sync = true): void {
     const today = todayStamp();
     if (this.profile.lastActiveDay && this.profile.lastActiveDay !== today) {
       const prev = new Date(this.profile.lastActiveDay);
@@ -101,7 +205,7 @@ class LifeStore {
         this.profile.dailyStreak = 0;
       }
       this.profile.todayHabits = emptyHabits();
-      this.save();
+      this.save(sync);
     }
   }
 
@@ -112,6 +216,17 @@ class LifeStore {
 
   public get(): LifeProfile {
     return this.profile;
+  }
+
+  public updateModulePrefs<K extends keyof ModulePreferences>(
+    moduleKey: K,
+    patch: Partial<ModulePreferences[K]>
+  ): void {
+    this.profile.modulePrefs[moduleKey] = {
+      ...this.profile.modulePrefs[moduleKey],
+      ...patch,
+    };
+    this.save();
   }
 
   public setTheme(theme: ThemeMode): void {
@@ -165,6 +280,25 @@ class LifeStore {
     return true;
   }
 
+  public addCustomPhrase(input: Omit<PhraseItem, 'id' | 'isCustom'>): PhraseItem {
+    const item: PhraseItem = {
+      ...input,
+      id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      isCustom: true,
+    };
+    this.profile.customPhrases.unshift(item);
+    this.profile.favoritePhraseIds.unshift(item.id);
+    this.markHabit('mindset');
+    this.save();
+    return item;
+  }
+
+  public removeCustomPhrase(id: string): void {
+    this.profile.customPhrases = this.profile.customPhrases.filter((p) => p.id !== id);
+    this.profile.favoritePhraseIds = this.profile.favoritePhraseIds.filter((fid) => fid !== id);
+    this.save();
+  }
+
   public saveWord(word: string, definition: string): void {
     const clean = word.trim().toLowerCase();
     if (!clean) return;
@@ -172,7 +306,7 @@ class LifeStore {
     if (!exists) {
       const item: SavedWord = { word: word.trim(), definition, addedAt: Date.now() };
       this.profile.savedWords.unshift(item);
-      this.profile.savedWords = this.profile.savedWords.slice(0, 80);
+      this.profile.savedWords = this.profile.savedWords.slice(0, 120);
     }
     this.markHabit('language');
     this.save();
@@ -222,14 +356,14 @@ class LifeStore {
       createdAt: Date.now(),
     };
     this.profile.reframeLog.unshift(entry);
-    this.profile.reframeLog = this.profile.reframeLog.slice(0, 40);
+    this.profile.reframeLog = this.profile.reframeLog.slice(0, 60);
     this.recordCalmSession();
   }
 
   public saveBookmark(bookmark: Omit<BookBookmark, 'updatedAt'>): void {
     this.profile.bookmarks = this.profile.bookmarks.filter((b) => b.title !== bookmark.title);
     this.profile.bookmarks.unshift({ ...bookmark, updatedAt: Date.now() });
-    this.profile.bookmarks = this.profile.bookmarks.slice(0, 20);
+    this.profile.bookmarks = this.profile.bookmarks.slice(0, 30);
     this.markHabit('read');
     this.save();
   }

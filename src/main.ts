@@ -1,7 +1,11 @@
 import './style.css';
 import { Icons } from './icons';
+import { cloudSync } from './services/CloudSync';
+import { initEcosystemRealtime } from './services/EcosystemSync';
+import { directoryStore } from './state/DirectoryStore';
 import { lifeStore } from './state/LifeStore';
 import { ModuleId } from './types';
+import { EcosystemModals } from './ui/EcosystemModals';
 import { CalligraphyView } from './views/CalligraphyView';
 import { CalmView } from './views/CalmView';
 import { HomeView } from './views/HomeView';
@@ -13,11 +17,11 @@ import { StudioView } from './views/StudioView';
 import { TypingView } from './views/TypingView';
 
 const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[] = [
-  { id: 'home', label: 'Inicio', icon: Icons.home },
+  { id: 'home', label: 'Directorio', icon: Icons.grid },
   { id: 'reader', label: 'Lectura', icon: Icons.book },
   { id: 'studio', label: 'Cuaderno/PDF', icon: Icons.tablet },
   { id: 'calligraphy', label: 'Caligrafía', icon: Icons.pen },
-  { id: 'typing', label: 'Escritura', icon: Icons.keyboard },
+  { id: 'typing', label: 'Mecanografía', icon: Icons.keyboard },
   { id: 'language', label: 'Léxico', icon: Icons.spell },
   { id: 'mindset', label: 'Criterio', icon: Icons.bulb },
   { id: 'singing', label: 'Canto', icon: Icons.mic },
@@ -53,6 +57,8 @@ if (VALID_ROUTES.has(initialHash)) {
   currentModule = initialHash;
 }
 
+const modals = new EcosystemModals(() => renderApp());
+
 function applyTheme(): void {
   const theme = lifeStore.get().theme;
   document.documentElement.setAttribute('data-theme', theme);
@@ -82,47 +88,87 @@ function navigate(next: ModuleId): void {
 function renderApp(): void {
   applyTheme();
   const theme = lifeStore.get().theme;
+  const dir = directoryStore.get();
+  const syncMeta = cloudSync.getSyncMeta();
+  const cloudLabel = syncMeta.configured
+    ? syncMeta.lastError
+      ? 'Nube con aviso'
+      : `Supabase · ${syncMeta.spaceCode}`
+    : 'Conectar Supabase';
 
   root.innerHTML = `
     <div class="al-shell">
       <header class="al-topbar">
-        <div class="al-brand" id="al-brand-home">
-          <span class="al-brand-mark">${Icons.book(22)}</span>
-          <span class="al-brand-name">Atelier Diario</span>
+        <div class="al-topbar-main">
+          <div class="al-brand" id="al-brand-home" role="button" tabindex="0" title="Ir al Directorio">
+            <span class="al-brand-emblem">
+              <span class="al-brand-emblem-core">${Icons.grid(18)}</span>
+            </span>
+            <div class="al-brand-copy">
+              <span class="al-brand-name">${dir.ecosystemTitle}</span>
+              <span class="al-brand-sub">${dir.ecosystemSubtitle}</span>
+            </div>
+          </div>
+
+          <div class="al-topbar-actions">
+            <button type="button" class="al-cloud-pill ${syncMeta.configured ? 'is-live' : ''} ${syncMeta.lastError ? 'is-err' : ''}" id="al-open-cloud" title="Configurar y sincronizar todo en Supabase">
+              ${Icons.cloud(15)}
+              <span>${cloudLabel}</span>
+            </button>
+
+            <button type="button" class="al-sos-btn" id="al-quick-sos">${Icons.wind(15)}<span>SOS Calma</span></button>
+
+            <button type="button" class="al-icon-btn" id="al-theme-toggle" title="${theme === 'day' ? 'Cambiar a modo noche' : 'Cambiar a modo día'}">
+              ${theme === 'day' ? Icons.moon(17) : Icons.sun(17)}
+            </button>
+
+            <button type="button" class="al-profile-chip" id="al-open-profile" title="Editar perfil y preferencias">
+              <span class="al-avatar">${dir.userInitials}</span>
+              <span class="al-profile-meta">
+                <strong>${dir.userName}</strong>
+                <small>${dir.userSubtitle}</small>
+              </span>
+              ${Icons.chevronDown(14)}
+            </button>
+          </div>
         </div>
 
-        <nav class="al-nav" aria-label="Estudios principales">
-          ${NAV_ITEMS.map(
-            (item) => `
-            <button type="button" class="al-nav-btn ${currentModule === item.id ? 'is-active' : ''}" data-route="${item.id}">
-              ${item.icon(16)}
-              <span>${item.label}</span>
-            </button>`
-          ).join('')}
-        </nav>
-
-        <div class="al-topbar-actions">
-          <button type="button" class="al-sos-btn" id="al-quick-sos">${Icons.wind(15)}<span>SOS Calma</span></button>
-          <button type="button" class="al-icon-btn" id="al-theme-toggle" title="${theme === 'day' ? 'Cambiar a modo noche' : 'Cambiar a modo día'}">
-            ${theme === 'day' ? Icons.moon(17) : Icons.sun(17)}
-          </button>
-        </div>
+        ${
+          currentModule !== 'home'
+            ? `
+          <div class="al-subnav-bar">
+            <button type="button" class="al-back-dir-btn" data-route="home">
+              ${Icons.arrowLeft(15)}<span>Directorio</span>
+            </button>
+            <nav class="al-nav" aria-label="Estudios principales">
+              ${NAV_ITEMS.filter((i) => i.id !== 'home')
+                .map(
+                  (item) => `
+                  <button type="button" class="al-nav-btn ${currentModule === item.id ? 'is-active' : ''}" data-route="${item.id}">
+                    ${item.icon(15)}
+                    <span>${item.label}</span>
+                  </button>`
+                )
+                .join('')}
+            </nav>
+          </div>`
+            : ''
+        }
       </header>
 
       <main class="al-main" id="al-main"></main>
+      ${modals.render()}
     </div>
   `;
 
   root.querySelector('#al-brand-home')!.addEventListener('click', () => navigate('home'));
   root.querySelector('#al-quick-sos')!.addEventListener('click', () => navigate('calm'));
+  root.querySelector('#al-open-cloud')!.addEventListener('click', () => modals.open('cloud'));
+  root.querySelector('#al-open-profile')!.addEventListener('click', () => modals.open('profile'));
+
   root.querySelector('#al-theme-toggle')!.addEventListener('click', () => {
     const next = lifeStore.get().theme === 'day' ? 'night' : 'day';
     lifeStore.setTheme(next);
-    try {
-      localStorage.setItem('umbral-theme', next === 'night' ? 'dark' : 'light');
-    } catch {
-      // Ignore storage failures
-    }
     renderApp();
   });
 
@@ -130,16 +176,22 @@ function renderApp(): void {
     btn.addEventListener('click', () => navigate(btn.dataset.route as ModuleId));
   });
 
+  modals.bind(root);
+
   const mainEl = root.querySelector<HTMLElement>('#al-main')!;
   switch (currentModule) {
     case 'home':
-      homeView.render(mainEl, navigate);
+      homeView.render(mainEl, navigate, (m) => modals.open(m));
       break;
     case 'reader':
-      readerView.render(mainEl);
+      readerView.render(mainEl, {
+        onOpenStudio: () => navigate('studio'),
+      });
       break;
     case 'studio':
-      void studioView.render(mainEl);
+      void studioView.render(mainEl, {
+        onOpenCloudModal: () => modals.open('cloud'),
+      });
       break;
     case 'calligraphy':
       calligraphyView.render(mainEl);
@@ -161,6 +213,24 @@ function renderApp(): void {
       break;
   }
 }
+
+cloudSync.onStatusChange(() => {
+  const pill = root.querySelector('#al-open-cloud span');
+  const btn = root.querySelector('#al-open-cloud');
+  if (!pill || !btn) return;
+  const meta = cloudSync.getSyncMeta();
+  pill.textContent = meta.configured
+    ? meta.lastError
+      ? 'Nube con aviso'
+      : `Supabase · ${meta.spaceCode}`
+    : 'Conectar Supabase';
+  btn.classList.toggle('is-live', meta.configured);
+  btn.classList.toggle('is-err', Boolean(meta.lastError));
+});
+
+initEcosystemRealtime(() => {
+  renderApp();
+});
 
 renderApp();
 

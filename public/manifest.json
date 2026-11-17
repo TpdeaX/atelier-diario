@@ -1,11 +1,11 @@
 {
-  "name": "Atelier Diario · Lectura, Voz y Calma",
-  "short_name": "Atelier Diario",
-  "description": "Compañero diario de lectura, caligrafía, ortografía, canto, mentalidad y calma conectado con UNUmbral.",
+  "name": "Ecosistema Atelier · Directorio y Estudio",
+  "short_name": "Ecosistema Atelier",
+  "description": "Directorio unificado del ecosistema personal con Atelier Diario, UNUmbral, OMNI ARENA y sincronización en Supabase.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#EEF2F0",
-  "theme_color": "#147D58",
+  "background_color": "#F1F4F8",
+  "theme_color": "#166534",
   "orientation": "portrait-primary",
   "icons": [
     {
