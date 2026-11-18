@@ -266,9 +266,9 @@ export class StudioView {
             </div>
 
             <div class="al-tool-group">
-              <button type="button" class="al-icon-btn" id="al-page-prev" title="Página anterior">◀</button>
+              <button type="button" class="al-icon-btn" id="al-page-prev" title="Página anterior" aria-label="Página anterior"><svg class="al-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg></button>
               <span class="al-mono-pill" id="al-page-label">Pág ${this.currentPage}/${doc.pageCount}</span>
-              <button type="button" class="al-icon-btn" id="al-page-next" title="Página siguiente">▶</button>
+              <button type="button" class="al-icon-btn" id="al-page-next" title="Página siguiente" aria-label="Página siguiente"><svg class="al-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
               ${
                 doc.kind === 'notebook'
                   ? `<button type="button" class="al-btn" id="al-page-add">${Icons.plus(14)}<span>Hoja</span></button>`

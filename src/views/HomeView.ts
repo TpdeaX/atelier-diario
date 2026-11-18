@@ -1,5 +1,6 @@
 import { PHRASES_BANK, VOCABULARY_DECK } from '../data/KnowledgeBank';
 import { VAULT_BANK } from '../data/SavedVaultBank';
+import { SINGING_DRILLS } from '../data/SingingBank';
 import { Icons } from '../icons';
 import { fetchRandomWikiSummary, WikiSummary } from '../services/OnlineApi';
 import {
@@ -7,6 +8,7 @@ import {
   importUmbralBackupJson,
   loadArenaSnapshot,
   loadUmbralSnapshot,
+  readArenaCatalogMeta,
   resolveCompanionUrl,
   UmbralSnapshot,
 } from '../services/UmbralBridge';
@@ -113,13 +115,19 @@ export class HomeView {
         subtitle:
           arenaSnap.source !== 'none'
             ? `Nivel ${arenaSnap.level} · Radar ${arenaSnap.overallRating} · ${arenaSnap.totalRuns} partidas`
-            : '14 disciplinas de reflejos, lógica y 3D',
+            : (() => {
+                const meta = readArenaCatalogMeta();
+                return `${meta.total} disciplinas · ${meta.academies} academias`;
+              })(),
         category: 'entrenamiento',
         c1: '#1D4ED8',
         c2: '#60A5FA',
         icon: Icons.gamepad,
         externalUrl: resolveCompanionUrl('arena'),
-        badgeText: arenaSnap.source !== 'none' ? `Nv ${arenaSnap.level}` : '14 Juegos',
+        badgeText:
+          arenaSnap.source !== 'none'
+            ? `Nv ${arenaSnap.level}`
+            : `${readArenaCatalogMeta().total} Modos`,
       },
       {
         id: 'mod-reader',
@@ -226,8 +234,8 @@ export class HomeView {
         title: 'Estudio de Canto',
         subtitle:
           profile.stats.singingBestCents !== null
-            ? `Mejor afinación ±${profile.stats.singingBestCents} cents · 12 rutinas`
-            : 'Afinador vocal en vivo y piano guía',
+            ? `Mejor afinación ±${profile.stats.singingBestCents} cents · ${SINGING_DRILLS.length} rutinas`
+            : 'Piano de 2 octavas, karaoke en vivo y oído',
         category: 'atelier',
         c1: '#6D28D9',
         c2: '#A78BFA',
@@ -619,8 +627,11 @@ export class HomeView {
       this.lastUmbralSnap = snap;
       if (snap.source === 'none') {
         umbralStatus.textContent =
-          'Conecta Supabase o abre UNUmbral para ver aquí tus huecos libres, clases de hoy y tareas críticas.';
-        umbralBody.innerHTML = '';
+          'Sin datos de esta app en este origen. Abre el ecosistema publicado o activa la Nube para verlos aquí.';
+        umbralBody.innerHTML = openModal
+          ? '<button type="button" class="al-btn" id="al-umbral-open-cloud">Configurar Nube</button>'
+          : '';
+        umbralBody.querySelector('#al-umbral-open-cloud')?.addEventListener('click', () => openModal?.('cloud'));
         return;
       }
       const originLabel =

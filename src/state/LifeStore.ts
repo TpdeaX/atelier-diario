@@ -15,6 +15,15 @@ import {
 } from '../types';
 
 const STORAGE_KEY = 'atelier_diario_profile_v1';
+const ECO_THEME_KEY = 'umbral-theme';
+
+export function normalizeEcoTheme(raw: string | null | undefined): 'light' | 'dark' | null {
+  if (!raw) return null;
+  const v = raw.trim().toLowerCase();
+  if (v === 'dark' || v === 'night') return 'dark';
+  if (v === 'light' || v === 'day') return 'light';
+  return null;
+}
 
 function todayStamp(): string {
   const d = new Date();
@@ -83,6 +92,8 @@ export function defaultModulePrefs(): ModulePreferences {
     },
     singing: {
       lastDrillId: 'major5',
+      level: 1,
+      timbre: 'piano',
     },
     calm: {
       patternId: '478',
@@ -117,6 +128,9 @@ function defaultProfile(): LifeProfile {
       calligraphySheets: 0,
       calmSessions: 0,
       singingBestCents: null,
+      vocalRangeLow: null,
+      vocalRangeHigh: null,
+      singingSongBest: {},
       bestWpmPc: 0,
       bestWpmMobile: 0,
       schulteBestMs: null,
@@ -132,11 +146,24 @@ function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifePro
   const base = defaultProfile();
   if (!raw || typeof raw !== 'object') return base;
   const mp = raw.modulePrefs ?? ({} as Partial<ModulePreferences>);
+  const singingStats = (raw.stats ?? {}) as Partial<LifeProfile['stats']>;
+  const singingPrefs = (mp.singing ?? {}) as Partial<ModulePreferences['singing']>;
   return {
     ...base,
     ...raw,
     todayHabits: { ...base.todayHabits, ...(raw.todayHabits ?? {}) },
-    stats: { ...base.stats, ...(raw.stats ?? {}) },
+    stats: {
+      ...base.stats,
+      ...singingStats,
+      vocalRangeLow:
+        typeof singingStats.vocalRangeLow === 'number' ? singingStats.vocalRangeLow : null,
+      vocalRangeHigh:
+        typeof singingStats.vocalRangeHigh === 'number' ? singingStats.vocalRangeHigh : null,
+      singingSongBest:
+        singingStats.singingSongBest && typeof singingStats.singingSongBest === 'object'
+          ? { ...singingStats.singingSongBest }
+          : {},
+    },
     favoritePhraseIds: Array.isArray(raw.favoritePhraseIds) ? raw.favoritePhraseIds : [],
     customPhrases: Array.isArray(raw.customPhrases) ? raw.customPhrases : [],
     vaultStatuses:
@@ -159,7 +186,19 @@ function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifePro
       mindset: { ...base.modulePrefs.mindset, ...(mp.mindset ?? {}) },
       vault: { ...base.modulePrefs.vault, ...(mp.vault ?? {}) },
       focuslab: { ...base.modulePrefs.focuslab, ...(mp.focuslab ?? {}) },
-      singing: { ...base.modulePrefs.singing, ...(mp.singing ?? {}) },
+      singing: {
+        lastDrillId: singingPrefs.lastDrillId || base.modulePrefs.singing.lastDrillId,
+        level:
+          singingPrefs.level === 1 || singingPrefs.level === 2 || singingPrefs.level === 3
+            ? singingPrefs.level
+            : 1,
+        timbre:
+          singingPrefs.timbre === 'piano' ||
+          singingPrefs.timbre === 'organ' ||
+          singingPrefs.timbre === 'soft'
+            ? singingPrefs.timbre
+            : 'piano',
+      },
       calm: { ...base.modulePrefs.calm, ...(mp.calm ?? {}) },
     },
     updatedAt: Number(raw.updatedAt) || 0,
@@ -211,16 +250,81 @@ class LifeStore {
   public applyRemote(raw: Partial<LifeProfile>, remoteUpdatedAt: number, force = false): boolean {
     const clean = normalizeProfile({ ...raw, updatedAt: remoteUpdatedAt || raw.updatedAt });
     if (!force && clean.updatedAt <= this.profile.updatedAt) return false;
+    // Device theme (`umbral-theme`) takes precedence over cloud profile theme
+    let deviceTheme: ThemeMode | null = null;
+    try {
+      const storedEco = normalizeEcoTheme(localStorage.getItem(ECO_THEME_KEY));
+      if (storedEco) deviceTheme = storedEco === 'dark' ? 'night' : 'day';
+    } catch {
+      // Ignore storage error
+    }
     this.profile = clean;
+    if (deviceTheme) {
+      this.profile.theme = deviceTheme;
+    }
     this.rolloverDay(false);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.profile));
-      localStorage.setItem('umbral-theme', this.profile.theme === 'night' ? 'dark' : 'light');
+      localStorage.setItem(ECO_THEME_KEY, this.profile.theme === 'night' ? 'dark' : 'light');
     } catch {
       // Ignore storage quota issues
     }
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', this.profile.theme);
+    }
     this.listeners.forEach((fn) => fn());
     return true;
+  }
+
+  public applyIncomingEcoTheme(): ThemeMode {
+    if (typeof window !== 'undefined') {
+      try {
+        const url = new URL(window.location.href);
+        const param = normalizeEcoTheme(url.searchParams.get('eco_theme'));
+        if (param) {
+          localStorage.setItem(ECO_THEME_KEY, param);
+          this.profile.theme = param === 'dark' ? 'night' : 'day';
+          url.searchParams.delete('eco_theme');
+          const clean = `${url.pathname}${url.search}${url.hash}`;
+          window.history.replaceState(null, '', clean || './');
+        } else {
+          const stored = normalizeEcoTheme(localStorage.getItem(ECO_THEME_KEY));
+          if (stored) {
+            this.profile.theme = stored === 'dark' ? 'night' : 'day';
+            if (localStorage.getItem(ECO_THEME_KEY) !== stored) {
+              localStorage.setItem(ECO_THEME_KEY, stored);
+            }
+          } else {
+            localStorage.setItem(ECO_THEME_KEY, this.profile.theme === 'night' ? 'dark' : 'light');
+          }
+        }
+      } catch {
+        // Ignore URL/storage errors
+      }
+    }
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', this.profile.theme);
+    }
+    return this.profile.theme;
+  }
+
+  public syncThemeFromStorage(): boolean {
+    try {
+      const stored = normalizeEcoTheme(localStorage.getItem(ECO_THEME_KEY));
+      if (!stored) return false;
+      const next: ThemeMode = stored === 'dark' ? 'night' : 'day';
+      if (next !== this.profile.theme) {
+        this.profile.theme = next;
+        if (typeof document !== 'undefined') {
+          document.documentElement.setAttribute('data-theme', next);
+        }
+        this.listeners.forEach((fn) => fn());
+        return true;
+      }
+    } catch {
+      // Ignore storage error
+    }
+    return false;
   }
 
   public replaceAll(raw: Partial<LifeProfile>): void {
@@ -468,6 +572,23 @@ class LifeStore {
     const prev = this.profile.stats.singingBestCents;
     if (prev === null || centsAbs < prev) {
       this.profile.stats.singingBestCents = Math.round(centsAbs);
+    }
+    this.markHabit('singing');
+    this.save();
+  }
+
+  public recordVocalRange(lowMidi: number | null, highMidi: number | null): void {
+    if (lowMidi !== null) this.profile.stats.vocalRangeLow = Math.round(lowMidi);
+    if (highMidi !== null) this.profile.stats.vocalRangeHigh = Math.round(highMidi);
+    this.markHabit('singing');
+    this.save();
+  }
+
+  public recordSingingSongScore(songId: string, pct: number): void {
+    const clean = Math.max(0, Math.min(100, Math.round(pct)));
+    const prev = this.profile.stats.singingSongBest[songId] ?? 0;
+    if (clean > prev) {
+      this.profile.stats.singingSongBest[songId] = clean;
     }
     this.markHabit('singing');
     this.save();

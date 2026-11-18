@@ -24,6 +24,10 @@ export type HabitKey =
 
 export type ThemeMode = 'day' | 'night';
 
+export type EcoAppId = 'directorio' | 'atelier' | 'unumbral' | 'arena';
+
+export type SingingTimbre = 'piano' | 'organ' | 'soft';
+
 export type DeviceProfile = 'auto' | 'pc' | 'mobile';
 
 export type BoardTool = 'pen' | 'highlighter' | 'rect' | 'circle' | 'arrow' | 'text' | 'eraser';
@@ -158,6 +162,8 @@ export interface ModulePreferences {
   };
   singing: {
     lastDrillId: string;
+    level: 1 | 2 | 3;
+    timbre: SingingTimbre;
   };
   calm: {
     patternId: '478' | 'box' | 'sigh';
@@ -190,6 +196,9 @@ export interface LifeProfile {
     calligraphySheets: number;
     calmSessions: number;
     singingBestCents: number | null;
+    vocalRangeLow: number | null;
+    vocalRangeHigh: number | null;
+    singingSongBest: Record<string, number>;
     bestWpmPc: number;
     bestWpmMobile: number;
     schulteBestMs: number | null;
@@ -296,6 +305,7 @@ export interface DirectoryConfig {
   order: string[];
   customLinks: CustomDirectoryLink[];
   companionUrls: {
+    atelier?: string;
     unumbral: string;
     arena: string;
   };

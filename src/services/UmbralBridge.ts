@@ -1,4 +1,6 @@
 import { directoryStore } from '../state/DirectoryStore';
+import { lifeStore } from '../state/LifeStore';
+import { EcoAppId } from '../types';
 
 export interface UmbralClassItem {
   id?: string | number;
@@ -45,24 +47,137 @@ export interface ArenaSnapshot {
 }
 
 const SNAPSHOT_KEY = 'atelier_umbral_snapshot_v1';
+const UNUMBRAL_SNAPSHOT_KEY = 'unumbral_last_snapshot_v1';
 const ARENA_LOCAL_KEY = 'omni_arena_profile_v1';
 const ARENA_CLOUD_CACHE_KEY = 'atelier_arena_snapshot_v1';
+const ARENA_META_KEY = 'omni_arena_catalog_meta_v1';
 const DAY_NAMES = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
 
-export function resolveCompanionUrl(app: 'atelier' | 'unumbral' | 'arena'): string {
-  const custom = directoryStore.get().companionUrls;
-  if (app === 'unumbral' && custom.unumbral) return custom.unumbral;
-  if (app === 'arena' && custom.arena) return custom.arena;
+export interface ArenaCatalogMeta {
+  total: number;
+  academies: number;
+  dexterity2d: number;
+  action3d: number;
+}
+
+const DEFAULT_ARENA_META: ArenaCatalogMeta = {
+  total: 26,
+  academies: 8,
+  dexterity2d: 13,
+  action3d: 5,
+};
+
+const ECO_APP_PORT: Record<EcoAppId, number> = {
+  directorio: 5178,
+  atelier: 5176,
+  unumbral: 5177,
+  arena: 5175,
+};
+
+const ECO_APP_PATH: Record<EcoAppId, string> = {
+  directorio: '/directorio/',
+  atelier: '/atelier-diario/',
+  unumbral: '/UNUmbral/',
+  arena: '/omni-arena/',
+};
+
+function isPrivateIp(host: string): boolean {
+  return /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host);
+}
+
+export function resolveEcoUrl(
+  app: EcoAppId,
+  opts: { hash?: string; carryTheme?: boolean } = {}
+): string {
+  const cleanHash = opts.hash ? `#${opts.hash.replace(/^#/, '')}` : '';
+  const carryTheme = opts.carryTheme !== false;
+  const ecoTheme = lifeStore.get().theme === 'night' ? 'dark' : 'light';
+
+  const customUrls = directoryStore.get().companionUrls;
+  const custom =
+    app === 'atelier'
+      ? customUrls.atelier?.trim()
+      : app === 'unumbral'
+        ? customUrls.unumbral?.trim()
+        : app === 'arena'
+          ? customUrls.arena?.trim()
+          : '';
+
+  if (custom) {
+    let base = `${custom.replace(/#.*$/, '').replace(/\/?$/, '/')}`;
+    try {
+      if (carryTheme) {
+        const targetOrigin = new URL(base, window.location.href).origin;
+        if (targetOrigin !== window.location.origin) {
+          base = `${base}${base.includes('?') ? '&' : '?'}eco_theme=${ecoTheme}`;
+        }
+      }
+    } catch {
+      // Ignore URL parse error
+    }
+    return `${base}${cleanHash}`;
+  }
 
   const host = window.location.hostname;
-  if (host.endsWith('github.io')) {
-    if (app === 'atelier') return '../atelier-diario/';
-    if (app === 'unumbral') return '../UNUmbral/';
-    return '../omni-arena/';
+  const port = window.location.port ?? '';
+  const protocol = window.location.protocol || 'http:';
+  const isCapacitor = Boolean((window as { Capacitor?: unknown }).Capacitor);
+
+  const route = ECO_APP_PATH[app];
+  const appPort = ECO_APP_PORT[app];
+
+  let base = '';
+  let crossOrigin = false;
+
+  if (isCapacitor || (host === 'localhost' && port === '')) {
+    base = `https://tpdeax.github.io${route}`;
+    crossOrigin = true;
+  } else if (host.endsWith('github.io')) {
+    base = `..${route}`;
+    crossOrigin = false;
+  } else if (
+    port !== '' &&
+    (host === 'localhost' || host === '127.0.0.1' || isPrivateIp(host))
+  ) {
+    base = `${protocol}//${host}:${appPort}/`;
+    crossOrigin = String(appPort) !== String(port);
+  } else {
+    base = `https://tpdeax.github.io${route}`;
+    crossOrigin = true;
   }
-  if (app === 'atelier') return 'http://localhost:5176/';
-  if (app === 'unumbral') return 'http://localhost:5177/';
-  return 'http://localhost:5175/';
+
+  if (crossOrigin && carryTheme) {
+    base = `${base}${base.includes('?') ? '&' : '?'}eco_theme=${ecoTheme}`;
+  }
+  return `${base}${cleanHash}`;
+}
+
+export function resolveCompanionUrl(
+  app: 'directorio' | 'atelier' | 'unumbral' | 'arena',
+  hash?: string
+): string {
+  return resolveEcoUrl(app, { hash });
+}
+
+export function readArenaCatalogMeta(): ArenaCatalogMeta {
+  try {
+    const raw = localStorage.getItem(ARENA_META_KEY);
+    if (!raw) return DEFAULT_ARENA_META;
+    const p = JSON.parse(raw) as Partial<ArenaCatalogMeta>;
+    const total = Number(p.total);
+    const academies = Number(p.academies);
+    if (Number.isFinite(total) && total > 0 && Number.isFinite(academies) && academies >= 0) {
+      return {
+        total,
+        academies,
+        dexterity2d: Number(p.dexterity2d) || DEFAULT_ARENA_META.dexterity2d,
+        action3d: Number(p.action3d) || DEFAULT_ARENA_META.action3d,
+      };
+    }
+  } catch {
+    // Fallback
+  }
+  return DEFAULT_ARENA_META;
 }
 
 function parseMinutes(str?: string): number {
@@ -279,6 +394,27 @@ export async function loadUmbralSnapshot(): Promise<UmbralSnapshot> {
         parsed._source === 'supabase' ? 'supabase' : 'json',
         parsed._updatedAt || Date.now()
       );
+    }
+
+    const snapRaw = localStorage.getItem(UNUMBRAL_SNAPSHOT_KEY);
+    if (snapRaw) {
+      const snap = JSON.parse(snapRaw) as {
+        coursesCount?: number;
+        pendingTasks?: number;
+        todayClasses?: number;
+        updatedAt?: number;
+      };
+      if (typeof snap.coursesCount === 'number') {
+        return {
+          source: 'indexeddb',
+          updatedAt: Number(snap.updatedAt) || Date.now(),
+          todayClassesCount: Number(snap.todayClasses) || 0,
+          coursesCount: Number(snap.coursesCount) || 0,
+          freeGaps: [],
+          criticalTasks: [],
+          pendingCount: Number(snap.pendingTasks) || 0,
+        };
+      }
     }
   } catch {
     // Ignore corrupt JSON

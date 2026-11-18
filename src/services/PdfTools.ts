@@ -185,7 +185,7 @@ export interface BookSection {
   text: string;
 }
 
-const WIN_ANSI_EXTRA = new Set('€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ');
+const WIN_ANSI_EXTRA = new Set('€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜\u2122š›œžŸ');
 
 /** Standard PDF fonts only encode WinAnsi; map common typography and drop the rest. */
 function toWinAnsi(raw: string): string {

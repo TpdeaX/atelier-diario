@@ -2,6 +2,7 @@ import './style.css';
 import { Icons } from './icons';
 import { cloudSync } from './services/CloudSync';
 import { initEcosystemRealtime } from './services/EcosystemSync';
+import { resolveEcoUrl } from './services/UmbralBridge';
 import { directoryStore } from './state/DirectoryStore';
 import { lifeStore } from './state/LifeStore';
 import { ModuleId } from './types';
@@ -96,10 +97,26 @@ function navigate(next: ModuleId): void {
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
-function resolveDirectorioUrl(): string {
-  const host = window.location.hostname;
-  if (host.endsWith('github.io')) return '../directorio/';
-  return 'http://localhost:5178/';
+const ECO_ARENA_ICON = (s = 16) =>
+  `<svg class="al-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 21 7 21 17 12 22 3 17 3 7"/><circle cx="12" cy="12" r="3"/></svg>`;
+
+function renderEcoSwitch(): string {
+  return `
+    <nav class="eco-switch" aria-label="Aplicaciones del ecosistema">
+      <a class="eco-switch-link" data-eco-app="directorio" href="${resolveEcoUrl('directorio')}">
+        ${Icons.grid(16)}<span class="eco-label-full">Directorio</span><span class="eco-label-short">Directorio</span>
+      </a>
+      <a class="eco-switch-link is-current" data-eco-app="atelier" aria-current="page" href="${resolveEcoUrl('atelier')}">
+        ${Icons.book(16)}<span class="eco-label-full">Atelier Diario</span><span class="eco-label-short">Atelier</span>
+      </a>
+      <a class="eco-switch-link" data-eco-app="unumbral" href="${resolveEcoUrl('unumbral')}">
+        ${Icons.graduation(16)}<span class="eco-label-full">UNUmbral</span><span class="eco-label-short">UNUmbral</span>
+      </a>
+      <a class="eco-switch-link" data-eco-app="arena" href="${resolveEcoUrl('arena')}">
+        ${ECO_ARENA_ICON(16)}<span class="eco-label-full">OMNI ARENA</span><span class="eco-label-short">Arena</span>
+      </a>
+    </nav>
+  `;
 }
 
 function renderApp(): void {
@@ -115,6 +132,7 @@ function renderApp(): void {
 
   root.innerHTML = `
     <div class="al-shell">
+      ${renderEcoSwitch()}
       <header class="al-topbar">
         <div class="al-topbar-main">
           <div class="al-brand">
@@ -128,17 +146,14 @@ function renderApp(): void {
           </div>
 
           <div class="al-topbar-actions">
-            <a class="al-back-dir-btn" href="${resolveDirectorioUrl()}" title="Ir al Directorio exclusivo del Ecosistema">
-              ${Icons.arrowLeft(14)}<span>Directorio</span>
-            </a>
-
             <button type="button" class="al-cloud-pill ${syncMeta.configured ? 'is-live' : ''} ${syncMeta.lastError ? 'is-err' : ''}" id="al-open-cloud" title="Configurar y sincronizar todo en Supabase">
               ${Icons.cloud(15)}
               <span>${cloudLabel}</span>
             </button>
 
-            <button type="button" class="al-icon-btn" id="al-theme-toggle" title="${theme === 'day' ? 'Cambiar a modo noche' : 'Cambiar a modo día'}">
-              ${theme === 'day' ? Icons.moon(17) : Icons.sun(17)}
+            <button type="button" class="al-btn al-theme-btn" id="al-theme-toggle" title="${theme === 'day' ? 'Cambiar a modo noche' : 'Cambiar a modo día'}" aria-pressed="${theme === 'night'}">
+              ${theme === 'day' ? Icons.moon(16) : Icons.sun(16)}
+              <span>${theme === 'day' ? 'Tema: Día' : 'Tema: Noche'}</span>
             </button>
 
             <button type="button" class="al-profile-chip" id="al-open-profile" title="Editar perfil y preferencias">
@@ -259,6 +274,18 @@ window.addEventListener('hashchange', () => {
   const next = (window.location.hash.replace('#', '') || 'home') as ModuleId;
   if (VALID_ROUTES.has(next) && next !== currentModule) {
     navigate(next);
+  }
+});
+
+lifeStore.applyIncomingEcoTheme();
+window.addEventListener('storage', (e) => {
+  if (e.key === 'umbral-theme' && lifeStore.syncThemeFromStorage()) {
+    renderApp();
+  }
+});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && lifeStore.syncThemeFromStorage()) {
+    renderApp();
   }
 });
 
