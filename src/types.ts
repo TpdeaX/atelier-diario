@@ -9,6 +9,7 @@ export type ModuleId =
   | 'vault'
   | 'focuslab'
   | 'singing'
+  | 'drawing'
   | 'calm';
 
 export type HabitKey =
@@ -20,9 +21,43 @@ export type HabitKey =
   | 'mindset'
   | 'focuslab'
   | 'singing'
+  | 'drawing'
   | 'calm';
 
+export type CalmPatternId = '478' | 'box' | 'sigh' | 'exhale36' | 'coherence';
+
+export type DrawingSymmetry = 'none' | 'vertical' | 'radial4';
+
+export type DrawingGridMode = 'none' | 'grid' | 'perspective1' | 'perspective2';
+
 export type ThemeMode = 'day' | 'night';
+
+const MODULE_IDS: readonly ModuleId[] = [
+  'home',
+  'reader',
+  'calligraphy',
+  'studio',
+  'typing',
+  'language',
+  'mindset',
+  'vault',
+  'focuslab',
+  'singing',
+  'drawing',
+  'calm',
+];
+
+/** Interpreta `#calm?sos=1`, `#sos` y `#<modulo>`; cualquier otra cosa cae a home. */
+export function parseHashRoute(rawHash: string): { moduleId: ModuleId; sos: boolean } {
+  const clean = (rawHash || '').replace(/^#/, '').trim();
+  if (!clean) return { moduleId: 'home', sos: false };
+  const [path, query = ''] = clean.split('?');
+  const name = path.toLowerCase();
+  if (name === 'sos') return { moduleId: 'calm', sos: true };
+  if (!(MODULE_IDS as readonly string[]).includes(name)) return { moduleId: 'home', sos: false };
+  const sos = name === 'calm' && new URLSearchParams(query).get('sos') === '1';
+  return { moduleId: name as ModuleId, sos };
+}
 
 export type EcoAppId = 'directorio' | 'atelier' | 'unumbral' | 'arena';
 
@@ -166,9 +201,19 @@ export interface ModulePreferences {
     timbre: SingingTimbre;
   };
   calm: {
-    patternId: '478' | 'box' | 'sigh';
+    patternId: CalmPatternId;
     soundCue: boolean;
     groundingIdx: number;
+  };
+  drawing: {
+    mode: 'lessons' | 'free';
+    lessonId: string;
+    brushColor: string;
+    brushSize: number;
+    brushOpacity: number;
+    symmetry: DrawingSymmetry;
+    grid: DrawingGridMode;
+    showGuide: boolean;
   };
 }
 
@@ -195,6 +240,7 @@ export interface LifeProfile {
     orthographyTotal: number;
     calligraphySheets: number;
     calmSessions: number;
+    drawingSheets: number;
     singingBestCents: number | null;
     vocalRangeLow: number | null;
     vocalRangeHigh: number | null;

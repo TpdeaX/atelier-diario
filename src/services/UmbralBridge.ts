@@ -1,6 +1,6 @@
-import { directoryStore } from '../state/DirectoryStore';
-import { lifeStore } from '../state/LifeStore';
-import { EcoAppId } from '../types';
+import { directoryStore } from '../state/DirectoryStore.ts';
+import { lifeStore } from '../state/LifeStore.ts';
+import type { EcoAppId } from '../types.ts';
 
 export interface UmbralClassItem {
   id?: string | number;
@@ -60,9 +60,9 @@ export interface ArenaCatalogMeta {
   action3d: number;
 }
 
-const DEFAULT_ARENA_META: ArenaCatalogMeta = {
-  total: 26,
-  academies: 8,
+export const DEFAULT_ARENA_META: ArenaCatalogMeta = {
+  total: 33,
+  academies: 15,
   dexterity2d: 13,
   action3d: 5,
 };

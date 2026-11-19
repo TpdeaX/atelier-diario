@@ -1,6 +1,7 @@
+import { DRAWING_LESSONS } from '../data/DrawingBank';
 import { PHRASES_BANK, VOCABULARY_DECK } from '../data/KnowledgeBank';
 import { VAULT_BANK } from '../data/SavedVaultBank';
-import { SINGING_DRILLS } from '../data/SingingBank';
+import { SINGING_DRILLS, SINGING_SONGS } from '../data/SingingBank';
 import { Icons } from '../icons';
 import { fetchRandomWikiSummary, WikiSummary } from '../services/OnlineApi';
 import {
@@ -35,6 +36,7 @@ const HABIT_LABELS: { key: HabitKey; label: string; target: ModuleId }[] = [
   { key: 'read', label: 'Lectura online', target: 'reader' },
   { key: 'studio', label: 'Cuaderno y PDF', target: 'studio' },
   { key: 'calligraphy', label: 'Caligrafía', target: 'calligraphy' },
+  { key: 'drawing', label: 'Dibujo guiado', target: 'drawing' },
   { key: 'typing', label: 'Mecanografía', target: 'typing' },
   { key: 'language', label: 'Ortografía y léxico', target: 'language' },
   { key: 'mindset', label: 'Frases e ideas', target: 'mindset' },
@@ -64,6 +66,8 @@ function iconForKey(key: string): (s?: number) => string {
       return Icons.tablet;
     case 'pen':
       return Icons.pen;
+    case 'palette':
+      return Icons.palette;
     case 'keyboard':
       return Icons.keyboard;
     case 'spell':
@@ -169,6 +173,21 @@ export class HomeView {
         badgeText: profile.todayHabits.calligraphy ? 'Hecho hoy' : 'Trazos',
       },
       {
+        id: 'mod-drawing',
+        prefix: 'Módulo',
+        title: 'Taller de Dibujo',
+        subtitle:
+          profile.stats.drawingSheets > 0
+            ? `${profile.stats.drawingSheets} láminas · ${DRAWING_LESSONS.length} lecciones y lienzo libre`
+            : `${DRAWING_LESSONS.length} lecciones guiadas, perspectiva y simetría`,
+        category: 'atelier',
+        c1: '#B45309',
+        c2: '#F59E0B',
+        icon: Icons.palette,
+        route: 'drawing',
+        badgeText: profile.todayHabits.drawing ? 'Hecho hoy' : 'Dibujo',
+      },
+      {
         id: 'mod-typing',
         prefix: 'Módulo',
         title: 'Mecanografía',
@@ -234,8 +253,8 @@ export class HomeView {
         title: 'Estudio de Canto',
         subtitle:
           profile.stats.singingBestCents !== null
-            ? `Mejor afinación ±${profile.stats.singingBestCents} cents · ${SINGING_DRILLS.length} rutinas`
-            : 'Piano de 2 octavas, karaoke en vivo y oído',
+            ? `Mejor ±${profile.stats.singingBestCents}c · ${SINGING_SONGS.length} canciones · ${SINGING_DRILLS.length} rutinas`
+            : `Canto, ${SINGING_SONGS.length} canciones, calentamiento 5 min y oído`,
         category: 'atelier',
         c1: '#6D28D9',
         c2: '#A78BFA',
@@ -247,7 +266,10 @@ export class HomeView {
         id: 'mod-calm',
         prefix: 'Módulo',
         title: 'Centro de Calma',
-        subtitle: `${profile.stats.calmSessions} sesiones · ${profile.reframeLog.length} reencuadres`,
+        subtitle:
+          profile.stats.calmSessions > 0
+            ? `${profile.stats.calmSessions} sesiones · SOS Pánico y ${profile.reframeLog.length} reencuadres`
+            : 'SOS Pánico inmediato, 5-4-3-2-1 y respiración',
         category: 'atelier',
         c1: '#0F766E',
         c2: '#5EEAD4',
@@ -451,6 +473,7 @@ export class HomeView {
             </div>
             <div class="al-habits-list">${habitChips}</div>
             <div class="al-mini-metrics">
+              <div><span>Dibujo</span><strong>${profile.stats.drawingSheets}</strong></div>
               <div><span>Ortografía</span><strong>${profile.stats.orthographyCorrect}/${profile.stats.orthographyTotal}</strong></div>
               <div><span>Tipeo PC / Móvil</span><strong>${profile.stats.bestWpmPc} / ${profile.stats.bestWpmMobile}</strong></div>
               <div><span>Calma</span><strong>${profile.stats.calmSessions}</strong></div>

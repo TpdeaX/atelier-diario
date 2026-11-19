@@ -1,7 +1,10 @@
-import { cloudSync } from '../services/CloudSync';
-import {
+import { cloudSync } from '../services/CloudSync.ts';
+import type {
   BookBookmark,
+  CalmPatternId,
   DeviceProfile,
+  DrawingGridMode,
+  DrawingSymmetry,
   FlashcardItem,
   HabitKey,
   LifeProfile,
@@ -12,7 +15,7 @@ import {
   ThemeMode,
   VaultItem,
   VaultStatus,
-} from '../types';
+} from '../types.ts';
 
 const STORAGE_KEY = 'atelier_diario_profile_v1';
 const ECO_THEME_KEY = 'umbral-theme';
@@ -40,6 +43,7 @@ function emptyHabits(): Record<HabitKey, boolean> {
     mindset: false,
     focuslab: false,
     singing: false,
+    drawing: false,
     calm: false,
   };
 }
@@ -100,6 +104,16 @@ export function defaultModulePrefs(): ModulePreferences {
       soundCue: true,
       groundingIdx: 0,
     },
+    drawing: {
+      mode: 'lessons',
+      lessonId: 'stroke-lines',
+      brushColor: '#1E293B',
+      brushSize: 4,
+      brushOpacity: 1,
+      symmetry: 'none',
+      grid: 'none',
+      showGuide: true,
+    },
   };
 }
 
@@ -127,6 +141,7 @@ function defaultProfile(): LifeProfile {
       orthographyTotal: 0,
       calligraphySheets: 0,
       calmSessions: 0,
+      drawingSheets: 0,
       singingBestCents: null,
       vocalRangeLow: null,
       vocalRangeHigh: null,
@@ -142,7 +157,52 @@ function defaultProfile(): LifeProfile {
   };
 }
 
-function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifeProfile {
+const CALM_PATTERNS: CalmPatternId[] = ['478', 'box', 'sigh', 'exhale36', 'coherence'];
+const DRAWING_SYMMETRIES: DrawingSymmetry[] = ['none', 'vertical', 'radial4'];
+const DRAWING_GRIDS: DrawingGridMode[] = ['none', 'grid', 'perspective1', 'perspective2'];
+
+function normalizeCalmPrefs(
+  raw: Partial<ModulePreferences['calm']> | undefined,
+  base: ModulePreferences['calm']
+): ModulePreferences['calm'] {
+  const r = raw ?? {};
+  return {
+    patternId: CALM_PATTERNS.includes(r.patternId as CalmPatternId)
+      ? (r.patternId as CalmPatternId)
+      : base.patternId,
+    soundCue: typeof r.soundCue === 'boolean' ? r.soundCue : base.soundCue,
+    groundingIdx:
+      typeof r.groundingIdx === 'number' && r.groundingIdx >= 0
+        ? Math.floor(r.groundingIdx)
+        : base.groundingIdx,
+  };
+}
+
+function normalizeDrawingPrefs(
+  raw: Partial<ModulePreferences['drawing']> | undefined,
+  base: ModulePreferences['drawing']
+): ModulePreferences['drawing'] {
+  const r = raw && typeof raw === 'object' ? raw : {};
+  const num = (v: unknown, min: number, max: number, fb: number): number =>
+    typeof v === 'number' && Number.isFinite(v) ? Math.min(max, Math.max(min, v)) : fb;
+  return {
+    mode: r.mode === 'free' ? 'free' : 'lessons',
+    lessonId: typeof r.lessonId === 'string' && r.lessonId ? r.lessonId : base.lessonId,
+    brushColor:
+      typeof r.brushColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(r.brushColor)
+        ? r.brushColor
+        : base.brushColor,
+    brushSize: num(r.brushSize, 1, 24, base.brushSize),
+    brushOpacity: num(r.brushOpacity, 0.1, 1, base.brushOpacity),
+    symmetry: DRAWING_SYMMETRIES.includes(r.symmetry as DrawingSymmetry)
+      ? (r.symmetry as DrawingSymmetry)
+      : base.symmetry,
+    grid: DRAWING_GRIDS.includes(r.grid as DrawingGridMode) ? (r.grid as DrawingGridMode) : base.grid,
+    showGuide: typeof r.showGuide === 'boolean' ? r.showGuide : base.showGuide,
+  };
+}
+
+export function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifeProfile {
   const base = defaultProfile();
   if (!raw || typeof raw !== 'object') return base;
   const mp = raw.modulePrefs ?? ({} as Partial<ModulePreferences>);
@@ -155,6 +215,10 @@ function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifePro
     stats: {
       ...base.stats,
       ...singingStats,
+      drawingSheets:
+        typeof singingStats.drawingSheets === 'number' && singingStats.drawingSheets >= 0
+          ? Math.floor(singingStats.drawingSheets)
+          : 0,
       vocalRangeLow:
         typeof singingStats.vocalRangeLow === 'number' ? singingStats.vocalRangeLow : null,
       vocalRangeHigh:
@@ -199,7 +263,8 @@ function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): LifePro
             ? singingPrefs.timbre
             : 'piano',
       },
-      calm: { ...base.modulePrefs.calm, ...(mp.calm ?? {}) },
+      calm: normalizeCalmPrefs(mp.calm, base.modulePrefs.calm),
+      drawing: normalizeDrawingPrefs(mp.drawing, base.modulePrefs.drawing),
     },
     updatedAt: Number(raw.updatedAt) || 0,
   };
@@ -559,6 +624,12 @@ class LifeStore {
   public recordCalligraphySheet(): void {
     this.profile.stats.calligraphySheets += 1;
     this.markHabit('calligraphy');
+    this.save();
+  }
+
+  public recordDrawingSheet(): void {
+    this.profile.stats.drawingSheets += 1;
+    this.markHabit('drawing');
     this.save();
   }
 

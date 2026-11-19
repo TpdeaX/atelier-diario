@@ -1,5 +1,5 @@
-import { createClient, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js';
-import { CloudSyncConfig, EcosystemScope, NotebookDoc } from '../types';
+import { createClient, type RealtimeChannel, type SupabaseClient } from '@supabase/supabase-js';
+import type { CloudSyncConfig, EcosystemScope, NotebookDoc } from '../types.ts';
 
 const CONFIG_KEY = 'atelier_cloud_sync_v1';
 

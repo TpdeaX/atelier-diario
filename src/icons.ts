@@ -88,6 +88,30 @@ export const Icons = {
     svgWrap('<polyline points="6 9 12 15 18 9"/>', s),
   user: (s = 18) =>
     svgWrap('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>', s),
+  palette: (s = 20) =>
+    svgWrap('<path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.9 1.5-1.9-.3-1 .4-2.1 1.5-2.1H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/>', s),
+  heartPulse: (s = 20) =>
+    svgWrap('<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/><polyline points="3 12 8 12 10 9 13 15 15 12 18 12"/>', s),
+  symmetry: (s = 16) =>
+    svgWrap('<line x1="12" y1="2" x2="12" y2="22"/><path d="M8 6L3 12l5 6z"/><path d="M16 6l5 6-5 6z"/>', s),
+  perspective: (s = 16) =>
+    svgWrap('<line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="12" x2="3" y2="4"/><line x1="12" y1="12" x2="21" y2="4"/><line x1="12" y1="12" x2="3" y2="20"/><line x1="12" y1="12" x2="21" y2="20"/>', s),
+  layers: (s = 16) =>
+    svgWrap('<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>', s),
+  redo: (s = 16) =>
+    svgWrap('<path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/>', s),
+  play: (s = 16) => svgWrap('<polygon points="6 4 20 12 6 20 6 4"/>', s),
+  pause: (s = 16) =>
+    svgWrap('<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>', s),
+  skip: (s = 16) =>
+    svgWrap('<polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>', s),
+  music: (s = 16) =>
+    svgWrap('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>', s),
+  hand: (s = 16) =>
+    svgWrap('<path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v6"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.9-2.4L3.4 16a2 2 0 0 1 3.2-2.4L8 15"/>', s),
+  droplet: (s = 16) => svgWrap('<path d="M12 2.7l5.7 5.7a8 8 0 1 1-11.3 0z"/>', s),
+  tone: (s = 16) =>
+    svgWrap('<path d="M2 12h3l3-8 4 16 3-8h7"/>', s),
   archive: (s = 20) =>
     svgWrap('<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/>', s),
 };

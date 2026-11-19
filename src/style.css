@@ -935,7 +935,7 @@ button {
 
 .al-mini-metrics {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   padding-top: 10px;
   border-top: 1px solid var(--border-subtle);
@@ -2639,5 +2639,636 @@ button {
 .al-fl-recall-back p {
   margin: 4px 0 0;
   line-height: 1.5;
+}
+
+/* ==================== ACCESIBILIDAD & BOTÓN SOS CABECERA ==================== */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.al-sos-pill-btn {
+  background: var(--accent-calm);
+  color: #ffffff;
+  border: 1px solid transparent;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 7px 13px;
+  white-space: nowrap;
+  transition: transform 0.14s ease, filter 0.14s ease, box-shadow 0.14s ease;
+}
+
+:root[data-theme='night'] .al-sos-pill-btn {
+  color: #06211e;
+}
+
+.al-sos-pill-btn:hover {
+  filter: brightness(1.07);
+  box-shadow: var(--shadow-soft);
+}
+
+.al-sos-pill-btn:active {
+  transform: translateY(1px);
+}
+
+.al-btn-lg {
+  padding: 11px 18px;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+/* ==================== SOS PÁNICO & CALMA ==================== */
+
+.al-calm-tabs {
+  margin-bottom: 4px;
+}
+
+.al-calm-tab-sos.is-active {
+  background: var(--accent-calm);
+  color: #ffffff;
+  border-color: var(--accent-calm);
+}
+
+:root[data-theme='night'] .al-calm-tab-sos.is-active {
+  color: #06211e;
+}
+
+.al-sos-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  border-left: 4px solid var(--accent-calm);
+}
+
+.al-sos-entry h2,
+.al-sos-entry p {
+  margin: 0;
+}
+
+.al-sos-entry p {
+  margin-top: 4px;
+}
+
+.al-sos-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 780px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.al-sos-banner {
+  margin: 0;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: rgba(15, 118, 110, 0.11);
+  border: 1px solid rgba(15, 118, 110, 0.34);
+  color: var(--ink-primary);
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+}
+
+:root[data-theme='night'] .al-sos-banner {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: rgba(45, 212, 191, 0.35);
+}
+
+.al-sos-breath,
+.al-sos-block {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.al-sos-block h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+}
+
+.al-sos-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.al-sos-patterns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.al-sos-chip {
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--ink-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.al-sos-chip:hover {
+  border-color: var(--accent-calm);
+}
+
+.al-sos-chip[aria-pressed='true'] {
+  background: var(--accent-calm);
+  border-color: var(--accent-calm);
+  color: #ffffff;
+}
+
+:root[data-theme='night'] .al-sos-chip[aria-pressed='true'] {
+  color: #06211e;
+}
+
+.al-sos-orb-wrap {
+  display: grid;
+  place-items: center;
+  min-height: 210px;
+  padding: 12px 0;
+}
+
+.al-sos-orb {
+  width: 174px;
+  height: 174px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(45, 212, 191, 0.28), rgba(15, 118, 110, 0.14));
+  border: 3px solid var(--accent-calm);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--accent-calm);
+  transform: scale(0.72);
+  will-change: transform;
+}
+
+.al-sos-phase {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.38rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.al-sos-rhythm {
+  margin: 0;
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--ink-secondary);
+}
+
+.al-sos-actions {
+  justify-content: center;
+}
+
+.al-sos-sounds {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.al-sos-sound {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--ink-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.al-sos-sound:hover {
+  border-color: var(--accent-calm);
+}
+
+.al-sos-sound[aria-pressed='true'] {
+  background: var(--accent-calm);
+  border-color: var(--accent-calm);
+  color: #ffffff;
+}
+
+:root[data-theme='night'] .al-sos-sound[aria-pressed='true'] {
+  color: #06211e;
+}
+
+.al-sos-note {
+  margin: 0;
+  min-height: 1.1em;
+}
+
+.al-ground-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.al-ground-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.al-ground-label {
+  font-weight: 600;
+  font-size: 0.96rem;
+  color: var(--ink-primary);
+}
+
+.al-ground-dots {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.al-ground-dot {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  background: var(--bg-surface);
+  color: var(--ink-primary);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.al-ground-dot:hover {
+  border-color: var(--accent-calm);
+}
+
+.al-ground-dot.is-done {
+  background: var(--accent-calm);
+  border-color: var(--accent-calm);
+  color: #ffffff;
+  transform: scale(1.04);
+}
+
+:root[data-theme='night'] .al-ground-dot.is-done {
+  color: #06211e;
+}
+
+.al-ground-done {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(22, 101, 52, 0.14);
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.al-pmr-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 18px 14px;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.al-pmr-box[data-pmr-phase='tense'] .al-pmr-stage {
+  border-color: var(--accent-amber);
+}
+
+.al-pmr-box[data-pmr-phase='release'] .al-pmr-stage,
+.al-pmr-box[data-pmr-phase='done'] .al-pmr-stage {
+  border-color: var(--accent-calm);
+}
+
+.al-pmr-group {
+  font-family: var(--font-display);
+  font-size: 1.24rem;
+  color: var(--ink-primary);
+}
+
+.al-pmr-instruction {
+  font-size: 0.98rem;
+  color: var(--ink-secondary);
+  max-width: 54ch;
+}
+
+.al-pmr-count {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-calm);
+}
+
+.al-anchor-card {
+  align-items: center;
+  text-align: center;
+}
+
+.al-anchor-text {
+  margin: 0;
+  font-family: var(--font-reader);
+  font-size: 1.24rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink-primary);
+  max-width: 46ch;
+}
+
+/* ==================== TALLER DE DIBUJO GUIADO ==================== */
+
+.al-drawing-mode-tabs {
+  margin-bottom: 2px;
+}
+
+.al-drawing-lessons-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.al-drawing-blocks,
+.al-drawing-lesson-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.al-drawing-tip-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--accent-amber);
+}
+
+.al-drawing-tip-banner p {
+  margin: 3px 0 0;
+  font-size: 0.88rem;
+  color: var(--ink-secondary);
+}
+
+.al-drawing-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.al-drawing-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+
+.al-drawing-toolbar-sub {
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.al-draw-group-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+
+.al-draw-vp-hint {
+  margin: 0;
+  font-size: 0.84rem;
+}
+
+.al-drawing-stage-wrap {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface);
+}
+
+.al-drawing-canvas {
+  display: block;
+  width: 100%;
+  height: 470px;
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.al-drawing-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ==================== CANTO AMPLIADO (CALENTAMIENTO, VOCALES, SALTOS, CONTEO) ==================== */
+
+.al-warmup-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-left: 4px solid var(--accent-voice);
+}
+
+.al-warmup-steps-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.al-warmup-step-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--bg-soft);
+  color: var(--ink-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.al-warmup-step-chip.is-current {
+  background: rgba(109, 40, 217, 0.14);
+  border-color: var(--accent-voice);
+  color: var(--accent-voice);
+}
+
+.al-warmup-step-chip.is-done {
+  background: rgba(22, 101, 52, 0.14);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.al-warmup-bar-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+
+.al-warmup-bar-fill {
+  height: 100%;
+  background: var(--accent-primary);
+  transition: width 0.2s ease;
+}
+
+.al-warmup-bar-fill.is-violet {
+  background: var(--accent-voice);
+}
+
+.al-warmup-stage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.al-warmup-stage p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  color: var(--ink-secondary);
+}
+
+.al-warmup-clock {
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--accent-voice);
+  font-variant-numeric: tabular-nums;
+}
+
+.al-karaoke-stage {
+  position: relative;
+}
+
+.al-karaoke-countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(15, 23, 42, 0.56);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+.al-karaoke-countdown[hidden] {
+  display: none;
+}
+
+.al-jump-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+.al-jump-node {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.al-jump-node.is-active {
+  border-color: var(--accent-voice);
+  box-shadow: 0 0 0 2px rgba(109, 40, 217, 0.18);
+}
+
+.al-jump-node.is-hit {
+  background: rgba(22, 101, 52, 0.15);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.al-jump-arrow {
+  font-family: var(--font-mono);
+  color: var(--ink-muted);
+  font-weight: 700;
+}
+
+.al-ear-options.is-full-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .al-mini-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .al-sos-sounds {
+    grid-template-columns: 1fr;
+  }
+  .al-sos-pill-btn {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+  .al-drawing-canvas {
+    height: 360px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .al-sos-orb,
+  .al-warmup-bar-fill,
+  .al-ground-dot {
+    transition: none;
+  }
 }
 

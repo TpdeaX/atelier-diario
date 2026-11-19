@@ -8,10 +8,10 @@ web
 
 ## Users
 
-Joseph Marquina (y uso personal en PC, laptop y móvil), usando un ecosistema integrado de tres aplicaciones web progresivas (PWA) alojadas en `https://tpdeax.github.io/`:
-1. **Atelier Diario** (`/atelier-diario/`): centro de crecimiento diario, lectura, cuaderno/PDF, caligrafía, mecanografía, léxico/ortografía, criterio, canto y calma.
+Joseph Marquina (y uso personal en PC, laptop y móvil), usando un ecosistema integrado de aplicaciones web progresivas (PWA) alojadas en `https://tpdeax.github.io/`:
+1. **Atelier Diario** (`/atelier-diario/`): centro de crecimiento diario con 10 hábitos: lectura, cuaderno/PDF, caligrafía, **taller de dibujo guiado (20 láminas + lienzo libre)**, mecanografía, léxico/ortografía, criterio, baúl de guardados, oratoria/enfoque, **estudio de canto ampliado (15 canciones y calentamiento 5 min)** y **centro de calma con modo SOS Pánico Ahora**.
 2. **UNUmbral** (`/UNUmbral/`): organizador académico universitario offline-first (horario semanal 12h, cursos, notas vigesimales, asistencias, tareas y enfoque).
-3. **OMNI ARENA** (`/omni-arena/`): entrenador cognitivo y de reflejos 2D/3D con 10 disciplinas, modo Gauntlet y prueba calibrada.
+3. **OMNI ARENA** (`/omni-arena/`): entrenador cognitivo, musical y de reflejos 2D/3D con **33 disciplinas** (**15 academias** de música e IQ, 13 destreza 2D, 5 acción 3D), modo Gauntlet, prueba calibrada, dificultad progresiva y modo infinito.
 
 ## Product Purpose
 
@@ -31,7 +31,7 @@ Un ecosistema personal todo-en-uno de productividad académica, bienestar y entr
 
 - **Idioma:** Interfaz, etiquetas, modos, ayudas y mensajes mayormente en español en las tres apps.
 - **Persistencia en Supabase:** Toda modificación y configuración debe poder guardarse y sincronizarse en Supabase por `space_code` (cuadernos/PDFs en `atelier_documents` + `atelier-pdfs`, y estado completo del ecosistema/apps en tabla unificada de estado/configuración en Supabase + Realtime).
-- **Integridad funcional:** Conservar todas las capacidades existentes de Atelier Diario (incluyendo los cambios locales en curso: buscador de libros a PDF en Estudio, mejoras en Canto, Caligrafía, Tipeo, Lector y Calma), todas las pruebas y flujo Capacitor/PWA de UNUmbral, y las 10 disciplinas 2D/3D de OMNI ARENA.
+- **Integridad funcional:** Conservar todas las capacidades existentes de Atelier Diario (incluyendo buscador de libros a PDF en Estudio, Taller de Dibujo Guiado `#drawing`, SOS Pánico `#calm?sos=1`, Canto con 15 canciones y calentamiento guiado de 5 min, Caligrafía, Tipeo, Lector, Baúl y Oratoria/Foco), todas las pruebas y flujo Capacitor/PWA de UNUmbral, y las 33 disciplinas 2D/3D de OMNI ARENA.
 - **Identidad Git:** `TpdeaX <personaljosephunu@gmail.com>` en rama `main` para los repositorios personales.
 
 ## Product Principles

@@ -5,10 +5,11 @@ import { initEcosystemRealtime } from './services/EcosystemSync';
 import { resolveEcoUrl } from './services/UmbralBridge';
 import { directoryStore } from './state/DirectoryStore';
 import { lifeStore } from './state/LifeStore';
-import { ModuleId } from './types';
+import { ModuleId, parseHashRoute } from './types';
 import { EcosystemModals } from './ui/EcosystemModals';
 import { CalligraphyView } from './views/CalligraphyView';
 import { CalmView } from './views/CalmView';
+import { DrawingView } from './views/DrawingView';
 import { FocusLabView } from './views/FocusLabView';
 import { HomeView } from './views/HomeView';
 import { LanguageView } from './views/LanguageView';
@@ -24,6 +25,7 @@ const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[]
   { id: 'reader', label: 'Lectura', icon: Icons.book },
   { id: 'studio', label: 'Cuaderno/PDF', icon: Icons.tablet },
   { id: 'calligraphy', label: 'Caligrafía', icon: Icons.pen },
+  { id: 'drawing', label: 'Dibujo', icon: Icons.palette },
   { id: 'typing', label: 'Mecanografía', icon: Icons.keyboard },
   { id: 'language', label: 'Léxico', icon: Icons.spell },
   { id: 'mindset', label: 'Criterio', icon: Icons.bulb },
@@ -38,6 +40,7 @@ const homeView = new HomeView();
 const readerView = new ReaderView();
 const studioView = new StudioView();
 const calligraphyView = new CalligraphyView();
+const drawingView = new DrawingView();
 const typingView = new TypingView();
 const languageView = new LanguageView();
 const mindsetView = new MindsetView();
@@ -46,25 +49,9 @@ const focusLabView = new FocusLabView();
 const singingView = new SingingView();
 const calmView = new CalmView();
 
-let currentModule: ModuleId = 'home';
-
-const VALID_ROUTES = new Set<ModuleId>([
-  'home',
-  'reader',
-  'studio',
-  'calligraphy',
-  'typing',
-  'language',
-  'mindset',
-  'vault',
-  'focuslab',
-  'singing',
-  'calm',
-]);
-const initialHash = window.location.hash.replace('#', '') as ModuleId;
-if (VALID_ROUTES.has(initialHash)) {
-  currentModule = initialHash;
-}
+const initialRoute = parseHashRoute(window.location.hash);
+let currentModule: ModuleId = initialRoute.moduleId;
+let pendingSos = initialRoute.sos;
 
 const modals = new EcosystemModals(() => renderApp());
 
@@ -73,12 +60,15 @@ function applyTheme(): void {
   document.documentElement.setAttribute('data-theme', theme);
 }
 
-function navigate(next: ModuleId): void {
+function navigate(next: ModuleId, options?: { sos?: boolean }): void {
   if (currentModule === 'singing' && next !== 'singing') {
     singingView.unmount();
   }
   if (currentModule === 'calm' && next !== 'calm') {
     calmView.unmount();
+  }
+  if (currentModule === 'drawing' && next !== 'drawing') {
+    drawingView.unmount();
   }
   if (currentModule === 'typing' && next !== 'typing') {
     typingView.unmount();
@@ -90,8 +80,11 @@ function navigate(next: ModuleId): void {
     focusLabView.unmount();
   }
   currentModule = next;
-  if (window.location.hash !== `#${next}`) {
-    history.replaceState(null, '', next === 'home' ? './' : `#${next}`);
+  pendingSos = Boolean(options?.sos && next === 'calm');
+  const nextHash =
+    next === 'home' ? './' : next === 'calm' && pendingSos ? '#calm?sos=1' : `#${next}`;
+  if (window.location.hash !== (nextHash === './' ? '' : nextHash)) {
+    history.replaceState(null, '', nextHash);
   }
   renderApp();
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -146,6 +139,11 @@ function renderApp(): void {
           </div>
 
           <div class="al-topbar-actions">
+            <button type="button" class="al-btn al-sos-pill-btn" id="al-open-sos" title="Abrir modo SOS Pánico Ahora">
+              ${Icons.heartPulse(16)}
+              <span>SOS Calma</span>
+            </button>
+
             <button type="button" class="al-cloud-pill ${syncMeta.configured ? 'is-live' : ''} ${syncMeta.lastError ? 'is-err' : ''}" id="al-open-cloud" title="Configurar y sincronizar todo en Supabase">
               ${Icons.cloud(15)}
               <span>${cloudLabel}</span>
@@ -195,6 +193,7 @@ function renderApp(): void {
     </div>
   `;
 
+  root.querySelector('#al-open-sos')!.addEventListener('click', () => navigate('calm', { sos: true }));
   root.querySelector('#al-open-cloud')!.addEventListener('click', () => modals.open('cloud'));
   root.querySelector('#al-open-profile')!.addEventListener('click', () => modals.open('profile'));
 
@@ -228,6 +227,9 @@ function renderApp(): void {
     case 'calligraphy':
       calligraphyView.render(mainEl);
       break;
+    case 'drawing':
+      drawingView.render(mainEl);
+      break;
     case 'typing':
       typingView.render(mainEl);
       break;
@@ -247,7 +249,12 @@ function renderApp(): void {
       singingView.render(mainEl);
       break;
     case 'calm':
-      calmView.render(mainEl);
+      if (pendingSos) {
+        pendingSos = false;
+        calmView.enterSosMode(mainEl);
+      } else {
+        calmView.render(mainEl);
+      }
       break;
   }
 }
@@ -271,9 +278,9 @@ initEcosystemRealtime(() => {
 });
 
 window.addEventListener('hashchange', () => {
-  const next = (window.location.hash.replace('#', '') || 'home') as ModuleId;
-  if (VALID_ROUTES.has(next) && next !== currentModule) {
-    navigate(next);
+  const parsed = parseHashRoute(window.location.hash);
+  if (parsed.moduleId !== currentModule || parsed.sos) {
+    navigate(parsed.moduleId, { sos: parsed.sos });
   }
 });
 

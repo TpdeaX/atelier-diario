@@ -1,5 +1,5 @@
-import { cloudSync } from '../services/CloudSync';
-import { CustomDirectoryLink, DirectoryCategory, DirectoryConfig } from '../types';
+import { cloudSync } from '../services/CloudSync.ts';
+import type { CustomDirectoryLink, DirectoryCategory, DirectoryConfig } from '../types.ts';
 
 const STORAGE_KEY = 'atelier_directory_config_v1';
 
@@ -7,6 +7,7 @@ export const DEFAULT_DIRECTORY_ORDER = [
   'mod-reader',
   'mod-studio',
   'mod-calligraphy',
+  'mod-drawing',
   'mod-typing',
   'mod-language',
   'mod-mindset',
