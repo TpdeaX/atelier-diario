@@ -2,6 +2,42 @@ import { DICTION_DRILLS, FLASHCARDS_BANK, ORATORY_PROMPTS } from '../data/FocusL
 import { Icons } from '../icons';
 import { lifeStore } from '../state/LifeStore';
 import { FlashcardItem } from '../types';
+import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
+
+const FOCUSLAB_TUTORIALS: Record<'oratory' | 'schulte' | 'recall', Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
+  oratory: {
+    sectionName: 'Oratoria y Dicción',
+    summary: 'Entrena exposiciones cronometradas con estructura, elimina muletillas y pule tu dicción.',
+    steps: [
+      'Lee el reto y su estructura guía (izquierda) antes de pulsar Iniciar práctica.',
+      'Habla siguiendo el reloj; el micrófono cuenta muletillas en vivo y también puedes pulsar los botones +1 manualmente.',
+      'Usa el panel derecho de Rutina de Dicción y Voz para calentar articulación y pausas en 1 minuto.',
+      'Pulsa Otro reto u Otra rutina para recorrer los 16 retos de oratoria y 10 rutinas de dicción.',
+    ],
+    tip: 'Cuando sientas venir un «eh» o «este», haz una pausa limpia de 1 segundo en silencio: proyecta seguridad.',
+  },
+  schulte: {
+    sectionName: 'Tabla de Schulte',
+    summary: 'Amplía tu visión periférica y velocidad de rastreo visual tocando números en orden.',
+    steps: [
+      'Elige el tamaño del tablero (4×4 para calentar, 5×5 estándar o 6×6 avanzado).',
+      'Fija los ojos en el centro de la cuadrícula e intenta ubicar del 1 al máximo sin mover la cabeza.',
+      'El cronómetro arranca automáticamente al tocar el 1 y guarda tu mejor marca en 5×5.',
+    ],
+    tip: 'Mantén la respiración tranquila: apresurar la mirada salta números y añade más tiempo que avanzar parejo.',
+  },
+  recall: {
+    sectionName: 'Evocación Activa',
+    summary: 'Fija conceptos técnicos y personales con recuperación activa y repetición espaciada.',
+    steps: [
+      'Filtra por mazo arriba o elige Todos para intercalar temas distintos.',
+      'Escribe o piensa tu respuesta en el campo de evocación antes de pulsar Mostrar respuesta.',
+      'Califica tu recuerdo (10 min, +2 días o +5 días) para programar automáticamente el próximo repaso.',
+      'Pulsa Nueva tarjeta para añadir preguntas propias de tus cursos o lecturas.',
+    ],
+    tip: 'Esforzarte 10 segundos en recordar antes de mirar la respuesta es lo que realmente consolida la memoria.',
+  },
+};
 
 const FILLER_PATTERNS: { key: string; label: string; regex: RegExp }[] = [
   { key: 'eh', label: 'eh / ehh', regex: /\b(?:eh+|emm+)\b/gi },
@@ -141,7 +177,7 @@ export class FocusLabView {
 
         <section class="al-panel al-focus-card">
           <div class="al-card-head">
-            <h2>Rutina de Dicción y Voz</h2>
+            <h2>Rutina de Dicción y Voz (${(this.drillIdx % DICTION_DRILLS.length) + 1}/${DICTION_DRILLS.length})</h2>
             <button type="button" class="al-btn al-btn-sm" id="fl-next-drill">${Icons.refresh(14)}<span>Otra rutina</span></button>
           </div>
           <h3 style="margin:0 0 8px;">${esc(drill.title)}</h3>
@@ -327,11 +363,17 @@ export class FocusLabView {
 
         <div class="al-toolbar">
           <div class="al-seg-tabs">
-            <button type="button" class="al-seg-btn ${prefs.tab === 'oratory' ? 'is-active' : ''}" data-fltab="oratory">Oratoria y Dicción</button>
+            <button type="button" class="al-seg-btn ${prefs.tab === 'oratory' ? 'is-active' : ''}" data-fltab="oratory">Oratoria y Dicción (${ORATORY_PROMPTS.length})</button>
             <button type="button" class="al-seg-btn ${prefs.tab === 'schulte' ? 'is-active' : ''}" data-fltab="schulte">Tabla de Schulte</button>
-            <button type="button" class="al-seg-btn ${prefs.tab === 'recall' ? 'is-active' : ''}" data-fltab="recall">Evocación Activa</button>
+            <button type="button" class="al-seg-btn ${prefs.tab === 'recall' ? 'is-active' : ''}" data-fltab="recall">Evocación Activa (${this.getAllCards().length})</button>
           </div>
         </div>
+
+        ${renderTutorialBanner({
+          id: `focuslab:${prefs.tab}`,
+          moduleName: 'Oratoria y Enfoque',
+          ...(FOCUSLAB_TUTORIALS[prefs.tab] ?? FOCUSLAB_TUTORIALS.oratory),
+        })}
 
         ${
           prefs.tab === 'oratory'
@@ -342,6 +384,8 @@ export class FocusLabView {
         }
       </div>
     `;
+
+    bindTutorialBanners(container);
 
     container.querySelectorAll<HTMLButtonElement>('[data-fltab]').forEach((btn) => {
       btn.addEventListener('click', () => {

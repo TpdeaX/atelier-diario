@@ -92,9 +92,17 @@ describe('CalmBank: pulso descendente y tarjetas', () => {
     assert.equal(computeDecayingPulseBpm(10, 84, 60, 0), 60);
   });
 
-  it('hay tarjetas de anclaje breves y mensaje de seguridad', () => {
-    assert.ok(PANIC_TRUTH_CARDS.length >= 8);
-    for (const c of PANIC_TRUTH_CARDS) assert.ok(c.length > 10 && c.length <= 110, c);
+  it('hay al menos 20 tarjetas de anclaje breves, unicas, sin emojis y mensaje de seguridad', () => {
+    const emojiRe = /\p{Extended_Pictographic}/u;
+    assert.ok(PANIC_TRUTH_CARDS.length >= 20, `esperado >= 20, obtuvo ${PANIC_TRUTH_CARDS.length}`);
+    const seen = new Set<string>();
+    for (const c of PANIC_TRUTH_CARDS) {
+      assert.ok(c.length > 10 && c.length <= 110, `longitud invalida (${c.length}): ${c}`);
+      assert.ok(!emojiRe.test(c), `emoji detectado: ${c}`);
+      const norm = c.trim().toLowerCase();
+      assert.ok(!seen.has(norm), `tarjeta duplicada: ${c}`);
+      seen.add(norm);
+    }
     assert.match(SOS_REASSURANCE, /Estás a salvo/);
   });
 });

@@ -1,7 +1,55 @@
 import { Icons } from '../icons';
 import { lifeStore } from '../state/LifeStore';
+import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
 
 type DrillMode = 'trazos' | 'imprenta' | 'cursiva' | 'frase';
+
+const MODE_TUTORIALS: Record<DrillMode, Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
+  trazos: {
+    sectionName: 'Trazos base',
+    summary: 'Calienta la mano y estabiliza ritmo, altura e inclinación antes de escribir letras.',
+    steps: [
+      'Activa Renglones e Inclinación 55° para ver la altura de cuerpo, ascendentes y descendentes.',
+      'Traza despacio de arriba hacia abajo siguiendo el modelo fantasma en el lienzo.',
+      'Mantén presión y velocidad parejas; el plumín dinámico engrosa si bajas con calma.',
+      'Pulsa Evaluar y guardar hoja cuando termines para medir tu precisión dentro de la pauta.',
+    ],
+    tip: 'Dibuja desde la muñeca y el antebrazo, no apretando los dedos contra el ratón o lápiz.',
+  },
+  imprenta: {
+    sectionName: 'Imprenta clara',
+    summary: 'Uniforma proporciones de mayúsculas, minúsculas, números y signos en español.',
+    steps: [
+      'Alinea las mayúsculas hasta la línea superior y las minúsculas en la zona media.',
+      'Observa el espacio uniforme entre cada letra del modelo.',
+      'Usa Siguiente muestra para recorrer las 24 láminas del bloque (incluidas tildes y signos).',
+      'Guarda la hoja para registrar tu práctica diaria de caligrafía.',
+    ],
+    tip: 'Una letra imprenta limpia depende más de mantener la línea base pareja que de escribir rápido.',
+  },
+  cursiva: {
+    sectionName: 'Cursiva fluida',
+    summary: 'Enlaza letras con inclinación constante y ritmo continuo sin cortes bruscos.',
+    steps: [
+      'Activa Inclinación 55° para que todos los ejes verticales compartan el mismo ángulo.',
+      'Intenta unir sílabas completas en un solo movimiento suave antes de levantar el trazo.',
+      'Ajusta el grosor del plumín entre 3 y 6 para resaltar el contraste fino-grueso.',
+      'Evalúa la hoja al completar la palabra o frase guía.',
+    ],
+    tip: 'Respira al soltar el trazo: si contienes el aire, las curvas salen tensas.',
+  },
+  frase: {
+    sectionName: 'Frases completas',
+    summary: 'Aplica legibilidad, espaciado entre palabras y ritmo sostenido en oraciones reales.',
+    steps: [
+      'Lee la frase completa antes de empezar para calcular el ancho del renglón.',
+      'Deja un espacio constante (equivalente a una «o») entre palabra y palabra.',
+      'Usa Deshacer si un trazo se desvía sin borrar toda la lámina.',
+      'Guarda tu hoja para sumar progreso en tu estadística semanal.',
+    ],
+    tip: 'Prioriza terminar la frase con la misma calma y altura con la que empezaste.',
+  },
+};
 
 interface StrokePt {
   x: number;
@@ -22,22 +70,37 @@ const TEMPLATES: Record<DrillMode, string[]> = {
     '|  |  |  |  |', 'O  O  O  O', '/ / / / / /', 'uuu   nnn   mmm',
     '\\ \\ \\ \\ \\ \\', 'o o o o o o', 'c c c c c c', 'l l l l l l',
     'iii   uuu   www', 'eee   lll   eee', 'vvv   www   vvv', 'mmm   nnn   uuu',
+    '(((   )))   (((', 'sss   sss   sss', 'rrr   nnn   rrr', 'hhh   kkk   bbb',
+    'ggg   jjj   yyy', 'ppp   qqq   ddd', 'aaa   ooo   ccc', 'zzz   xxx   zzz',
+    'ooo   eee   ooo', 'lll   ttt   fff', 'nnn   hhh   mmm', '8 8 8 8 8 8',
   ],
   imprenta: [
     'A a  B b  C c', 'E e  G g  R r', 'M m  S s  Z z', 'La letra clara ordena la mente.',
     'D d  F f  H h', 'I i  J j  K k', 'L l  N n  Ñ ñ', 'O o  P p  Q q',
     'T t  U u  V v', 'W w  X x  Y y', 'á é í ó ú ü', '¿Qué? ¡Sí! «Ya»',
+    '0 1 2 3 4 5', '6 7 8 9  # @', 'Ch ch  Ll ll  Rr', 'Á É Í Ó Ú  Ñ',
+    'ba be bi bo bu', 'ca ce ci co cu', 'ga ge gi go gu', 'que qui gue gui',
+    'pra pre pri pro', 'tra tre tri tro', 'claro · orden · paz', 'El lápiz dibuja ideas.',
   ],
   cursiva: [
     'ele  ala  olo', 'fluidez y ritmo', 'serenidad', 'Paso firme cada día',
     'mar  mano  menta', 'bello  llama  lluvia', 'ñandú  niño  año', 'gracia  guiño',
     'armonía', 'constancia', 'quietud y luz', 'Querida libreta',
+    'sol  sombra  silencio', 'brisa  bosque  brote', 'pulso  pluma  pausa', 'claridad mental',
+    'tinta verde', 'horizonte sereno', 'palabra precisa', 'lectura nocturna',
+    'canto y melodía', 'paso a paso', 'estudio profundo', 'atelier diario',
   ],
   frase: [
     'Respira hondo.', 'Un paso hoy.', 'Mente serena.', 'Todo mejora paso a paso.',
     'Hoy elijo la calma.', 'Poco a poco se llega.', 'Hecho es mejor que perfecto.',
     'La calma también es fuerza.', 'Lento, pero sin pausa.', 'Aprendo de cada error.',
     'Sé amable contigo.', 'El jamón y el kiwi añejo.',
+    'La claridad supera a la prisa.', 'Escribir despacio ordena el día.',
+    'Cada línea entrena tu pulso.', 'Sin prisa, pero sin rendirse.',
+    'La práctica diaria construye oficio.', 'Escucha antes de responder.',
+    'Menos ruido, más presencia.', 'Un trazo firme vale por diez.',
+    'El orden exterior trae sosiego.', 'Cuida el detalle en lo pequeño.',
+    'Tu atención es tu mejor recurso.', 'Hoy sumo una hoja limpia más.',
   ],
 };
 
@@ -56,7 +119,9 @@ export class CalligraphyView {
     const profile = lifeStore.get();
     const prefs = profile.modulePrefs.calligraphy;
     const list = TEMPLATES[prefs.mode];
+    const totalTemplates = Object.values(TEMPLATES).reduce((acc, arr) => acc + arr.length, 0);
     const currentText = list[prefs.sampleIdx % list.length];
+    const modeTut = MODE_TUTORIALS[prefs.mode];
 
     container.innerHTML = `
       <div class="al-page al-calligraphy-page">
@@ -68,7 +133,7 @@ export class CalligraphyView {
             </div>
             <div>
               <h1>Taller de Caligrafía</h1>
-              <p>Practica pulso, altura uniforme e inclinación constante sobre pauta profesional.</p>
+              <p>Practica pulso, altura uniforme e inclinación constante en ${totalTemplates} plantillas sobre pauta profesional.</p>
             </div>
           </div>
           <div class="al-mono-pill">Hojas completadas: ${profile.stats.calligraphySheets}</div>
@@ -76,10 +141,10 @@ export class CalligraphyView {
 
         <div class="al-toolbar">
           <div class="al-seg-tabs">
-            <button type="button" class="al-seg-btn ${prefs.mode === 'trazos' ? 'is-active' : ''}" data-cmode="trazos">Trazos base</button>
-            <button type="button" class="al-seg-btn ${prefs.mode === 'imprenta' ? 'is-active' : ''}" data-cmode="imprenta">Imprenta</button>
-            <button type="button" class="al-seg-btn ${prefs.mode === 'cursiva' ? 'is-active' : ''}" data-cmode="cursiva">Cursiva</button>
-            <button type="button" class="al-seg-btn ${prefs.mode === 'frase' ? 'is-active' : ''}" data-cmode="frase">Frases</button>
+            <button type="button" class="al-seg-btn ${prefs.mode === 'trazos' ? 'is-active' : ''}" data-cmode="trazos">Trazos base (${TEMPLATES.trazos.length})</button>
+            <button type="button" class="al-seg-btn ${prefs.mode === 'imprenta' ? 'is-active' : ''}" data-cmode="imprenta">Imprenta (${TEMPLATES.imprenta.length})</button>
+            <button type="button" class="al-seg-btn ${prefs.mode === 'cursiva' ? 'is-active' : ''}" data-cmode="cursiva">Cursiva (${TEMPLATES.cursiva.length})</button>
+            <button type="button" class="al-seg-btn ${prefs.mode === 'frase' ? 'is-active' : ''}" data-cmode="frase">Frases (${TEMPLATES.frase.length})</button>
           </div>
 
           <div class="al-tool-group">
@@ -95,6 +160,12 @@ export class CalligraphyView {
             <label class="al-inline-range">Plumín <input type="range" id="al-cal-nib" min="2" max="9" value="${prefs.nibSize}" /></label>
           </div>
         </div>
+
+        ${renderTutorialBanner({
+          id: `calligraphy:${prefs.mode}`,
+          moduleName: 'Taller de Caligrafía',
+          ...modeTut,
+        })}
 
         <div class="al-panel al-canvas-panel">
           <div class="al-cal-sample-label">
@@ -119,6 +190,7 @@ export class CalligraphyView {
     this.resizeCanvas();
     this.redraw();
     this.bindEvents(container);
+    bindTutorialBanners(container);
   }
 
   private resizeCanvas(): void {

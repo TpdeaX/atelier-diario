@@ -2,6 +2,7 @@ import {
   DRAWING_BLOCKS,
   DRAWING_LESSONS,
   DRAWING_SWATCHES,
+  DRAWING_TOPIC_CHIPS,
   evaluateDrawingCoverage,
   mirrorStrokePoints,
   parseNormalizedPathCommands,
@@ -10,10 +11,30 @@ import {
   type DrawingPoint,
 } from '../data/DrawingBank';
 import { Icons } from '../icons';
+import {
+  sanitizeManualImageUrl,
+  searchDrawingReferences,
+  type DrawingReferenceItem,
+  type DrawingRefSourceFilter,
+} from '../services/OnlineApi';
 import { lifeStore } from '../state/LifeStore';
 import type { DrawingGridMode, DrawingSymmetry } from '../types';
+import { bindTutorialBanners, renderTutorialBanner, type SectionTutorialSpec } from '../ui/TutorialBanner';
 
 type DrawingTool = 'pencil' | 'ruler' | 'eraser';
+type RefViewMode = 'side' | 'trace' | 'off';
+type RefImgStatus = 'idle' | 'loading' | 'ready' | 'error';
+
+interface ActiveDrawingRef {
+  id: string;
+  origin: 'wikimedia' | 'cleveland' | 'upload' | 'url';
+  title: string;
+  artist: string;
+  license: string;
+  thumbUrl: string;
+  fullUrl: string;
+  pageUrl: string;
+}
 
 interface CanvasStroke {
   tool: DrawingTool;
@@ -26,6 +47,15 @@ interface CanvasStroke {
 }
 
 const MAX_UNDO_STEPS = 30;
+
+function esc(raw: string): string {
+  return raw
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 export class DrawingView {
   private container: HTMLElement | null = null;
@@ -50,6 +80,27 @@ export class DrawingView {
   private vp2X = 0.88;
   private draggingVp: 'vp1' | 'vp2' | null = null;
 
+  // Estado transitorio de Referencias de Internet / Calco (en memoria, sin inflar localStorage)
+  private refPanelOpen = false;
+  private refQuery = '';
+  private refSource: DrawingRefSourceFilter = 'all';
+  private refActiveChipId: string | null = null;
+  private refSearching = false;
+  private refStatusMsg =
+    'Busca fotos y dibujos libres en Wikimedia Commons o Museo de Cleveland CC0, o carga tu propia imagen.';
+  private refResults: DrawingReferenceItem[] = [];
+  private activeRef: ActiveDrawingRef | null = null;
+  private refViewMode: RefViewMode = 'side';
+  private refOpacity = 0.38;
+  private refHighContrast = false;
+  private refMirror = false;
+  private refImgStatus: RefImgStatus = 'idle';
+  private searchSeq = 0;
+  private urlInputOpen = false;
+  private urlDraft = '';
+  private activeObjectUrl: string | null = null;
+  private uploadedFile: File | null = null;
+
   private feedbackMsg =
     'Elige una lámina guiada o pasa a Lienzo Libre. Toca y arrastra con ratón, dedo o lápiz stylus.';
   private keyHandler: ((e: KeyboardEvent) => void) | null = null;
@@ -57,6 +108,8 @@ export class DrawingView {
 
   public render(container: HTMLElement): void {
     this.container = container;
+    this.restoreLocalUploadUrlIfNeeded();
+
     const profile = lifeStore.get();
     const prefs = profile.modulePrefs.drawing;
     const activeLesson = this.getActiveLesson(prefs.lessonId);
@@ -64,6 +117,14 @@ export class DrawingView {
     const blockLessons = DRAWING_LESSONS.filter((l) => l.block === activeBlock);
     const lessonIndex = DRAWING_LESSONS.findIndex((l) => l.id === activeLesson.id);
     const isLessons = prefs.mode === 'lessons';
+    const totalLessons = DRAWING_LESSONS.length;
+
+    const showSideRef = Boolean(this.activeRef && this.refViewMode === 'side');
+    const showTraceRef = Boolean(this.activeRef && this.refViewMode === 'trace');
+    const refUrl = this.activeRef ? this.activeRef.fullUrl || this.activeRef.thumbUrl : '';
+    const refImgStyle = this.buildRefFilterStyle(showTraceRef);
+
+    const tutorialSpec = this.getTutorialSpec(isLessons);
 
     container.innerHTML = `
       <div class="al-page al-drawing-page">
@@ -75,15 +136,17 @@ export class DrawingView {
             </div>
             <div>
               <h1>Taller de Dibujo Guiado</h1>
-              <p>20 láminas paso a paso de trazo, perspectiva, luz y figura, más lienzo libre con simetría y puntos de fuga.</p>
+              <p>${totalLessons} láminas paso a paso de trazo, perspectiva, luz y figura, más referencias de Internet para estudiar o calcar.</p>
             </div>
           </div>
           <div class="al-mono-pill">Láminas guardadas: ${profile.stats.drawingSheets}</div>
         </div>
 
+        ${renderTutorialBanner(tutorialSpec)}
+
         <div class="al-seg-tabs al-drawing-mode-tabs" role="tablist" aria-label="Modo de dibujo">
           <button type="button" role="tab" aria-selected="${isLessons}" class="al-seg-btn ${isLessons ? 'is-active' : ''}" data-draw-mode="lessons">
-            ${Icons.layers(16)}<span>Lecciones Guiadas (20)</span>
+            ${Icons.layers(16)}<span>Lecciones Guiadas (${totalLessons})</span>
           </button>
           <button type="button" role="tab" aria-selected="${!isLessons}" class="al-seg-btn ${!isLessons ? 'is-active' : ''}" data-draw-mode="free">
             ${Icons.palette(16)}<span>Lienzo Libre</span>
@@ -98,7 +161,7 @@ export class DrawingView {
               ${DRAWING_BLOCKS.map(
                 (b) => `
                 <button type="button" class="al-btn al-btn-sm ${activeBlock === b.id ? 'al-btn-primary' : ''}" data-draw-block="${b.id}">
-                  <span>${b.label}</span>
+                  <span>${esc(b.label)}</span>
                 </button>`
               ).join('')}
             </div>
@@ -109,7 +172,7 @@ export class DrawingView {
                   const globalNum = DRAWING_LESSONS.findIndex((item) => item.id === l.id) + 1;
                   return `
                   <button type="button" class="al-btn al-btn-sm ${l.id === activeLesson.id ? 'is-toggled' : ''}" data-draw-lesson="${l.id}">
-                    <span>${globalNum}. ${l.title}</span>
+                    <span>${globalNum}. ${esc(l.title)}</span>
                   </button>`;
                 })
                 .join('')}
@@ -117,8 +180,8 @@ export class DrawingView {
 
             <div class="al-drawing-tip-banner">
               <div>
-                <strong>Lámina ${lessonIndex + 1}/20 · ${activeLesson.title}</strong>
-                <p>${activeLesson.tip}</p>
+                <strong>Lámina ${lessonIndex + 1}/${totalLessons} · ${esc(activeLesson.title)}</strong>
+                <p>${esc(activeLesson.tip)}</p>
               </div>
               <button type="button" class="al-btn al-btn-sm" id="al-draw-next-lesson">
                 ${Icons.skip(15)}<span>Siguiente lámina</span>
@@ -127,6 +190,151 @@ export class DrawingView {
           </section>`
             : ''
         }
+
+        <section class="al-panel al-drawing-ref-panel" aria-label="Referencias de Internet y Calco">
+          <div class="al-drawing-ref-head">
+            <div class="al-drawing-ref-head-title">
+              ${Icons.search(17)}
+              <strong>Referencias de Internet / Calco</strong>
+              ${
+                this.activeRef
+                  ? `<span class="al-mono-pill">${esc(this.activeRef.title.slice(0, 36))}${this.activeRef.title.length > 36 ? '...' : ''}</span>`
+                  : `<span class="al-muted">Wikimedia Commons + Museo CC0 + Subida local</span>`
+              }
+            </div>
+            <button
+              type="button"
+              class="al-btn al-btn-sm ${this.refPanelOpen ? 'is-toggled' : ''}"
+              id="al-draw-ref-toggle"
+              aria-expanded="${this.refPanelOpen}"
+            >
+              ${Icons.chevronDown(14)}<span>${this.refPanelOpen ? 'Ocultar buscador' : 'Abrir referencias'}</span>
+            </button>
+          </div>
+
+          <div class="al-drawing-ref-body" id="al-draw-ref-body"${this.refPanelOpen ? '' : ' hidden'}>
+            <div class="al-drawing-ref-search-row">
+              <form class="al-drawing-ref-search-form" id="al-draw-ref-form">
+                <input
+                  type="search"
+                  class="al-drawing-ref-input"
+                  id="al-draw-ref-query"
+                  value="${esc(this.refQuery)}"
+                  placeholder="Ej: hand anatomy, portrait, skull, botanical..."
+                  aria-label="Buscar referencia visual en Internet"
+                />
+                <select class="al-drawing-ref-select" id="al-draw-ref-source" aria-label="Fuente de referencias">
+                  <option value="all"${this.refSource === 'all' ? ' selected' : ''}>Todas</option>
+                  <option value="wikimedia"${this.refSource === 'wikimedia' ? ' selected' : ''}>Wikimedia</option>
+                  <option value="cleveland"${this.refSource === 'cleveland' ? ' selected' : ''}>Museo CC0</option>
+                </select>
+                <button type="submit" class="al-btn al-btn-sm al-btn-primary" id="al-draw-ref-search-btn"${this.refSearching ? ' disabled' : ''}>
+                  ${Icons.search(15)}<span>${this.refSearching ? 'Buscando...' : 'Buscar'}</span>
+                </button>
+              </form>
+
+              <div class="al-tool-group">
+                <input type="file" id="al-draw-ref-file" accept="image/*" hidden />
+                <button type="button" class="al-btn al-btn-sm" id="al-draw-ref-upload-btn">
+                  ${Icons.upload(15)}<span>Subir foto</span>
+                </button>
+                <button type="button" class="al-btn al-btn-sm ${this.urlInputOpen ? 'is-toggled' : ''}" id="al-draw-ref-url-toggle">
+                  ${Icons.link(15)}<span>Pegar URL</span>
+                </button>
+              </div>
+            </div>
+
+            ${
+              this.urlInputOpen
+                ? `
+              <form class="al-drawing-ref-url-bar" id="al-draw-ref-url-form">
+                <input
+                  type="url"
+                  class="al-drawing-ref-input"
+                  id="al-draw-ref-url-input"
+                  value="${esc(this.urlDraft)}"
+                  placeholder="Pega enlace https:// o data:image/..."
+                  aria-label="URL directa de imagen de referencia"
+                />
+                <button type="submit" class="al-btn al-btn-sm al-btn-primary">Usar imagen</button>
+                <button type="button" class="al-btn al-btn-sm" id="al-draw-ref-url-cancel">Cancelar</button>
+              </form>`
+                : ''
+            }
+
+            <div class="al-drawing-ref-chips" role="group" aria-label="Temas sugeridos de dibujo">
+              ${DRAWING_TOPIC_CHIPS.map(
+                (chip) => `
+                <button
+                  type="button"
+                  class="al-chip-btn al-drawing-ref-chip ${this.refActiveChipId === chip.id ? 'is-active' : ''}"
+                  data-ref-chip="${chip.id}"
+                >
+                  <span>${esc(chip.label)}</span>
+                </button>`
+              ).join('')}
+            </div>
+
+            <div id="al-draw-ref-feed">
+              ${this.renderRefFeedHtml()}
+            </div>
+          </div>
+
+          ${
+            this.activeRef
+              ? `
+            <div class="al-drawing-ref-controls" role="group" aria-label="Controles de referencia activa">
+              <div class="al-tool-group">
+                <button type="button" class="al-btn al-btn-sm ${this.refViewMode === 'side' ? 'al-btn-primary' : ''}" data-ref-view="side">
+                  <span>Lado a lado</span>
+                </button>
+                <button type="button" class="al-btn al-btn-sm ${this.refViewMode === 'trace' ? 'al-btn-primary' : ''}" data-ref-view="trace">
+                  <span>Calco traslúcido</span>
+                </button>
+                <button type="button" class="al-btn al-btn-sm ${this.refViewMode === 'off' ? 'is-toggled' : ''}" data-ref-view="off">
+                  ${Icons.eyeOff(15)}<span>Ocultar</span>
+                </button>
+                <button type="button" class="al-btn al-btn-sm" id="al-draw-ref-clear">
+                  ${Icons.trash(15)}<span>Quitar</span>
+                </button>
+              </div>
+
+              <label class="al-inline-range">
+                <span>Opacidad ref. <strong id="al-draw-ref-opacity-val">${Math.round(this.refOpacity * 100)}%</strong></span>
+                <input
+                  type="range"
+                  id="al-draw-ref-opacity"
+                  min="0.1"
+                  max="0.9"
+                  step="0.05"
+                  value="${this.refOpacity}"
+                  ${this.refViewMode === 'trace' ? '' : 'disabled'}
+                />
+              </label>
+
+              <button
+                type="button"
+                class="al-btn al-btn-sm ${this.refHighContrast ? 'is-toggled' : ''}"
+                id="al-draw-ref-contrast"
+                aria-pressed="${this.refHighContrast}"
+              >
+                ${Icons.sliders(14)}<span>Alto contraste B/N</span>
+              </button>
+
+              <button
+                type="button"
+                class="al-btn al-btn-sm ${this.refMirror ? 'is-toggled' : ''}"
+                id="al-draw-ref-mirror"
+                aria-pressed="${this.refMirror}"
+              >
+                ${Icons.symmetry(14)}<span>Espejo ref.</span>
+              </button>
+
+              <span class="al-muted" id="al-draw-ref-img-state">${esc(this.getActiveRefStatusLabel())}</span>
+            </div>`
+              : ''
+          }
+        </section>
 
         <section class="al-panel al-drawing-workspace">
           <div class="al-drawing-toolbar">
@@ -193,7 +401,7 @@ export class DrawingView {
             <div class="al-tool-group" role="group" aria-label="Paleta de color">
               ${DRAWING_SWATCHES.map(
                 (s) => `
-                <button type="button" class="al-swatch ${prefs.brushColor.toLowerCase() === s.hex.toLowerCase() ? 'is-active' : ''}" data-draw-color="${s.hex}" title="${s.name}" aria-label="Color ${s.name}" style="background:${s.hex}"></button>`
+                <button type="button" class="al-swatch ${prefs.brushColor.toLowerCase() === s.hex.toLowerCase() ? 'is-active' : ''}" data-draw-color="${s.hex}" title="${esc(s.name)}" aria-label="Color ${esc(s.name)}" style="background:${s.hex}"></button>`
               ).join('')}
             </div>
 
@@ -214,12 +422,54 @@ export class DrawingView {
               : ''
           }
 
-          <div class="al-drawing-stage-wrap">
-            <canvas id="al-drawing-canvas" class="al-drawing-canvas" aria-label="Lienzo de dibujo interactivo"></canvas>
+          <div class="al-drawing-stage-grid ${showSideRef ? 'has-ref-side' : ''}">
+            ${
+              showSideRef && this.activeRef
+                ? `
+              <aside class="al-drawing-ref-side" aria-label="Referencia lateral">
+                <div class="al-drawing-ref-side-frame">
+                  <img
+                    id="al-draw-ref-side-img"
+                    class="al-drawing-ref-side-img"
+                    src="${esc(refUrl)}"
+                    alt="${esc(this.activeRef.title)}"
+                    referrerpolicy="no-referrer"
+                    style="${refImgStyle}"
+                  />
+                </div>
+                <div class="al-drawing-ref-side-meta">
+                  <strong>${esc(this.activeRef.title)}</strong>
+                  <span>${esc(this.activeRef.artist)} · ${esc(this.activeRef.license)}</span>
+                  ${
+                    this.activeRef.pageUrl
+                      ? `<a class="al-link-btn" href="${esc(this.activeRef.pageUrl)}" target="_blank" rel="noopener noreferrer">Ver ficha original</a>`
+                      : ''
+                  }
+                </div>
+              </aside>`
+                : ''
+            }
+
+            <div class="al-drawing-stage-wrap">
+              ${
+                showTraceRef && this.activeRef
+                  ? `<img
+                      id="al-draw-ref-bg-img"
+                      class="al-drawing-ref-bg"
+                      src="${esc(refUrl)}"
+                      alt=""
+                      aria-hidden="true"
+                      referrerpolicy="no-referrer"
+                      style="${refImgStyle}"
+                    />`
+                  : ''
+              }
+              <canvas id="al-drawing-canvas" class="al-drawing-canvas" aria-label="Lienzo de dibujo interactivo"></canvas>
+            </div>
           </div>
 
           <div class="al-drawing-foot">
-            <span id="al-draw-feedback" class="al-muted">${this.feedbackMsg}</span>
+            <span id="al-draw-feedback" class="al-muted">${esc(this.feedbackMsg)}</span>
             <div class="al-tool-group">
               <button type="button" class="al-btn al-btn-sm" id="al-draw-undo" ${this.undoStack.length === 0 ? 'disabled' : ''} title="Deshacer (Ctrl+Z)">
                 ${Icons.undo(15)}<span>Deshacer</span>
@@ -247,14 +497,17 @@ export class DrawingView {
     this.strokeLayer = document.createElement('canvas');
     this.sg = this.strokeLayer.getContext('2d');
 
-    this.resizeCanvas(false);
+    this.resizeCanvas(this.strokes.length > 0);
     this.redraw();
     this.bindEvents(container);
+    this.bindActiveRefImageEvents(container);
+    bindTutorialBanners(container);
     this.attachWindowListeners();
   }
 
   public unmount(): void {
     this.detachWindowListeners();
+    this.revokeObjectUrlOnly();
     this.activeStroke = null;
     this.draggingVp = null;
     this.container = null;
@@ -262,6 +515,295 @@ export class DrawingView {
     this.g = null;
     this.strokeLayer = null;
     this.sg = null;
+  }
+
+  private getTutorialSpec(isLessons: boolean): SectionTutorialSpec {
+    if (this.activeRef && this.refViewMode === 'trace') {
+      return {
+        id: 'drawing:reference-trace',
+        moduleName: 'Taller de Dibujo',
+        sectionName: 'Calco traslúcido',
+        summary: 'Calca proporciones sobre una imagen sin manchar el archivo PNG exportado.',
+        steps: [
+          'Ajusta Opacidad ref. entre 10% y 90% y activa Alto contraste B/N si quieres ver mejor las sombras.',
+          'Usa Espejo ref. para invertir la foto y entrenar el ojo en otra orientación sin alterar el pincel.',
+          'Dibuja con Lápiz o Regla recta; tus trazos quedan en una capa aparte limpia y lista para Descargar PNG.',
+        ],
+        tip: 'Alterna entre Calco traslúcido y Lado a lado cuando quieras pasar de calcar líneas base a dibujar por observación.',
+      };
+    }
+    if (this.activeRef) {
+      return {
+        id: 'drawing:reference-side',
+        moduleName: 'Taller de Dibujo',
+        sectionName: 'Referencia de Internet',
+        summary: 'Estudia anatomía, retratos u obras CC0 lado a lado sin perder tus trazos.',
+        steps: [
+          'Usa los 12 temas rápidos o busca en Wikimedia Commons y Museo de Cleveland CC0.',
+          'Cambia entre Lado a lado, Calco traslúcido u Ocultar sin borrar tu dibujo actual.',
+          'Pulsa Evaluar y guardar para registrar la lámina en tu progreso diario sin penalización de guía.',
+        ],
+        tip: 'Activa Cuadrícula en la barra superior para medir proporciones comparando la foto lateral con tu lienzo.',
+      };
+    }
+    if (isLessons) {
+      return {
+        id: 'drawing:lessons',
+        moduleName: 'Taller de Dibujo',
+        sectionName: 'Lecciones Guiadas',
+        summary: `${DRAWING_LESSONS.length} láminas estructuradas en 5 bloques progresivos.`,
+        steps: [
+          'Elige un bloque (Trazos, Perspectiva, Luz, Proporción o Composición) y selecciona una lámina.',
+          'Activa Plantilla fantasma si deseas ver el trazo base o apágala para intentar de memoria.',
+          'Al terminar, pulsa Evaluar y guardar para medir cobertura de puntos clave y sumar la lámina.',
+        ],
+        tip: 'También puedes abrir Referencias de Internet / Calco en cualquier momento sin perder lo dibujado.',
+      };
+    }
+    return {
+      id: 'drawing:free',
+      moduleName: 'Taller de Dibujo',
+      sectionName: 'Lienzo Libre',
+      summary: 'Espacio abierto con regla recta, simetría, puntos de fuga arrastrables y referencias.',
+      steps: [
+        'Combina Lápiz con Simetría Espejo o Radial 4x para diseños geométricos o retratos frontales.',
+        'En Fuga 1 pt o Fuga 2 pts, arrastra los círculos F1 y F2 directamente sobre el lienzo.',
+        'Usa Ctrl+Z para deshacer y Ctrl+Y para rehacer en cualquier momento.',
+      ],
+      tip: 'Si abres Referencias de Internet / Calco puedes subir una foto propia o pegar una URL segura para estudiarla.',
+    };
+  }
+
+  private renderRefFeedHtml(): string {
+    const cardsHtml =
+      this.refResults.length > 0
+        ? `
+      <div class="al-drawing-ref-results" role="list">
+        ${this.refResults
+          .map((item) => {
+            const isSelected = this.activeRef?.id === item.id;
+            const srcBadge = item.source === 'cleveland' ? 'Museo CC0' : 'Wikimedia';
+            return `
+            <button
+              type="button"
+              role="listitem"
+              class="al-drawing-ref-card ${isSelected ? 'is-active' : ''}"
+              data-ref-pick="${esc(item.id)}"
+              title="${esc(item.title)}"
+            >
+              <img
+                class="al-drawing-ref-card-thumb"
+                src="${esc(item.thumbUrl)}"
+                alt="${esc(item.title)}"
+                loading="lazy"
+                referrerpolicy="no-referrer"
+              />
+              <div class="al-drawing-ref-card-meta">
+                <span class="al-drawing-ref-card-title">${esc(item.title)}</span>
+                <span class="al-drawing-ref-card-sub">${esc(srcBadge)} · ${esc(item.artist)}</span>
+              </div>
+            </button>`;
+          })
+          .join('')}
+      </div>`
+        : '';
+
+    return `
+      <p class="al-drawing-ref-status" id="al-draw-ref-status">${esc(this.refStatusMsg)}</p>
+      ${cardsHtml}
+    `;
+  }
+
+  private buildRefFilterStyle(isTrace: boolean): string {
+    const parts: string[] = [];
+    if (isTrace) parts.push(`opacity:${this.refOpacity}`);
+    parts.push(`filter:${this.refHighContrast ? 'grayscale(1) contrast(1.45)' : 'none'}`);
+    parts.push(`transform:${this.refMirror ? 'scaleX(-1)' : 'none'}`);
+    return parts.join(';');
+  }
+
+  private getActiveRefStatusLabel(): string {
+    if (!this.activeRef) return '';
+    if (this.refViewMode === 'off') return 'Referencia oculta (los trazos siguen intactos).';
+    if (this.refImgStatus === 'loading') return 'Cargando imagen de referencia...';
+    if (this.refImgStatus === 'error') {
+      return 'No se pudo cargar esta imagen; papel sólido restaurado. Prueba otra referencia.';
+    }
+    return this.refViewMode === 'trace'
+      ? `Calco activo (${Math.round(this.refOpacity * 100)}%) · descarga PNG limpia`
+      : 'Vista lateral activa';
+  }
+
+  private syncActiveRefStyles(container: HTMLElement): void {
+    const bgImg = container.querySelector<HTMLImageElement>('#al-draw-ref-bg-img');
+    if (bgImg) {
+      bgImg.style.opacity = String(this.refOpacity);
+      bgImg.style.filter = this.refHighContrast ? 'grayscale(1) contrast(1.45)' : 'none';
+      bgImg.style.transform = this.refMirror ? 'scaleX(-1)' : 'none';
+    }
+    const sideImg = container.querySelector<HTMLImageElement>('#al-draw-ref-side-img');
+    if (sideImg) {
+      sideImg.style.filter = this.refHighContrast ? 'grayscale(1) contrast(1.45)' : 'none';
+      sideImg.style.transform = this.refMirror ? 'scaleX(-1)' : 'none';
+    }
+    const opLabel = container.querySelector('#al-draw-ref-opacity-val');
+    if (opLabel) opLabel.textContent = `${Math.round(this.refOpacity * 100)}%`;
+
+    const contrastBtn = container.querySelector('#al-draw-ref-contrast');
+    if (contrastBtn) {
+      contrastBtn.classList.toggle('is-toggled', this.refHighContrast);
+      contrastBtn.setAttribute('aria-pressed', String(this.refHighContrast));
+    }
+    const mirrorBtn = container.querySelector('#al-draw-ref-mirror');
+    if (mirrorBtn) {
+      mirrorBtn.classList.toggle('is-toggled', this.refMirror);
+      mirrorBtn.setAttribute('aria-pressed', String(this.refMirror));
+    }
+    const stateEl = container.querySelector('#al-draw-ref-img-state');
+    if (stateEl) stateEl.textContent = this.getActiveRefStatusLabel();
+  }
+
+  private bindActiveRefImageEvents(container: HTMLElement): void {
+    const img =
+      container.querySelector<HTMLImageElement>('#al-draw-ref-bg-img') ??
+      container.querySelector<HTMLImageElement>('#al-draw-ref-side-img');
+    if (!img || !this.activeRef) return;
+
+    const updateStateLabel = () => {
+      const stateEl = this.container?.querySelector('#al-draw-ref-img-state');
+      if (stateEl) stateEl.textContent = this.getActiveRefStatusLabel();
+    };
+
+    if (img.complete) {
+      this.refImgStatus = img.naturalWidth > 0 ? 'ready' : 'error';
+      updateStateLabel();
+      this.redraw();
+      return;
+    }
+
+    this.refImgStatus = 'loading';
+    updateStateLabel();
+    this.redraw();
+
+    const expectedSrc = img.src;
+    img.addEventListener('load', () => {
+      if (!this.container || img.src !== expectedSrc) return;
+      this.refImgStatus = 'ready';
+      updateStateLabel();
+      this.redraw();
+    });
+    img.addEventListener('error', () => {
+      if (!this.container || img.src !== expectedSrc) return;
+      this.refImgStatus = 'error';
+      updateStateLabel();
+      this.redraw();
+    });
+  }
+
+  private revokeObjectUrlOnly(): void {
+    if (this.activeObjectUrl) {
+      URL.revokeObjectURL(this.activeObjectUrl);
+      this.activeObjectUrl = null;
+    }
+  }
+
+  private restoreLocalUploadUrlIfNeeded(): void {
+    if (
+      this.activeRef &&
+      this.activeRef.origin === 'upload' &&
+      this.uploadedFile &&
+      !this.activeObjectUrl
+    ) {
+      const freshUrl = URL.createObjectURL(this.uploadedFile);
+      this.activeObjectUrl = freshUrl;
+      this.activeRef = {
+        ...this.activeRef,
+        thumbUrl: freshUrl,
+        fullUrl: freshUrl,
+      };
+      this.refImgStatus = 'loading';
+    }
+  }
+
+  private selectReference(ref: ActiveDrawingRef): void {
+    if (ref.origin !== 'upload') {
+      this.revokeObjectUrlOnly();
+      this.uploadedFile = null;
+    }
+    this.activeRef = ref;
+    this.refImgStatus = 'loading';
+    if (this.refViewMode === 'off') this.refViewMode = 'side';
+    this.feedbackMsg = `Referencia activa: ${ref.title}. Puedes alternar Lado a lado o Calco traslúcido sin perder tus trazos.`;
+    if (this.container) this.render(this.container);
+  }
+
+  private async runRefSearch(rawQuery: string): Promise<void> {
+    const q = rawQuery.trim();
+    this.refQuery = q;
+    this.refPanelOpen = true;
+    if (!q) {
+      this.refStatusMsg = 'Escribe un tema para buscar referencias o elige uno de los 12 chips rápidos.';
+      this.updateRefFeedDom();
+      return;
+    }
+
+    const seq = ++this.searchSeq;
+    this.refSearching = true;
+    this.refStatusMsg = 'Buscando referencias abiertas en Wikimedia Commons y Museo CC0...';
+    const searchBtn = this.container?.querySelector<HTMLButtonElement>('#al-draw-ref-search-btn');
+    if (searchBtn) searchBtn.disabled = true;
+    this.updateRefFeedDom();
+
+    const result = await searchDrawingReferences(q, this.refSource);
+    if (!this.container || seq !== this.searchSeq) return;
+
+    this.refSearching = false;
+    this.refResults = result.items;
+
+    const errNotes = [
+      result.errors.wikimedia ? `Wikimedia (${result.errors.wikimedia})` : '',
+      result.errors.cleveland ? `Museo CC0 (${result.errors.cleveland})` : '',
+    ].filter(Boolean);
+
+    if (result.items.length === 0) {
+      this.refStatusMsg =
+        errNotes.length > 0
+          ? `No se obtuvieron resultados (${errNotes.join(' · ')}). Prueba otra palabra o sube una foto.`
+          : 'Sin resultados para esa búsqueda. Prueba términos en inglés como "hand sketch" o "portrait".';
+    } else {
+      const warnSuffix = errNotes.length > 0 ? ` · aviso: ${errNotes.join(', ')}` : '';
+      this.refStatusMsg = `${result.items.length} referencias encontradas (clic en una tarjeta para abrirla)${warnSuffix}.`;
+    }
+
+    const btnAfter = this.container.querySelector<HTMLButtonElement>('#al-draw-ref-search-btn');
+    if (btnAfter) btnAfter.disabled = false;
+    this.updateRefFeedDom();
+  }
+
+  private updateRefFeedDom(): void {
+    const feedEl = this.container?.querySelector<HTMLElement>('#al-draw-ref-feed');
+    if (!feedEl) return;
+    feedEl.innerHTML = this.renderRefFeedHtml();
+    this.bindRefResultCards(feedEl);
+  }
+
+  private bindRefResultCards(scope: HTMLElement): void {
+    scope.querySelectorAll<HTMLButtonElement>('[data-ref-pick]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const picked = this.refResults.find((item) => item.id === btn.dataset.refPick);
+        if (!picked) return;
+        this.selectReference({
+          id: picked.id,
+          origin: picked.source,
+          title: picked.title,
+          artist: picked.artist,
+          license: picked.license,
+          thumbUrl: picked.thumbUrl,
+          fullUrl: picked.fullUrl,
+          pageUrl: picked.pageUrl,
+        });
+      });
+    });
   }
 
   private getActiveLesson(lessonId: string): DrawingLesson {
@@ -372,9 +914,18 @@ export class DrawingView {
     const w = this.width;
     const h = this.height;
 
-    // 1. Papel base
-    g.fillStyle = this.getPaperBg(isNight);
-    g.fillRect(0, 0, w, h);
+    const tracingReady =
+      this.refViewMode === 'trace' &&
+      this.activeRef !== null &&
+      this.refImgStatus === 'ready';
+
+    // 1. Papel base (solo transparente cuando el calco traslúcido está listo)
+    if (tracingReady) {
+      g.clearRect(0, 0, w, h);
+    } else {
+      g.fillStyle = this.getPaperBg(isNight);
+      g.fillRect(0, 0, w, h);
+    }
 
     // 2. Rejilla / Perspectiva
     this.drawGridGuides(g, prefs.grid, isNight);
@@ -382,8 +933,8 @@ export class DrawingView {
     // 3. Ejes de simetría visibles
     this.drawSymmetryAxes(g, prefs.symmetry, isNight);
 
-    // 4. Plantilla fantasma (solo en modo lecciones cuando showGuide=true)
-    if (prefs.mode === 'lessons' && prefs.showGuide) {
+    // 4. Plantilla fantasma (se suprime cuando hay calco activo listo para no encimar líneas)
+    if (prefs.mode === 'lessons' && prefs.showGuide && !tracingReady) {
       const lesson = this.getActiveLesson(prefs.lessonId);
       this.drawLessonGuide(g, lesson, isNight);
     }
@@ -436,7 +987,6 @@ export class DrawingView {
     }
 
     const hy = this.horizonY * h;
-    // Línea de horizonte
     g.strokeStyle = horizonCol;
     g.lineWidth = 1.4;
     g.setLineDash([7, 5]);
@@ -564,7 +1114,6 @@ export class DrawingView {
       g.stroke();
     }
 
-    // Puntos de referencia suaves
     g.setLineDash([]);
     g.fillStyle = isNight ? 'rgba(245, 158, 11, 0.35)' : 'rgba(180, 83, 9, 0.28)';
     for (const [nx, ny] of lesson.targetCheckpoints) {
@@ -679,7 +1228,10 @@ export class DrawingView {
       allMirrored.push(...mirrorStrokePoints(s.points, s.symmetry, this.width, this.height));
     }
 
-    if (prefs.mode === 'lessons') {
+    if (this.activeRef) {
+      lifeStore.recordDrawingSheet();
+      this.feedbackMsg = `Estudio con referencia guardado (${inkStrokes.length} trazos · total ${lifeStore.get().stats.drawingSheets} láminas).`;
+    } else if (prefs.mode === 'lessons') {
       const lesson = this.getActiveLesson(prefs.lessonId);
       const res = evaluateDrawingCoverage(
         allMirrored,
@@ -713,19 +1265,21 @@ export class DrawingView {
     const ctx = out.getContext('2d');
     if (!ctx) return;
 
+    // Zero-taint PNG: solo papel sólido + capa de trazos del usuario
     ctx.fillStyle = this.getPaperBg(isNight);
     ctx.fillRect(0, 0, out.width, out.height);
     ctx.drawImage(this.strokeLayer, 0, 0);
 
     const a = document.createElement('a');
-    const slug =
-      prof.modulePrefs.drawing.mode === 'lessons'
+    const slug = this.activeRef
+      ? 'estudio-referencia'
+      : prof.modulePrefs.drawing.mode === 'lessons'
         ? prof.modulePrefs.drawing.lessonId
         : 'lienzo-libre';
     a.download = `atelier-dibujo-${slug}.png`;
     a.href = out.toDataURL('image/png');
     a.click();
-    this.feedbackMsg = `Imagen descargada como ${a.download}.`;
+    this.feedbackMsg = `PNG limpio descargado como ${a.download}.`;
     this.updateFeedback();
   }
 
@@ -759,6 +1313,17 @@ export class DrawingView {
     if (canvas) {
       canvas.addEventListener('pointerdown', (e) => {
         if (e.button !== 0 && e.pointerType === 'mouse') return;
+
+        // Blur de inputs/selects/textareas enfocados dentro de la vista para devolver Ctrl+Z/Y al lienzo
+        const activeEl = document.activeElement;
+        if (
+          activeEl instanceof HTMLElement &&
+          container.contains(activeEl) &&
+          (activeEl.tagName === 'INPUT' || activeEl.tagName === 'SELECT' || activeEl.tagName === 'TEXTAREA')
+        ) {
+          activeEl.blur();
+        }
+
         e.preventDefault();
         canvas.setPointerCapture(e.pointerId);
         const pt = this.pointFromEvent(e);
@@ -838,6 +1403,161 @@ export class DrawingView {
       canvas.addEventListener('pointerup', finishPointer);
       canvas.addEventListener('pointercancel', finishPointer);
     }
+
+    // Referencias de Internet / Calco
+    container.querySelector('#al-draw-ref-toggle')?.addEventListener('click', () => {
+      this.refPanelOpen = !this.refPanelOpen;
+      const body = container.querySelector<HTMLElement>('#al-draw-ref-body');
+      const btn = container.querySelector<HTMLButtonElement>('#al-draw-ref-toggle');
+      if (body) body.hidden = !this.refPanelOpen;
+      if (btn) {
+        btn.classList.toggle('is-toggled', this.refPanelOpen);
+        btn.setAttribute('aria-expanded', String(this.refPanelOpen));
+        const span = btn.querySelector('span');
+        if (span) span.textContent = this.refPanelOpen ? 'Ocultar buscador' : 'Abrir referencias';
+      }
+    });
+
+    container.querySelector<HTMLInputElement>('#al-draw-ref-query')?.addEventListener('input', (e) => {
+      this.refQuery = (e.target as HTMLInputElement).value;
+    });
+
+    container.querySelector<HTMLSelectElement>('#al-draw-ref-source')?.addEventListener('change', (e) => {
+      this.refSource = (e.target as HTMLSelectElement).value as DrawingRefSourceFilter;
+      if (this.refQuery.trim()) {
+        void this.runRefSearch(this.refQuery);
+      }
+    });
+
+    container.querySelector('#al-draw-ref-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.refActiveChipId = null;
+      const input = container.querySelector<HTMLInputElement>('#al-draw-ref-query');
+      void this.runRefSearch(input?.value ?? this.refQuery);
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-ref-chip]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const chip = DRAWING_TOPIC_CHIPS.find((c) => c.id === btn.dataset.refChip);
+        if (!chip) return;
+        this.refActiveChipId = chip.id;
+        this.refQuery = chip.query;
+        const input = container.querySelector<HTMLInputElement>('#al-draw-ref-query');
+        if (input) input.value = chip.query;
+        container.querySelectorAll<HTMLButtonElement>('[data-ref-chip]').forEach((other) => {
+          other.classList.toggle('is-active', other.dataset.refChip === chip.id);
+        });
+        void this.runRefSearch(chip.query);
+      });
+    });
+
+    const feedEl = container.querySelector<HTMLElement>('#al-draw-ref-feed');
+    if (feedEl) this.bindRefResultCards(feedEl);
+
+    // Subir foto local
+    const fileInput = container.querySelector<HTMLInputElement>('#al-draw-ref-file');
+    container.querySelector('#al-draw-ref-upload-btn')?.addEventListener('click', () => {
+      fileInput?.click();
+    });
+    fileInput?.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      fileInput.value = '';
+      if (!file) return;
+      if (file.type && !file.type.startsWith('image/')) {
+        this.refStatusMsg = 'Selecciona un archivo de imagen válido (PNG, JPG, WebP o SVG).';
+        this.updateRefFeedDom();
+        return;
+      }
+      this.revokeObjectUrlOnly();
+      const objUrl = URL.createObjectURL(file);
+      this.activeObjectUrl = objUrl;
+      this.uploadedFile = file;
+      this.refStatusMsg = `Imagen local cargada: ${file.name}.`;
+      this.selectReference({
+        id: `local-file-${Date.now()}`,
+        origin: 'upload',
+        title: file.name || 'Foto subida',
+        artist: 'Archivo local',
+        license: 'Uso personal',
+        thumbUrl: objUrl,
+        fullUrl: objUrl,
+        pageUrl: '',
+      });
+    });
+
+    // Pegar URL manual
+    container.querySelector('#al-draw-ref-url-toggle')?.addEventListener('click', () => {
+      this.urlInputOpen = !this.urlInputOpen;
+      this.render(container);
+    });
+    container.querySelector('#al-draw-ref-url-cancel')?.addEventListener('click', () => {
+      this.urlInputOpen = false;
+      this.render(container);
+    });
+    container.querySelector<HTMLInputElement>('#al-draw-ref-url-input')?.addEventListener('input', (e) => {
+      this.urlDraft = (e.target as HTMLInputElement).value;
+    });
+    container.querySelector('#al-draw-ref-url-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const raw = container.querySelector<HTMLInputElement>('#al-draw-ref-url-input')?.value ?? this.urlDraft;
+      const safeUrl = sanitizeManualImageUrl(raw);
+      if (!safeUrl) {
+        this.refStatusMsg = 'URL rechazada: usa solo https://, http://, blob: o data:image/... válido.';
+        this.updateRefFeedDom();
+        return;
+      }
+      this.urlDraft = '';
+      this.urlInputOpen = false;
+      this.refStatusMsg = 'Imagen externa cargada desde URL manual.';
+      this.selectReference({
+        id: `manual-url-${Date.now()}`,
+        origin: 'url',
+        title: 'Imagen desde URL',
+        artist: 'Enlace manual',
+        license: 'Referencia externa',
+        thumbUrl: safeUrl,
+        fullUrl: safeUrl,
+        pageUrl: '',
+      });
+    });
+
+    // Controles de referencia activa
+    container.querySelectorAll<HTMLButtonElement>('[data-ref-view]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const nextMode = btn.dataset.refView as RefViewMode;
+        if (this.refViewMode === nextMode) return;
+        this.refViewMode = nextMode;
+        if (this.activeRef && nextMode !== 'off' && this.refImgStatus === 'idle') {
+          this.refImgStatus = 'loading';
+        }
+        this.render(container);
+      });
+    });
+
+    container.querySelector('#al-draw-ref-clear')?.addEventListener('click', () => {
+      this.revokeObjectUrlOnly();
+      this.uploadedFile = null;
+      this.activeRef = null;
+      this.refImgStatus = 'idle';
+      this.feedbackMsg = 'Referencia retirada. Tus trazos permanecen intactos.';
+      this.render(container);
+    });
+
+    container.querySelector<HTMLInputElement>('#al-draw-ref-opacity')?.addEventListener('input', (e) => {
+      const val = parseFloat((e.target as HTMLInputElement).value);
+      this.refOpacity = Number.isFinite(val) ? Math.max(0.1, Math.min(0.9, val)) : 0.38;
+      this.syncActiveRefStyles(container);
+    });
+
+    container.querySelector('#al-draw-ref-contrast')?.addEventListener('click', () => {
+      this.refHighContrast = !this.refHighContrast;
+      this.syncActiveRefStyles(container);
+    });
+
+    container.querySelector('#al-draw-ref-mirror')?.addEventListener('click', () => {
+      this.refMirror = !this.refMirror;
+      this.syncActiveRefStyles(container);
+    });
 
     // Tabs modo (Lecciones / Lienzo Libre)
     container.querySelectorAll<HTMLButtonElement>('[data-draw-mode]').forEach((btn) => {
@@ -924,7 +1644,7 @@ export class DrawingView {
       });
     });
 
-    // Grosor y Opacidad
+    // Grosor y Opacidad de pincel
     container.querySelector<HTMLInputElement>('#al-draw-size')?.addEventListener('input', (e) => {
       const v = parseInt((e.target as HTMLInputElement).value, 10) || 4;
       lifeStore.updateModulePrefs('drawing', { brushSize: v });
@@ -961,7 +1681,12 @@ export class DrawingView {
       if (!this.container) return;
       const active = document.activeElement as HTMLElement | null;
       const tag = active?.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || active?.isContentEditable) {
+      const isTextInput =
+        tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
+        Boolean(active?.isContentEditable) ||
+        (tag === 'INPUT' && (active as HTMLInputElement).type !== 'range');
+      if (isTextInput) {
         return;
       }
       if (!(e.ctrlKey || e.metaKey) || e.altKey) return;

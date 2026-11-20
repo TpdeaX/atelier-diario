@@ -25,10 +25,285 @@ export interface OpenLibraryBook {
   readUrl?: string;
 }
 
+export type DrawingRefSourceFilter = 'all' | 'wikimedia' | 'cleveland';
+
+export interface DrawingReferenceItem {
+  id: string;
+  source: 'wikimedia' | 'cleveland';
+  title: string;
+  artist: string;
+  license: string;
+  thumbUrl: string;
+  fullUrl: string;
+  pageUrl: string;
+}
+
+export interface DrawingReferenceSearchResult {
+  items: DrawingReferenceItem[];
+  errors: Partial<Record<'wikimedia' | 'cleveland', string>>;
+}
+
+const NAMED_HTML_ENTITIES: Record<string, string> = {
+  nbsp: ' ',
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  ndash: '–',
+  mdash: '—',
+  laquo: '«',
+  raquo: '»',
+};
+
+const WIKIMEDIA_ALLOWED_MIMES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/svg+xml',
+  'image/tiff',
+]);
+
+/** Limpia etiquetas HTML y entidades sin tocar el DOM (seguro para XSS y Node tests). */
+export function stripHtmlSafe(raw: string): string {
+  if (typeof raw !== 'string' || !raw) return '';
+  const withoutBlocks = raw
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ')
+    .replace(/<\/?(?:p|div|br|li|tr|td|th|h[1-6]|section|article)\b[^>]*>/gi, ' ')
+    .replace(/<[^>]*>/g, '');
+  const decoded = withoutBlocks.replace(
+    /&(nbsp|amp|lt|gt|quot|apos|ndash|mdash|laquo|raquo|#\d+|#x[0-9a-fA-F]+);/gi,
+    (full, token: string) => {
+      const low = token.toLowerCase();
+      if (low in NAMED_HTML_ENTITIES) return NAMED_HTML_ENTITIES[low];
+      if (low.startsWith('#x')) {
+        const cp = Number.parseInt(low.slice(2), 16);
+        return Number.isFinite(cp) && cp > 0 && cp <= 0x10ffff ? String.fromCodePoint(cp) : full;
+      }
+      if (low.startsWith('#')) {
+        const cp = Number.parseInt(low.slice(1), 10);
+        return Number.isFinite(cp) && cp > 0 && cp <= 0x10ffff ? String.fromCodePoint(cp) : full;
+      }
+      return full;
+    }
+  );
+  return decoded.replace(/\s+/g, ' ').trim();
+}
+
+/** Valida URLs de imagen provenientes de APIs externas: solo protocolo https:. */
+export function sanitizeApiImageUrl(url: string): string {
+  if (typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== 'https:' || !parsed.hostname) return '';
+    return parsed.toString();
+  } catch {
+    return '';
+  }
+}
+
+/** Valida URLs ingresadas manualmente o archivos locales: https:, http:, blob: y data:image/*. */
+export function sanitizeManualImageUrl(url: string): string {
+  if (typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  if (/^data:image\/(png|jpeg|jpg|webp|gif|bmp|avif|svg\+xml)(?:;charset=[^;,]+)?(?:;base64)?,/i.test(trimmed)) {
+    return trimmed;
+  }
+  if (trimmed.toLowerCase().startsWith('data:')) return '';
+  try {
+    const parsed = new URL(trimmed);
+    if ((parsed.protocol === 'https:' || parsed.protocol === 'http:') && parsed.hostname) {
+      return parsed.toString();
+    }
+    if (parsed.protocol === 'blob:' && trimmed.length > 5) {
+      return trimmed;
+    }
+    return '';
+  } catch {
+    return '';
+  }
+}
+
+export function parseWikimediaSearchPayload(json: unknown): DrawingReferenceItem[] {
+  const pagesObj = (json as { query?: { pages?: Record<string, unknown> } } | null)?.query?.pages;
+  if (!pagesObj || typeof pagesObj !== 'object') return [];
+
+  interface RawWikiPage {
+    pageid?: number;
+    index?: number;
+    title?: string;
+    imageinfo?: Array<{
+      url?: string;
+      thumburl?: string;
+      descriptionurl?: string;
+      mime?: string;
+      extmetadata?: {
+        ObjectName?: { value?: string };
+        Artist?: { value?: string };
+        LicenseShortName?: { value?: string };
+      };
+    }>;
+  }
+
+  const pages = (Object.values(pagesObj) as RawWikiPage[]).sort(
+    (a, b) => (a.index ?? Number.MAX_SAFE_INTEGER) - (b.index ?? Number.MAX_SAFE_INTEGER)
+  );
+
+  const out: DrawingReferenceItem[] = [];
+  for (const page of pages) {
+    const info = Array.isArray(page.imageinfo) ? page.imageinfo[0] : undefined;
+    if (!info) continue;
+    const mime = String(info.mime ?? '').toLowerCase().trim();
+    if (!WIKIMEDIA_ALLOWED_MIMES.has(mime)) continue;
+
+    const safeThumb = sanitizeApiImageUrl(String(info.thumburl ?? ''));
+    const safeFull = sanitizeApiImageUrl(String(info.url ?? ''));
+
+    // Los navegadores no renderizan .tiff en <img>; exige thumburl rasterizado
+    if (mime === 'image/tiff' && !safeThumb) continue;
+
+    const thumbUrl = safeThumb || safeFull;
+    const fullUrl = mime === 'image/tiff' ? safeThumb : safeFull || safeThumb;
+    if (!thumbUrl || !fullUrl) continue;
+
+    const ext = info.extmetadata ?? {};
+    const fallbackTitle = String(page.title ?? '')
+      .replace(/^File:/i, '')
+      .replace(/\.[a-z0-9]{2,5}$/i, '')
+      .replace(/_/g, ' ')
+      .trim();
+
+    out.push({
+      id: `wm-${String(page.pageid ?? page.title ?? thumbUrl)}`,
+      source: 'wikimedia',
+      title: stripHtmlSafe(String(ext.ObjectName?.value ?? '')) || fallbackTitle || 'Referencia Wikimedia',
+      artist: stripHtmlSafe(String(ext.Artist?.value ?? '')) || 'Wikimedia Commons',
+      license: stripHtmlSafe(String(ext.LicenseShortName?.value ?? '')) || 'Wikimedia',
+      thumbUrl,
+      fullUrl,
+      pageUrl: sanitizeApiImageUrl(String(info.descriptionurl ?? '')),
+    });
+  }
+  return out;
+}
+
+export function parseClevelandSearchPayload(json: unknown): DrawingReferenceItem[] {
+  const list = (json as { data?: unknown[] } | null)?.data;
+  if (!Array.isArray(list)) return [];
+
+  interface RawClevelandItem {
+    id?: number | string;
+    title?: string;
+    url?: string;
+    share_license_status?: string;
+    creators?: Array<{ description?: string; name?: string }>;
+    images?: {
+      web?: { url?: string };
+      print?: { url?: string };
+    };
+  }
+
+  const out: DrawingReferenceItem[] = [];
+  for (const raw of list as RawClevelandItem[]) {
+    const webUrl = sanitizeApiImageUrl(String(raw?.images?.web?.url ?? ''));
+    if (!webUrl) continue;
+    const printUrl = sanitizeApiImageUrl(String(raw?.images?.print?.url ?? ''));
+    const creators = Array.isArray(raw?.creators) ? raw.creators : [];
+    const artistNames = creators
+      .map((c) => stripHtmlSafe(String(c?.description ?? c?.name ?? '')))
+      .filter(Boolean);
+
+    out.push({
+      id: `cma-${String(raw?.id ?? webUrl)}`,
+      source: 'cleveland',
+      title: stripHtmlSafe(String(raw?.title ?? '')) || 'Obra CC0',
+      artist: artistNames.length > 0 ? artistNames.join(', ') : 'Artista anónimo',
+      license: stripHtmlSafe(String(raw?.share_license_status ?? '')) || 'CC0',
+      thumbUrl: webUrl,
+      fullUrl: printUrl || webUrl,
+      pageUrl: sanitizeApiImageUrl(String(raw?.url ?? '')),
+    });
+  }
+  return out;
+}
+
+async function fetchJsonWithTimeout(url: string, timeoutMs = 8000): Promise<unknown> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function searchDrawingReferences(
+  query: string,
+  source: DrawingRefSourceFilter = 'all'
+): Promise<DrawingReferenceSearchResult> {
+  const q = query.trim();
+  if (!q) return { items: [], errors: {} };
+
+  const errors: Partial<Record<'wikimedia' | 'cleveland', string>> = {};
+  let wmItems: DrawingReferenceItem[] = [];
+  let cmaItems: DrawingReferenceItem[] = [];
+
+  const tasks: Array<Promise<void>> = [];
+
+  if (source === 'all' || source === 'wikimedia') {
+    const wmUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${encodeURIComponent(
+      q
+    )}&gsrlimit=12&prop=imageinfo&iiprop=url|mime|size|extmetadata&iiurlwidth=960&format=json&origin=*`;
+    tasks.push(
+      fetchJsonWithTimeout(wmUrl, 8000)
+        .then((json) => {
+          wmItems = parseWikimediaSearchPayload(json);
+        })
+        .catch((err) => {
+          errors.wikimedia = err instanceof Error ? err.message : 'Error al consultar Wikimedia';
+        })
+    );
+  }
+
+  if (source === 'all' || source === 'cleveland') {
+    const cmaUrl = `https://openaccess-api.clevelandart.org/api/artworks/?q=${encodeURIComponent(
+      q
+    )}&has_image=1&cc0=1&limit=12`;
+    tasks.push(
+      fetchJsonWithTimeout(cmaUrl, 8000)
+        .then((json) => {
+          cmaItems = parseClevelandSearchPayload(json);
+        })
+        .catch((err) => {
+          errors.cleveland = err instanceof Error ? err.message : 'Error al consultar Cleveland CC0';
+        })
+    );
+  }
+
+  await Promise.allSettled(tasks);
+
+  const combined: DrawingReferenceItem[] = [];
+  const seen = new Set<string>();
+  const maxLen = Math.max(cmaItems.length, wmItems.length);
+  for (let i = 0; i < maxLen; i++) {
+    for (const candidate of [cmaItems[i], wmItems[i]]) {
+      if (candidate && !seen.has(candidate.thumbUrl)) {
+        seen.add(candidate.thumbUrl);
+        combined.push(candidate);
+      }
+    }
+  }
+
+  return { items: combined, errors };
+}
+
 function stripHtml(raw: string): string {
-  const div = document.createElement('div');
-  div.innerHTML = raw;
-  return (div.textContent ?? '').replace(/\s+/g, ' ').trim();
+  return stripHtmlSafe(raw);
 }
 
 export async function fetchRandomWikiSummary(): Promise<WikiSummary> {

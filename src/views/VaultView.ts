@@ -8,6 +8,7 @@ import {
   VaultItem,
   VaultStatus,
 } from '../types';
+import { bindTutorialBanners, renderTutorialBanner } from '../ui/TutorialBanner';
 
 const CAT_LABELS: Record<VaultCategory, string> = {
   mentalidad: 'Mentalidad',
@@ -442,6 +443,20 @@ export class VaultView {
           </div>
         </div>
 
+        ${renderTutorialBanner({
+          id: 'vault:main',
+          moduleName: 'Baúl de Guardados',
+          sectionName: 'Curación y aplicación',
+          summary: 'Convierte tus enlaces guardados en aprendizaje accionable con estados, notas y promoción a Criterio.',
+          steps: [
+            'Filtra por categoría arriba (o activa + Visual / Ocio) y elige estado: Activos, Pendientes, Vistos o Aplicados.',
+            'Abre el ojo para previsualizar posts de Instagram aquí mismo o añade notas propias con el botón Nota.',
+            'Pulsa Pasar a Criterio en las ideas más valiosas para moverlas a tu cuaderno de Frases y Criterio.',
+            'Usa Añadir recurso para sumar un enlace individual o importar varios enlaces/JSON en lote.',
+          ],
+          tip: 'Procesa solo 3 guardados pendientes al día: marcarlos como Aplicado u Ocultar mantiene el baúl limpio y útil.',
+        })}
+
         <div class="al-phrases-grid" id="al-vault-grid">
           ${this.renderCardsHtml(filtered)}
         </div>
@@ -622,5 +637,6 @@ export class VaultView {
     });
 
     this.bindGridEvents(container, allItems);
+    bindTutorialBanners(container);
   }
 }

@@ -148,6 +148,16 @@ export const PANIC_TRUTH_CARDS: string[] = [
   'Exhalar más largo le dice a mi cuerpo que puede bajar la guardia.',
   'No necesito resolver nada ahora. Solo respirar.',
   'Esta ola tiene un pico y después baja. Estoy en el pico.',
+  'Mis pies están firmes en el suelo y mi entorno es seguro ahora.',
+  'Sentir el corazón rápido es señal de energía, no de peligro.',
+  'Puedo soltar los hombros y la mandíbula aunque siga nervioso.',
+  'Un pensamiento catastrófico es ruido mental, no una predicción.',
+  'No tengo que demostrar calma perfecta; basta con respirar suave.',
+  'Cada exhalación lenta apaga poco a poco la alarma interna.',
+  'Puedo ir despacio: el mundo no se cae si paro cinco minutos.',
+  'Lo incómodo no es necesariamente peligroso. Esto también pasará.',
+  'Traer mi atención a cinco objetos reales me devuelve al presente.',
+  'Merezco tratarme con paciencia mientras mi cuerpo recupera el equilibrio.',
 ];
 
 /** BPM del pulso calmante: baja linealmente de `startBpm` a `endBpm` en `durationSec` y se queda ahi. */

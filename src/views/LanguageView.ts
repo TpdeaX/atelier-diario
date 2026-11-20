@@ -2,6 +2,40 @@ import { ORTHOGRAPHY_BANK, VOCABULARY_DECK } from '../data/KnowledgeBank';
 import { Icons } from '../icons';
 import { lookupWiktionary } from '../services/OnlineApi';
 import { lifeStore } from '../state/LifeStore';
+import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
+
+const LANGUAGE_TUTORIALS: Record<'ortho' | 'vocab' | 'dict', Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
+  ortho: {
+    sectionName: 'Reto de ortografía',
+    summary: 'Domina tildes, homófonos y reglas reales del español respondiendo casos prácticos.',
+    steps: [
+      'Lee la frase completa y elige la opción que llena correctamente el espacio en blanco.',
+      'Revisa la regla explicada al responder para fijar el criterio, no solo memorizar.',
+      'Pulsa Siguiente pregunta para recorrer el banco de preguntas y subir tu porcentaje de aciertos.',
+    ],
+    tip: 'Cuando falles una duda frecuente (como a ver / haber o sino / si no), invéntate una frase propia en voz alta.',
+  },
+  vocab: {
+    sectionName: 'Vocabulario útil',
+    summary: 'Incorpora palabras precisas que reemplazan expresiones genéricas al hablar y redactar.',
+    steps: [
+      'Lee la palabra, su definición y la expresión cotidiana que puede reemplazar.',
+      'Lee el ejemplo en voz alta e intenta crear una oración aplicable a tu día.',
+      'Pulsa Guardar en glosario en las palabras que quieras repasar después.',
+    ],
+    tip: 'Adopta solo 1 palabra nueva cada dos días y úsala en un mensaje real para fijarla de verdad.',
+  },
+  dict: {
+    sectionName: 'Diccionario vivo y Glosario',
+    summary: 'Consulta definiciones en vivo en Wikcionario y construye tu propio léxico personal.',
+    steps: [
+      'Escribe cualquier palabra en el buscador izquierdo y pulsa Buscar.',
+      'Si te resulta útil, pulsa Guardar para sumarla a tu glosario sincronizado a la derecha.',
+      'Depura tu glosario eliminando las palabras que ya dominas con naturalidad.',
+    ],
+    tip: 'Si un verbo conjugado no devuelve resultado, búscalo en infinitivo o en singular.',
+  },
+};
 
 export class LanguageView {
   private orthoPicked: number | null = null;
@@ -43,16 +77,23 @@ export class LanguageView {
         </div>
 
         <div class="al-seg-tabs">
-          <button type="button" class="al-seg-btn ${prefs.tab === 'ortho' ? 'is-active' : ''}" data-ltab="ortho">Reto de ortografía</button>
+          <button type="button" class="al-seg-btn ${prefs.tab === 'ortho' ? 'is-active' : ''}" data-ltab="ortho">Reto de ortografía (${ORTHOGRAPHY_BANK.length})</button>
           <button type="button" class="al-seg-btn ${prefs.tab === 'vocab' ? 'is-active' : ''}" data-ltab="vocab">Vocabulario útil (${VOCABULARY_DECK.length})</button>
           <button type="button" class="al-seg-btn ${prefs.tab === 'dict' ? 'is-active' : ''}" data-ltab="dict">Diccionario vivo y Glosario (${profile.savedWords.length})</button>
         </div>
+
+        ${renderTutorialBanner({
+          id: `language:${prefs.tab}`,
+          moduleName: 'Ortografía y Léxico',
+          ...(LANGUAGE_TUTORIALS[prefs.tab] ?? LANGUAGE_TUTORIALS.ortho),
+        })}
 
         ${bodyHtml}
       </div>
     `;
 
     this.bindEvents(container);
+    bindTutorialBanners(container);
   }
 
   private renderOrthoHtml(orthoIdx: number): string {

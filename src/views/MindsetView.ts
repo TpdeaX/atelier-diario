@@ -2,12 +2,77 @@ import { PHRASES_BANK } from '../data/KnowledgeBank';
 import { Icons } from '../icons';
 import { lifeStore } from '../state/LifeStore';
 import { PhraseItem } from '../types';
+import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
 
 const CAT_LABELS: Record<PhraseItem['category'], string> = {
   hablar: 'Hablar mejor',
   mente: 'Mente fuerte',
   decisiones: 'Decisiones',
   calma: 'Calma',
+};
+
+const MINDSET_TUTORIALS: Record<'all' | 'favs' | PhraseItem['category'], Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
+  all: {
+    sectionName: 'Todas las ideas y principios',
+    summary: 'Recorre modelos mentales prácticos, filtra por situación y guarda tus propias frases.',
+    steps: [
+      'Elige una categoría según lo que necesites hoy (Hablar mejor, Mente fuerte, Decisiones o Calma).',
+      'Usa el buscador para encontrar ideas por autor o palabra clave.',
+      'Marca con el ícono de marcador tus favoritas y aplica la Micro-acción del día.',
+      'Pulsa Nueva idea para registrar criterios propios sincronizados en Supabase.',
+    ],
+    tip: 'Elige una sola micro-acción por día en lugar de leer veinte frases sin aplicar ninguna.',
+  },
+  hablar: {
+    sectionName: 'Hablar mejor',
+    summary: 'Principios concretos de comunicación, preguntas útiles, límites y presencia verbal.',
+    steps: [
+      'Revisa una tarjeta antes de una exposición, reunión o conversación importante.',
+      'Identifica en Cuándo usarla si coincide con tu situación actual.',
+      'Ejecuta la micro-acción sugerida en tu próxima charla real.',
+    ],
+    tip: 'Combina estas ideas con el simulador de Oratoria y Dicción para ensayarlas en voz alta.',
+  },
+  mente: {
+    sectionName: 'Mente fuerte',
+    summary: 'Herramientas de aprendizaje activo, constancia, metacognición y autodiálogo sano.',
+    steps: [
+      'Lee Qué significa para traducir la cita a conducta observable.',
+      'Guarda como favoritas las ideas que te destraben cuando pierdas motivación.',
+      'Aplica una micro-acción corta de 5 minutos hoy mismo.',
+    ],
+    tip: 'Releer tus 5 favoritas una vez por semana fija criterios que después salen en automático.',
+  },
+  decisiones: {
+    sectionName: 'Decisiones y estrategia',
+    summary: 'Criterios prácticos para priorizar, evitar la parálisis y diseñar tu entorno.',
+    steps: [
+      'Filtra aquí cuando tengas demasiados pendientes o dudes entre dos caminos.',
+      'Usa la micro-acción para tomar una decisión reversible en menos de cinco minutos.',
+      'Anota principios propios con Nueva idea cada vez que aprendas una lección importante.',
+    ],
+    tip: 'La claridad antes de ejecutar ahorra horas de retrabajo después.',
+  },
+  calma: {
+    sectionName: 'Calma y perspectiva',
+    summary: 'Recordatorios serenos para cortar la rumiación y volver a lo que sí controlas.',
+    steps: [
+      'Lee con pausa una sola tarjeta y suelta la urgencia antes de actuar.',
+      'Si sientes ansiedad física intensa, abre el Centro de Calma para respirar primero.',
+      'Usa la micro-acción para aterrizar el problema en un paso concreto.',
+    ],
+    tip: 'Cuando la emoción está alta, prioriza regular el cuerpo antes de analizar el problema.',
+  },
+  favs: {
+    sectionName: 'Tus favoritas',
+    summary: 'Tu cuaderno personal con los principios que elegiste mantener siempre a mano.',
+    steps: [
+      'Repasa tus frases guardadas al empezar o cerrar la jornada.',
+      'Quita el marcador de las que ya integraste para mantener la lista enfocada.',
+      'Añade notas propias con Nueva idea o promueve recursos desde el Baúl.',
+    ],
+    tip: 'Una lista corta de 8 a 12 favoritas vivas es más útil que cien guardadas sin releer.',
+  },
 };
 
 export class MindsetView {
@@ -116,7 +181,7 @@ export class MindsetView {
 
         <div class="al-toolbar">
           <div class="al-seg-tabs">
-            <button type="button" class="al-seg-btn ${prefs.category === 'all' ? 'is-active' : ''}" data-cat="all">Todas</button>
+            <button type="button" class="al-seg-btn ${prefs.category === 'all' ? 'is-active' : ''}" data-cat="all">Todas (${allPhrases.length})</button>
             <button type="button" class="al-seg-btn ${prefs.category === 'hablar' ? 'is-active' : ''}" data-cat="hablar">Hablar mejor</button>
             <button type="button" class="al-seg-btn ${prefs.category === 'mente' ? 'is-active' : ''}" data-cat="mente">Mente fuerte</button>
             <button type="button" class="al-seg-btn ${prefs.category === 'decisiones' ? 'is-active' : ''}" data-cat="decisiones">Decisiones</button>
@@ -127,11 +192,19 @@ export class MindsetView {
           <input type="search" id="al-phrase-search" class="al-filter-input" value="${prefs.searchQuery.replace(/"/g, '&quot;')}" placeholder="Filtrar ideas o autores..." />
         </div>
 
+        ${renderTutorialBanner({
+          id: `mindset:${prefs.category}`,
+          moduleName: 'Frases y Criterio',
+          ...(MINDSET_TUTORIALS[prefs.category] ?? MINDSET_TUTORIALS.all),
+        })}
+
         <div class="al-phrases-grid">
           ${cardsHtml || '<p class="al-muted">No hay frases que coincidan con ese filtro.</p>'}
         </div>
       </div>
     `;
+
+    bindTutorialBanners(container);
 
     container.querySelector('#al-mind-add-btn')?.addEventListener('click', () => {
       this.addFormOpen = !this.addFormOpen;

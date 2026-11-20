@@ -21,8 +21,44 @@ import {
 import { Icons } from '../icons';
 import { lifeStore } from '../state/LifeStore';
 import { SingingTimbre } from '../types';
+import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
 
 type SingingTab = 'karaoke' | 'routines' | 'ear';
+
+const SINGING_TUTORIALS: Record<SingingTab, Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
+  karaoke: {
+    sectionName: 'Afinador y Karaoke',
+    summary: 'Afina tu voz en tiempo real y canta canciones guiadas con piano, acordes y transporte de octava.',
+    steps: [
+      'Pulsa Activar micrófono arriba para ver tu nota exacta, desvío en cents y vibrato en vivo.',
+      'Elige una canción del repertorio, ajusta Velocidad (0.75× a 1.15×) y Transporte (-12 / 0 / +12) a tu registro cómodo.',
+      'Pulsa Iniciar karaoke: escucharás un conteo 3·2·1 seguido de la guía melódica y los acordes.',
+      'Usa el Piano Do3–Do5 inferior con clic o teclado PC (Z–M y Q–I) para comprobar cualquier nota.',
+    ],
+    tip: 'Si una canción queda muy alta o baja, captura tu rango en Rutinas o cambia el transporte antes de forzar la garganta.',
+  },
+  routines: {
+    sectionName: 'Calentamiento 5 min y Rutinas',
+    summary: 'Prepara tu voz en 5 minutos, estabiliza vocales, verifica saltos y entrena rutinas por nivel.',
+    steps: [
+      'Inicia el Calentamiento guiado automático (5 min) antes de cantar piezas exigentes.',
+      'Practica Estabilidad de vocales (A-E-I-O-U) y Saltos cantados con el micrófono activo.',
+      'Filtra Rutinas por nivel (1 Inicial, 2 Intermedio, 3 Avanzado) y pulsa Escuchar guía para imitar cada patrón.',
+      'Registra tu nota grave y aguda en Rango vocal para recibir sugerencias de transporte.',
+    ],
+    tip: 'Calentar 5 minutos con zumbido «Mmmm» y trino «Brrr» evita fatiga y mejora tu afinación al instante.',
+  },
+  ear: {
+    sectionName: 'Oído y Acordes',
+    summary: 'Entrena el reconocimiento auditivo de acordes (Mayor, Menor, 7ª) e intervalos de 1 a 12 semitonos.',
+    steps: [
+      'Elige entre modo Acordes o Intervalos (Básico de 3 o Completo de 12 semitonos).',
+      'Pulsa Escuchar para repetir el ejemplo las veces que necesites y elige la respuesta correcta.',
+      'Lee la explicación armónica tras cada intento y usa el piano inferior para comparar el sonido.',
+    ],
+    tip: 'Asocia cada intervalo con el inicio de una canción conocida (ej. 5ª justa con Estrellita).',
+  },
+};
 type ChordQuality = 'major' | 'minor' | 'seventh';
 type KaraokeTempo = 0.75 | 1 | 1.15;
 
@@ -189,12 +225,18 @@ export class SingingView {
             ${Icons.music(15)}<span>Afinador y Karaoke (${SINGING_SONGS.length})</span>
           </button>
           <button type="button" role="tab" aria-selected="${this.activeTab === 'routines'}" class="al-seg-btn ${this.activeTab === 'routines' ? 'is-active' : ''}" data-sing-tab="routines">
-            ${Icons.wind(15)}<span>Calentamiento 5 min y Rutinas</span>
+            ${Icons.wind(15)}<span>Calentamiento 5 min y Rutinas (${SINGING_DRILLS.length})</span>
           </button>
           <button type="button" role="tab" aria-selected="${this.activeTab === 'ear'}" class="al-seg-btn ${this.activeTab === 'ear' ? 'is-active' : ''}" data-sing-tab="ear">
             ${Icons.volume(15)}<span>Oído y Acordes</span>
           </button>
         </div>
+
+        ${renderTutorialBanner({
+          id: `singing:${this.activeTab}`,
+          moduleName: 'Estudio de Canto',
+          ...(SINGING_TUTORIALS[this.activeTab] ?? SINGING_TUTORIALS.karaoke),
+        })}
 
         ${this.activeTab === 'karaoke' ? this.renderKaraokeTab(level) : ''}
         ${this.activeTab === 'routines' ? this.renderRoutinesTab(level, lastDrillId, suggestedTranspose) : ''}
@@ -247,6 +289,7 @@ export class SingingView {
     `;
 
     this.bindEvents(container);
+    bindTutorialBanners(container);
     this.attachKeyboardListeners();
     if (this.activeTab === 'karaoke') {
       this.drawKaraokeCanvas();

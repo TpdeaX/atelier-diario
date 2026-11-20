@@ -1,9 +1,75 @@
 import { Icons } from '../icons';
 import { lifeStore } from '../state/LifeStore';
 import { DeviceProfile } from '../types';
+import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
 
 type PcDrill = 'accents' | 'speed' | 'classic';
 type MobileDrill = 'agile' | 'orthowords' | 'sprint30';
+
+const TYPING_TUTORIALS: Record<string, Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
+  'pc:accents': {
+    sectionName: 'PC · Con tildes',
+    summary: 'Entrena precisión ortográfica con tildes, diéresis, eñe y signos de apertura.',
+    steps: [
+      'Coloca los índices sobre F y J (las marcas táctiles) antes de empezar.',
+      'Escribe siguiendo el texto resaltado; el reloj arranca con tu primera tecla.',
+      'Activa Guía de dedo si quieres ver qué dedo corresponde a la siguiente letra.',
+      'Al terminar, revisa las 3 teclas con más tropiezos y pulsa Siguiente reto.',
+    ],
+    tip: 'No busques velocidad máxima hoy: 97% de precisión acelera más que corregir errores.',
+  },
+  'pc:speed': {
+    sectionName: 'PC · Velocidad pura',
+    summary: 'Construye cadencia constante sin pausas sobre la fila base en minúsculas.',
+    steps: [
+      'Mantén la vista en la palabra siguiente en lugar de mirar el teclado.',
+      'Conserva un ritmo parejo entre letras fáciles y difíciles.',
+      'Si fallas una tecla, corrige con calma sin perder la postura de manos.',
+      'Supera tu récord de PPM completando textos completos sin cortes.',
+    ],
+    tip: 'Relaja hombros y muñecas: la tensión frena los dedos después de 2 minutos.',
+  },
+  'pc:classic': {
+    sectionName: 'PC · Párrafo clásico',
+    summary: 'Sostén ritmo y puntuación real en pasajes literarios de dominio público.',
+    steps: [
+      'Lee la primera línea antes de teclear para anticipar comas y mayúsculas.',
+      'Practica Shift alterno (mano opuesta a la letra) para no cortar la fluidez.',
+      'Usa Otro texto para rotar entre los 14 pasajes literarios clásicos.',
+    ],
+    tip: 'Los párrafos largos entrenan resistencia mental y control de errores acumulados.',
+  },
+  'mobile:agile': {
+    sectionName: 'Celular · Frases ágiles',
+    summary: 'Mejora la velocidad natural con ambos pulgares sin depender del autocorrector.',
+    steps: [
+      'Toca el campo de escritura y reparte las teclas entre pulgar izquierdo y derecho.',
+      'Observa las letras en verde o rojo arriba del teclado sin perder la línea.',
+      'Completa la frase para guardar tu marca de PPM móvil.',
+    ],
+    tip: 'Alternar ambos pulgares reduce fatiga y duplica la cadencia en mensajes reales.',
+  },
+  'mobile:orthowords': {
+    sectionName: 'Celular · Tildes rápidas',
+    summary: 'Practica escribir acentos y dudas frecuentes con soltura en pantalla táctil.',
+    steps: [
+      'Mantén pulsada la vocal un instante (o usa la barra de tildes) para acentuar bien.',
+      'Verifica cada homófono (a ver / haber, hay / ahí, sino / si no) al teclear.',
+      'Pulsa Otro texto para recorrer las 24 frases ortográficas.',
+    ],
+    tip: 'Escribir bien en el celular también refuerza tu ortografía automática en PC.',
+  },
+  'mobile:sprint30': {
+    sectionName: 'Celular · Ráfaga 30s',
+    summary: 'Reto cronometrado de palabras sueltas para disparar reflejos y precisión.',
+    steps: [
+      'Escribe la palabra mostrada y pulsa Espacio para validarla y pasar a la siguiente.',
+      'El cronómetro de 30 segundos arranca con la primera letra que pulses.',
+      'Intenta encadenar palabras limpias del banco de más de 180 términos variados.',
+    ],
+    tip: 'No te apures en la barra espaciadora: confirma mentalmente la última letra antes de enviarla.',
+  },
+};
 
 const PC_TEXTS: Record<PcDrill, string[]> = {
   accents: [
@@ -19,6 +85,14 @@ const PC_TEXTS: Record<PcDrill, string[]> = {
     '¡Qué alegría! Por fin logré escribir sin mirar el teclado durante cinco minutos seguidos.',
     'La música, la lectura y el ejercicio físico son hábitos que fortalecen la atención.',
     'Aún no sé cuál será el próximo capítulo, pero sí sé que quiero escribirlo con calma.',
+    '¿Dónde guardaste el código de acceso? Ojalá esté en la libreta azul junto al lápiz.',
+    'El análisis exhaustivo reveló cómo reducir la latencia sin añadir complejidad innecesaria.',
+    'Quizás mañana haya llovizna en la montaña; lleva abrigo, té caliente y buena compañía.',
+    'La sintaxis clara facilita la colaboración técnica y evita malentendidos costosos.',
+    'Ningún método mágico reemplaza quince minutos diarios de práctica enfocada y honesta.',
+    'El técnico revisó la conexión inalámbrica, verificó el módulo y registró la solución.',
+    '¡Qué rápido pasa el semestre! Conviene repasar hoy antes de que se acumulen exámenes.',
+    'La elocuencia nace del orden interior: piensa la idea central y exprésala sin rodeos.',
   ],
   speed: [
     'cada tecla tiene su propio lugar cuando mantienes los dedos sobre la fila base',
@@ -33,6 +107,14 @@ const PC_TEXTS: Record<PcDrill, string[]> = {
     'cada error es una pista sobre que dedo necesita mas atencion en la siguiente ronda',
     'leer en voz alta mientras escribes ayuda a sentir el ritmo natural de las palabras',
     'una mente tranquila comete menos errores que una mente apurada y dispersa',
+    'alterna ambas manos con soltura y evita mirar abajo cuando aparezca una palabra larga',
+    'repite los bloques cortos cada tarde para que la memoria muscular trabaje por ti',
+    'quien controla el pulso al teclear piensa mejor mientras redacta notas o codigo',
+    'mira siempre una palabra por delante para anticipar el movimiento de tus dedos',
+    'una sesion breve de diez minutos bien enfocada rinde mas que una hora sin calma',
+    'el ritmo parejo suena suave sobre el teclado y evita golpes bruscos en cada tecla',
+    'cierra pestanas innecesarias antes de practicar para sostener la atencion continua',
+    'cada ronda limpia suma confianza y convierte el teclado en una extension natural',
   ],
   classic: [
     'En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidalgo de los de lanza en astillero, adarga antigua, rocín flaco y galgo corredor.',
@@ -43,6 +125,12 @@ const PC_TEXTS: Record<PcDrill, string[]> = {
     'Pues sepa vuestra merced, ante todas cosas, que a mí llaman Lázaro de Tormes, hijo de Tomé González y de Antona Pérez.',
     '¿Qué es la vida? Un frenesí. ¿Qué es la vida? Una ilusión, una sombra, una ficción, y el mayor bien es pequeño.',
     'Era del año la estación florida en que el mentido robador de Europa, media luna las armas de su frente, y el Sol todos los rayos de su pelo.',
+    'Platero es pequeño, peludo, suave; tan blando por fuera, que se diría todo de algodón, que no lleva huesos.',
+    'Recuerde el alma dormida, avive el seso y despierte contemplando cómo se pasa la vida, cómo se viene la muerte tan callando.',
+    'Hombres necios que acusáis a la mujer sin razón, sin ver que sois la ocasión de lo mismo que culpáis.',
+    'Juventud, divino tesoro, ya te vas para no volver. Cuando quiero llorar, no lloro, y a veces lloro sin querer.',
+    'No es verdad, ángel de amor, que en esta apartada orilla más pura la luna brilla y se respira mejor.',
+    'Por una mirada, un mundo; por una sonrisa, un cielo; por un beso, yo no sé qué te diera por un beso.',
   ],
 };
 
@@ -60,6 +148,18 @@ const MOBILE_PHRASES: Record<'agile' | 'orthowords', string[]> = {
     'Avísame cuando llegues para quedarme en paz',
     'Me tomo un descanso y vuelvo con energía',
     'Podemos hablarlo con calma después de cenar',
+    'Te mando el archivo revisado en cinco minutos',
+    'Prefiero cerrar este pendiente antes de almorzar',
+    'Hoy practiqué canto y lectura durante veinte minutos',
+    'Guarda las llaves en la mochila para no olvidarlas',
+    'Nos juntamos a las cuatro en la entrada principal',
+    'Anoté tus sugerencias y ya las apliqué al diseño',
+    'Si necesitas una pausa avisa y seguimos mañana',
+    'Voy camino al taller llevo mi cuaderno listo',
+    'El café de la mañana ayuda a empezar con enfoque',
+    'Revisé las pruebas y ahora todo responde rápido',
+    'Te llamo apenas salga de la reunión del equipo',
+    'Un bloque corto bien hecho vale más que correr',
   ],
   orthowords: [
     'Quizás haya tiempo para revisar la próxima práctica',
@@ -74,6 +174,18 @@ const MOBILE_PHRASES: Record<'agile' | 'orthowords', string[]> = {
     'Ojalá que la valla del parque ya esté reparada',
     'Se cayó el vaso pero nadie se hizo daño',
     'Hecho el trabajo nos fuimos a descansar',
+    'Ahí sobre la mesa hay una taza de té verde',
+    'El informe reveló una vasta lista de mejoras',
+    'Cruzamos el arroyo antes de llegar a la cima',
+    'Prefiero grabar la exposición para pulir mi voz',
+    'No recordó dónde había dejado las llaves ayer',
+    'El concejo municipal aprobó renovar la plaza',
+    'Aun cansado cumplió la meta con serenidad',
+    'Se quedó deshecho tras subir por el sendero',
+    'La raíz profunda sostiene al árbol en tormenta',
+    'Hubo una excepción muy clara en el reglamento',
+    'Ella abría la ventana mientras hacía el desayuno',
+    'Estábamos yendo hacia el aula cuando sonó el timbre',
   ],
 };
 
@@ -90,6 +202,18 @@ const SPRINT_WORDS = [
   'agua', 'pingüino', 'cigüeña', 'vergüenza', 'guitarra', 'guiño', 'queso', 'kilo',
   'horizonte', 'brillo', 'calle', 'llave', 'yema', 'zapato', 'exacto', 'xilófono',
   'aprender', 'crecer', 'avanzar', 'respirar', 'pensar', 'crear', 'leer', 'cantar',
+  'bosque', 'brisa', 'nube', 'estrella', 'selva', 'río', 'valle', 'cumbre',
+  'sendero', 'puente', 'faro', 'puerto', 'barco', 'vela', 'viento', 'lluvia',
+  'tinta', 'papel', 'pluma', 'pincel', 'lienzo', 'color', 'sombra', 'perfil',
+  'acorde', 'escala', 'compás', 'sonido', 'eco', 'timbre', 'coro', 'piano',
+  'código', 'dato', 'nodo', 'red', 'servidor', 'sistema', 'módulo', 'prueba',
+  'lógica', 'algoritmo', 'índice', 'clave', 'cifra', 'archivo', 'bloque', 'flujo',
+  'diálogo', 'pausa', 'énfasis', 'síntesis', 'método', 'enfoque', 'esmero', 'oficio',
+  'templanza', 'lucidez', 'sosiego', 'cautela', 'audacia', 'mesura', 'destreza', 'ingenio',
+  'maestría', 'disciplina', 'constancia', 'entereza', 'claridad', 'presencia', 'serenidad', 'respeto',
+  'preguntar', 'escuchar', 'observar', 'medir', 'diseñar', 'construir', 'pulir', 'revisar',
+  'explicar', 'resumir', 'decidir', 'sostener', 'dibujar', 'afinar', 'practicar', 'lograr',
+  'ventana', 'mesa', 'silla', 'lámpara', 'reloj', 'taza', 'café', 'silencio',
 ];
 
 const FINGER_HINTS: Record<string, string> = {
@@ -172,19 +296,22 @@ export class TypingView {
         ? `Récord PC: ${profile.stats.bestWpmPc} PPM`
         : `Récord Celular: ${profile.stats.bestWpmMobile} PPM`;
 
+    const activeTutKey = eff === 'pc' ? `pc:${prefs.pcDrill}` : `mobile:${prefs.mobileDrill}`;
+    const activeTut = TYPING_TUTORIALS[activeTutKey] ?? TYPING_TUTORIALS['pc:accents'];
+
     const modeTabs =
       eff === 'pc'
         ? `
         <div class="al-seg-tabs">
-          <button type="button" class="al-seg-btn ${prefs.pcDrill === 'accents' ? 'is-active' : ''}" data-pcdrill="accents">Con tildes</button>
-          <button type="button" class="al-seg-btn ${prefs.pcDrill === 'speed' ? 'is-active' : ''}" data-pcdrill="speed">Velocidad pura</button>
-          <button type="button" class="al-seg-btn ${prefs.pcDrill === 'classic' ? 'is-active' : ''}" data-pcdrill="classic">Párrafo clásico</button>
+          <button type="button" class="al-seg-btn ${prefs.pcDrill === 'accents' ? 'is-active' : ''}" data-pcdrill="accents">Con tildes (${PC_TEXTS.accents.length})</button>
+          <button type="button" class="al-seg-btn ${prefs.pcDrill === 'speed' ? 'is-active' : ''}" data-pcdrill="speed">Velocidad pura (${PC_TEXTS.speed.length})</button>
+          <button type="button" class="al-seg-btn ${prefs.pcDrill === 'classic' ? 'is-active' : ''}" data-pcdrill="classic">Párrafo clásico (${PC_TEXTS.classic.length})</button>
         </div>`
         : `
         <div class="al-seg-tabs">
-          <button type="button" class="al-seg-btn ${prefs.mobileDrill === 'agile' ? 'is-active' : ''}" data-mdrill="agile">Frases ágiles</button>
-          <button type="button" class="al-seg-btn ${prefs.mobileDrill === 'orthowords' ? 'is-active' : ''}" data-mdrill="orthowords">Tildes rápidas</button>
-          <button type="button" class="al-seg-btn ${prefs.mobileDrill === 'sprint30' ? 'is-active' : ''}" data-mdrill="sprint30">Ráfaga 30s</button>
+          <button type="button" class="al-seg-btn ${prefs.mobileDrill === 'agile' ? 'is-active' : ''}" data-mdrill="agile">Frases ágiles (${MOBILE_PHRASES.agile.length})</button>
+          <button type="button" class="al-seg-btn ${prefs.mobileDrill === 'orthowords' ? 'is-active' : ''}" data-mdrill="orthowords">Tildes rápidas (${MOBILE_PHRASES.orthowords.length})</button>
+          <button type="button" class="al-seg-btn ${prefs.mobileDrill === 'sprint30' ? 'is-active' : ''}" data-mdrill="sprint30">Ráfaga 30s (${SPRINT_WORDS.length})</button>
         </div>`;
 
     container.innerHTML = `
@@ -215,6 +342,12 @@ export class TypingView {
           </div>
           ${modeTabs}
         </div>
+
+        ${renderTutorialBanner({
+          id: `typing:${activeTutKey}`,
+          moduleName: 'Mecanografía',
+          ...activeTut,
+        })}
 
         <section class="al-panel al-typing-card">
           <div class="al-typing-stats">
@@ -264,6 +397,7 @@ export class TypingView {
     `;
 
     this.bindEvents(container, eff);
+    bindTutorialBanners(container);
     if (this.finished) {
       this.paintSummary(container, eff);
     }

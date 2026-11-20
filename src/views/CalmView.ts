@@ -11,8 +11,33 @@ import {
 import { Icons } from '../icons';
 import { lifeStore } from '../state/LifeStore';
 import type { CalmPatternId } from '../types';
+import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
 
 type CalmTab = 'sos' | 'reframe';
+
+const CALM_TUTORIALS: Record<CalmTab, Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
+  sos: {
+    sectionName: 'SOS Pánico Ahora',
+    summary: 'Protocolo inmediato paso a paso para bajar la adrenalina sin tener que pensar ni escribir.',
+    steps: [
+      'Sigue el círculo respiratorio (Exhalar largo 3-6 o Suspiro fisiológico son los más rápidos en crisis).',
+      'Si ayuda, activa Lluvia suave, Pulso 84→60 BPM o Tono cálido para anclar tu atención auditiva.',
+      'Toca los círculos de Aterrizaje 5-4-3-2-1 para traer tu mente a objetos reales de la habitación.',
+      'Usa Relajación muscular guiada y lee una Frase de anclaje cuando el pulso empiece a bajar.',
+    ],
+    tip: 'Puedes abrir esta pantalla directo con la ruta #sos o #calm?sos=1 cuando necesites alivio en un toque.',
+  },
+  reframe: {
+    sectionName: 'Calma y Reencuadre',
+    summary: 'Ordena un mal día separando lo que escapa de tus manos de tu próximo micro-paso concreto.',
+    steps: [
+      'Si sientes pánico físico en este momento, entra primero a SOS Pánico Ahora para regular la respiración.',
+      'Escribe en 3 líneas cortas: qué te preocupa, qué parte sí depende de ti y un paso amable de 5 minutos.',
+      'Guarda el reencuadre en tu cuaderno privado para ver después cómo superaste momentos similares.',
+    ],
+    tip: 'No intentes resolver toda la semana en el paso 3: elige una acción tan pequeña que puedas hacerla hoy.',
+  },
+};
 type CalmSoundKind = 'rain' | 'pulse' | 'drone';
 
 const SOUND_TOGGLES: { kind: CalmSoundKind; label: string; icon: (s?: number) => string }[] = [
@@ -62,6 +87,7 @@ export class CalmView {
     container.innerHTML =
       this.tab === 'sos' ? this.renderSos() : this.renderReframe();
     this.bind(container);
+    bindTutorialBanners(container);
     if (this.tab === 'sos') this.syncAllSos();
   }
 
@@ -106,6 +132,11 @@ export class CalmView {
     return `
       <div class="al-page al-calm-page al-calm-sos">
         ${this.renderTabs()}
+        ${renderTutorialBanner({
+          id: 'calm:sos',
+          moduleName: 'Centro de Calma',
+          ...CALM_TUTORIALS.sos,
+        })}
         <div class="al-sos-stage">
           <p class="al-sos-banner" role="status">${SOS_REASSURANCE}</p>
 
@@ -216,6 +247,12 @@ export class CalmView {
         </div>
 
         ${this.renderTabs()}
+
+        ${renderTutorialBanner({
+          id: 'calm:reframe',
+          moduleName: 'Centro de Calma',
+          ...CALM_TUTORIALS.reframe,
+        })}
 
         <section class="al-panel al-sos-entry">
           <div>

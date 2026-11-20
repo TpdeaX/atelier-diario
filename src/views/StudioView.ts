@@ -31,6 +31,32 @@ import {
   NotebookDoc,
   PaperStyle,
 } from '../types';
+import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
+
+const STUDIO_TUTORIALS: Record<'notebook' | 'pdf', Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
+  notebook: {
+    sectionName: 'Cuaderno Digital',
+    summary: 'Toma apuntes tipo tablet con pluma, resaltador, figuras, texto y hojas configurables.',
+    steps: [
+      'Elige herramienta (Pluma, Resaltar, Caja, Círculo, Flecha, Texto o Borrar), color y grosor.',
+      'Cambia el papel entre punteado, cuadriculado, rayado o blanco según tu esquema.',
+      'Añade páginas con + Hoja y navega con las flechas; todo se guarda automáticamente.',
+      'Exporta tu cuaderno completo en PDF anotado o respaldo .json en un clic.',
+    ],
+    tip: 'Usa la herramienta Texto para títulos limpios y Flecha + Resaltar para mapas conceptuales rápidos.',
+  },
+  pdf: {
+    sectionName: 'Editor y Subrayador PDF',
+    summary: 'Sube tus propios PDFs o descarga clásicos desde Wikisource/Archive para anotar encima.',
+    steps: [
+      'Pulsa Subir PDF para importar un archivo local o Buscar libro para convertir un clásico en PDF.',
+      'Usa Resaltar para marcar ideas clave y Pluma o Texto para comentarios al margen.',
+      'Cambia de página con las flechas superiores; tus trazos quedan separados por página.',
+      'Pulsa Exportar PDF para descargar una copia nueva con todas tus anotaciones integradas.',
+    ],
+    tip: 'Si activas Supabase en Nube, tus cuadernos y anotaciones se sincronizan en vivo entre dispositivos.',
+  },
+};
 
 const PALETTE = [
   { name: 'Tinta', hex: '#10211B' },
@@ -230,6 +256,12 @@ export class StudioView {
             .join('')}
         </div>
 
+        ${renderTutorialBanner({
+          id: `studio:${doc.kind}`,
+          moduleName: 'Cuaderno y PDF',
+          ...(STUDIO_TUTORIALS[doc.kind] ?? STUDIO_TUTORIALS.notebook),
+        })}
+
         <div class="al-panel al-board-shell">
           <div class="al-board-toolbar">
             <div class="al-tool-group" aria-label="Herramientas">
@@ -303,6 +335,7 @@ export class StudioView {
     this.fgCtx = this.fgCanvas.getContext('2d')!;
 
     this.bindEvents(container);
+    bindTutorialBanners(container);
     void this.renderAllLayers();
 
     this.resizeObs?.disconnect();

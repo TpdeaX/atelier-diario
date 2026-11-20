@@ -16,6 +16,59 @@ import {
 import { directoryStore } from '../state/DirectoryStore';
 import { lifeStore } from '../state/LifeStore';
 import { DirectoryCategory, HabitKey, ModuleId } from '../types';
+import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
+
+const HOME_TUTORIALS: Record<'all' | DirectoryCategory, Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
+  all: {
+    sectionName: 'Directorio del Ecosistema',
+    summary: 'Centraliza todos los módulos de Atelier Diario, UNUmbral, OMNI ARENA y tus accesos personales.',
+    steps: [
+      'Usa las pestañas superiores para filtrar entre Atelier Diario, Universidad, Entrenamiento o Mis Accesos.',
+      'Pulsa Personalizar para fijar tus módulos favoritos arriba, reordenar tarjetas u ocultar lo que no uses hoy.',
+      'Pulsa Nuevo acceso para guardar cualquier enlace útil en tu directorio sincronizado.',
+      'Revisa abajo Tu ritmo de hoy, el pulso de UNUmbral y las cápsulas diarias de léxico e ideas.',
+    ],
+    tip: 'Cada módulo que practiques marca automáticamente su hábito del día y mantiene tu racha activa.',
+  },
+  atelier: {
+    sectionName: 'Módulos de Atelier Diario',
+    summary: 'Espacio personal de lectura, escritura, dibujo, canto, oratoria, enfoque y calma.',
+    steps: [
+      'Abre cualquier tarjeta para entrenar sin cambiar de aplicación.',
+      'Usa Centro de Calma o el acceso SOS si necesitas bajar revoluciones en segundos.',
+      'Dentro de cada módulo encontrarás su propia guía rápida adaptada a la pestaña activa.',
+    ],
+    tip: 'Alternar 5 minutos de dos talleres distintos al día da mejores resultados que una maratón aislada.',
+  },
+  universidad: {
+    sectionName: 'Universidad y UNUmbral',
+    summary: 'Conecta tu horario, tareas pendientes y huecos libres con tu rutina diaria.',
+    steps: [
+      'Abre UNUmbral Académico para gestionar cursos, asistencias y notas.',
+      'Importa un respaldo JSON o activa la Nube para ver tus próximos huecos libres en la portada.',
+      'Aprovecha los huecos cortos entre clases con fichas de Evocación Activa u Ortografía.',
+    ],
+    tip: 'Si cambias de dispositivo, configura el mismo Código de Espacio en Nube para sincronizar.',
+  },
+  entrenamiento: {
+    sectionName: 'Entrenamiento Cognitivo y Musical',
+    summary: 'Accede a OMNI ARENA 2D/3D con academias guiadas, circuitos y radar de 5 ejes.',
+    steps: [
+      'Abre OMNI ARENA para entrenar piano, batería, cuerdas, ajedrez, IQ, memoria y destreza.',
+      'Tu nivel, radar y partidas se reflejan en esta tarjeta cuando compartes el mismo origen o nube.',
+    ],
+    tip: 'Combina 10 minutos de Atelier (calma o lectura) con un circuito de OMNI ARENA para enfoque total.',
+  },
+  personal: {
+    sectionName: 'Mis Accesos Personalizados',
+    summary: 'Guarda tus portales, repositorios y recursos personales en el mismo tablero.',
+    steps: [
+      'Pulsa Nuevo acceso para crear un enlace con nombre, categoría y color propio.',
+      'Activa Personalizar para reordenar o eliminar accesos cuando ya no los necesites.',
+    ],
+    tip: 'Fija con estrella tus 3 enlaces más visitados para tenerlos siempre al inicio.',
+  },
+};
 
 export interface DirectoryEntry {
   id: string;
@@ -424,6 +477,12 @@ export class HomeView {
           </div>
         </section>
 
+        ${renderTutorialBanner({
+          id: `home:${dir.activeCategory}`,
+          moduleName: 'Inicio',
+          ...(HOME_TUTORIALS[dir.activeCategory] ?? HOME_TUTORIALS.all),
+        })}
+
         ${
           this.addLinkOpen
             ? `
@@ -533,6 +592,7 @@ export class HomeView {
     container.querySelectorAll<HTMLElement>('[data-nav]').forEach((el) => {
       el.addEventListener('click', () => navigate(el.dataset.nav as ModuleId));
     });
+    bindTutorialBanners(container);
 
     container.querySelectorAll<HTMLButtonElement>('[data-dcat]').forEach((btn) => {
       btn.addEventListener('click', () => {

@@ -16,6 +16,41 @@ import {
 import { buildBookPdf } from '../services/PdfTools';
 import { lifeStore } from '../state/LifeStore';
 import { NotebookDoc } from '../types';
+import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
+
+const READER_TUTORIALS: Record<'wikisource' | 'wikipedia' | 'openlibrary', Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
+  wikisource: {
+    sectionName: 'Wikisource (Textos completos)',
+    summary: 'Lee clásicos en español de dominio público, define palabras al doble clic y expórtalos a PDF.',
+    steps: [
+      'Elige una obra de Clásicos sugeridos en la barra lateral o busca cualquier título/autor arriba.',
+      'Haz doble clic sobre cualquier palabra del texto para consultar su definición en Wikcionario.',
+      'Pulsa Guardar marcador para retomar después o Pasar a Cuaderno PDF para subrayar a mano.',
+      'Ajusta el tamaño de letra (A- / A+) y marca tu lectura de hoy.',
+    ],
+    tip: 'Si una portada es índice de obra, elige cualquiera de los capítulos mostrados arriba del texto.',
+  },
+  wikipedia: {
+    sectionName: 'Wikipedia (Curiosidades)',
+    summary: 'Explora resúmenes culturales al instante para ampliar criterio y vocabulario.',
+    steps: [
+      'Al activar Wikipedia se carga un resumen aleatorio en español listo para leer.',
+      'Haz doble clic sobre términos desconocidos para guardarlos en tu glosario personal.',
+      'Guarda un marcador si deseas conservar la referencia en tu lista lateral.',
+    ],
+    tip: 'Leer un artículo breve de 3 minutos y resumirlo mentalmente ejercita comprensión rápida.',
+  },
+  openlibrary: {
+    sectionName: 'Open Library (Catálogo)',
+    summary: 'Busca ediciones, autores y libros gratuitos abiertos en Internet.',
+    steps: [
+      'Escribe un título, tema o autor en la barra de búsqueda y pulsa Buscar.',
+      'Revisa año, autor y temática de cada resultado del catálogo.',
+      'Usa el botón Leer gratis cuando la obra tenga vista directa disponible.',
+    ],
+    tip: 'Si buscas subrayar el texto dentro de Atelier, cambia a Wikisource o usa Buscar libro en Cuaderno PDF.',
+  },
+};
 
 export interface ReaderRenderOpts {
   onOpenStudio?: () => void;
@@ -81,10 +116,16 @@ export class ReaderView {
           </form>
         </div>
 
+        ${renderTutorialBanner({
+          id: `reader:${prefs.sourceTab}`,
+          moduleName: 'Biblioteca y Lector',
+          ...(READER_TUTORIALS[prefs.sourceTab] ?? READER_TUTORIALS.wikisource),
+        })}
+
         <div class="al-reader-layout">
           <aside class="al-reader-sidebar">
             <div class="al-panel">
-              <h2>Clásicos sugeridos</h2>
+              <h2>Clásicos sugeridos (${CLASSIC_WIKISOURCE_SUGGESTIONS.length})</h2>
               <div class="al-stack-list">
                 ${CLASSIC_WIKISOURCE_SUGGESTIONS.map(
                   (c) => `
@@ -125,6 +166,7 @@ export class ReaderView {
     `;
 
     this.bindEvents(container, opts);
+    bindTutorialBanners(container);
     this.renderResultsStrip(container, opts);
   }
 
