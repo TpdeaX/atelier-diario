@@ -251,13 +251,20 @@ export class ReaderView {
     const isCompleted = prog.readArticles.includes(this.activeArticle.title);
     const savedNote = prog.readingNotes[this.activeArticle.title] ?? '';
 
+    const escText = (s: string) =>
+      s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+
     const subHtml = this.activeArticle.subpages.length
       ? `
       <div class="al-chapters-bar">
-        <span>Capítulos y secciones relacionadas:</span>
+        <span>Capítulos y secciones relacionadas (${this.activeArticle.subpages.length}):</span>
         <div class="al-chip-wrap">
           ${this.activeArticle.subpages
-            .slice(0, 14)
+            .slice(0, 24)
             .map((sp) => `<button type="button" class="al-chip-btn" data-open-ws="${sp.replace(/"/g, '&quot;')}">${sp.split('/').pop()}</button>`)
             .join('')}
         </div>
@@ -266,7 +273,15 @@ export class ReaderView {
 
     let bodyHtml = '';
     if (totalParas === 0) {
-      bodyHtml = '<p class="al-muted">Esta portada es un índice de obra. Elige uno de los capítulos arriba para comenzar a leer.</p>';
+      const firstSub = this.activeArticle.subpages[0];
+      bodyHtml = `
+        <p class="al-muted">Esta portada es un índice de obra. Elige uno de los capítulos arriba para comenzar a leer.</p>
+        ${
+          firstSub
+            ? `<button type="button" class="al-btn al-btn-primary" data-open-ws="${firstSub.replace(/"/g, '&quot;')}">Abrir primer capítulo: ${firstSub.split('/').pop()}</button>`
+            : ''
+        }
+      `;
     } else if (prog.mode === 'guiada') {
       const size = this.chunkSizeFor(diff);
       const totalChunks = Math.max(1, Math.ceil(totalParas / size));
@@ -286,10 +301,10 @@ export class ReaderView {
             <button type="button" class="al-btn al-btn-sm al-btn-primary" id="al-chunk-next">${idx + 1 < totalChunks ? 'Siguiente bloque y guardar' : 'Finalizar texto y guardar'}</button>
           </div>
         </div>
-        ${slice.map((p) => `<p>${p}</p>`).join('')}
+        ${slice.map((p) => `<p>${escText(p)}</p>`).join('')}
       `;
     } else {
-      bodyHtml = this.activeArticle.paragraphs.map((p) => `<p>${p}</p>`).join('');
+      bodyHtml = this.activeArticle.paragraphs.map((p) => `<p>${escText(p)}</p>`).join('');
     }
 
     const prompts = READER_COMPREHENSION_PROMPTS[diff];
@@ -378,12 +393,28 @@ export class ReaderView {
     });
   }
 
-  private async openWikisource(title: string, container: HTMLElement, opts?: ReaderRenderOpts): Promise<void> {
+  private async openWikisource(
+    title: string,
+    container: HTMLElement,
+    opts?: ReaderRenderOpts,
+    autoEnterChapter = false
+  ): Promise<void> {
     this.statusText = `Cargando «${title}»...`;
     const paper = container.querySelector<HTMLElement>('#al-book-paper');
     if (paper) paper.innerHTML = `<p class="al-muted">${this.statusText}</p>`;
     try {
-      this.activeArticle = await fetchWikisourcePage(title);
+      let article = await fetchWikisourcePage(title);
+      if (autoEnterChapter && article.paragraphs.length === 0 && article.subpages.length > 0) {
+        const siblings = article.subpages;
+        const firstChapter = await fetchWikisourcePage(siblings[0]).catch(() => null);
+        if (firstChapter && firstChapter.paragraphs.length > 0) {
+          article = {
+            ...firstChapter,
+            subpages: Array.from(new Set([...firstChapter.subpages, ...siblings])).slice(0, 30),
+          };
+        }
+      }
+      this.activeArticle = article;
       const savedPct = lifeStore.get().progress.reader.scrollByTitle[this.activeArticle.title] ?? 0;
       const diff = lifeStore.getDifficulty('reader');
       const totalChunks = Math.max(1, Math.ceil(this.activeArticle.paragraphs.length / this.chunkSizeFor(diff)));
@@ -535,7 +566,7 @@ export class ReaderView {
         lifeStore.updateModulePrefs('reader', { sourceTab: 'wikisource' });
         this.searchResults = await searchWikisource(btn.dataset.suggest!).catch(() => []);
         if (this.searchResults.length > 0) {
-          await this.openWikisource(this.searchResults[0].title, container, opts);
+          await this.openWikisource(this.searchResults[0].title, container, opts, true);
         } else {
           this.render(container, opts);
         }

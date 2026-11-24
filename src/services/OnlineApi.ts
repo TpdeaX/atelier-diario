@@ -340,40 +340,198 @@ export async function searchWikisource(query: string): Promise<WikisourceSearchI
   }));
 }
 
+const WIKISOURCE_NOISE_SELECTORS = [
+  'style',
+  'script',
+  'noscript',
+  '.noprint',
+  '.ws-noexport',
+  '#headertemplate',
+  '#footertemplate',
+  '.wsbox-main',
+  '.mw-editsection',
+  '.toc',
+  '#toc',
+  'sup.reference',
+  '.references',
+  '.licenseContainer',
+  '.plainlinks',
+  '.sisterproject',
+  'table.infobox',
+  'table.metadata',
+  '.pagenum',
+  '.ws-pagenum',
+  'figure',
+].join(', ');
+
+/** Extrae párrafos legibles y enlaces de capítulos desde el HTML devuelto por `action=parse` de Wikisource. */
+export function extractWikisourceFromHtml(
+  html: string,
+  pageTitle: string
+): { paragraphs: string[]; bodyLinks: string[] } {
+  if (!html || typeof html !== 'string') return { paragraphs: [], bodyLinks: [] };
+
+  const normSelf = pageTitle.trim().toLowerCase();
+
+  if (typeof DOMParser !== 'undefined') {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const root = doc.querySelector('.mw-parser-output') ?? doc.body;
+    root.querySelectorAll(WIKISOURCE_NOISE_SELECTORS).forEach((el) => el.remove());
+
+    const bodyLinks: string[] = [];
+    const seenLinks = new Set<string>();
+    root.querySelectorAll<HTMLAnchorElement>('a[href^="/wiki/"]').forEach((a) => {
+      const titleAttr = (a.getAttribute('title') || '').trim();
+      if (!titleAttr || titleAttr.includes(':') || titleAttr.includes('(la página no existe)')) return;
+      if (titleAttr.toLowerCase() === normSelf) return;
+      if (!seenLinks.has(titleAttr)) {
+        seenLinks.add(titleAttr);
+        bodyLinks.push(titleAttr);
+      }
+    });
+
+    const paragraphs: string[] = [];
+    const seenPara = new Set<string>();
+    const pushPara = (raw: string) => {
+      const cleaned = raw
+        .replace(/\u00a0/g, ' ')
+        .replace(/[ \t]+\n/g, '\n')
+        .replace(/\n[ \t]+/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/[ \t]{2,}/g, ' ')
+        .trim();
+      if (cleaned.length < 4) return;
+      if (seenPara.has(cleaned)) return;
+      seenPara.add(cleaned);
+      paragraphs.push(cleaned);
+    };
+
+    const blocks = root.querySelectorAll('.poem, p, dd, blockquote, h2, h3');
+    blocks.forEach((el) => {
+      if (el.closest('.poem') && !el.classList.contains('poem')) return;
+      if (el.closest('blockquote') && el.tagName !== 'BLOCKQUOTE') return;
+      if (el.tagName === 'P' && el.closest('dd')) return;
+      if (el.classList.contains('poem')) {
+        const clone = el.cloneNode(true) as HTMLElement;
+        clone.querySelectorAll('br').forEach((br) => br.replaceWith('\n'));
+        clone.querySelectorAll('p').forEach((p) => {
+          p.append('\n');
+        });
+        const verses = (clone.textContent ?? '')
+          .split(/\n{2,}/)
+          .map((stanza) => stanza.trim())
+          .filter((stanza) => stanza.length > 0);
+        verses.forEach(pushPara);
+      } else {
+        const text = (el.textContent ?? '').trim();
+        // Evitar líneas de índice cortas que son solo enlaces de lista
+        const linksInEl = el.querySelectorAll('a').length;
+        if (linksInEl >= 3 && text.length < 180) return;
+        pushPara(text);
+      }
+    });
+
+    if (paragraphs.length === 0) {
+      const rawFallback = (root.textContent ?? '')
+        .split(/\n{2,}/)
+        .map((chunk) => chunk.trim())
+        .filter((chunk) => chunk.length >= 25);
+      rawFallback.forEach(pushPara);
+    }
+
+    return { paragraphs, bodyLinks };
+  }
+
+  // Fallback puro para Node tests (sin DOMParser)
+  const stripped = html
+    .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
+    .replace(/<div[^>]+id="(?:headertemplate|footertemplate|ws-data)"[^>]*>[\s\S]*?<\/div>/gi, '');
+
+  const bodyLinks: string[] = [];
+  const seenLinks = new Set<string>();
+  const linkRe = /<a\b[^>]*href="\/wiki\/[^"]+"[^>]*title="([^"]+)"/gi;
+  let lm: RegExpExecArray | null;
+  while ((lm = linkRe.exec(stripped)) !== null) {
+    const t = stripHtmlSafe(lm[1]);
+    if (!t || t.includes(':') || t.includes('(la página no existe)') || t.toLowerCase() === normSelf) continue;
+    if (!seenLinks.has(t)) {
+      seenLinks.add(t);
+      bodyLinks.push(t);
+    }
+  }
+
+  const paragraphs: string[] = [];
+  const pRe = /<(?:p|dd|blockquote|h2|h3)\b[^>]*>([\s\S]*?)<\/(?:p|dd|blockquote|h2|h3)>/gi;
+  let pm: RegExpExecArray | null;
+  while ((pm = pRe.exec(stripped)) !== null) {
+    const text = stripHtmlSafe(pm[1]);
+    if (text.length >= 12) paragraphs.push(text);
+  }
+  return { paragraphs, bodyLinks };
+}
+
 export async function fetchWikisourcePage(title: string): Promise<WikisourceArticle> {
-  const extractUrl = `https://es.wikisource.org/w/api.php?action=query&prop=extracts&explaintext=true&titles=${encodeURIComponent(
+  const parseUrl = `https://es.wikisource.org/w/api.php?action=parse&page=${encodeURIComponent(
     title
-  )}&format=json&origin=*`;
+  )}&prop=text|links&redirects=1&format=json&origin=*`;
   const subUrl = `https://es.wikisource.org/w/api.php?action=query&list=prefixsearch&pssearch=${encodeURIComponent(
     title + '/'
-  )}&pslimit=20&format=json&origin=*`;
+  )}&pslimit=30&format=json&origin=*`;
 
-  const [extRes, subRes] = await Promise.all([fetch(extractUrl), fetch(subUrl)]);
-  if (!extRes.ok) throw new Error(`HTTP ${extRes.status}`);
+  const [parseRes, subRes] = await Promise.all([fetch(parseUrl), fetch(subUrl)]);
+  if (!parseRes.ok) throw new Error(`HTTP ${parseRes.status}`);
 
-  const extData = (await extRes.json()) as {
-    query?: { pages?: Record<string, { title?: string; extract?: string }> };
+  const parseData = (await parseRes.json()) as {
+    parse?: {
+      title?: string;
+      text?: { '*'?: string };
+      links?: Array<{ ns?: number; exists?: string; '*'?: string }>;
+    };
   };
-  const pages = Object.values(extData.query?.pages ?? {});
-  const page = pages[0];
-  const rawText = page?.extract ?? '';
-  const paragraphs = rawText
-    .split(/\n{2,}/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 0);
 
-  let subpages: string[] = [];
+  const resolvedTitle = parseData.parse?.title ?? title;
+  const html = parseData.parse?.text?.['*'] ?? '';
+  const { paragraphs, bodyLinks } = extractWikisourceFromHtml(html, resolvedTitle);
+
+  const subSet = new Set<string>();
+  const normResolved = resolvedTitle.trim().toLowerCase();
+  const addSub = (t: string) => {
+    const clean = t.trim();
+    if (!clean || clean.toLowerCase() === normResolved) return;
+    if (clean.includes(':')) return;
+    subSet.add(clean);
+  };
+
   if (subRes.ok) {
     const subData = (await subRes.json()) as {
       query?: { prefixsearch?: Array<{ title: string }> };
     };
-    subpages = (subData.query?.prefixsearch ?? []).map((s) => s.title);
+    for (const s of subData.query?.prefixsearch ?? []) {
+      if (s.title.toLowerCase().startsWith(normResolved + '/')) {
+        addSub(s.title);
+      }
+    }
+  }
+
+  // Si no hay subpáginas con "/" (ej. Fábulas de Samaniego), usar los capítulos enlazados del índice
+  for (const bl of bodyLinks) {
+    if (subSet.size >= 36) break;
+    addSub(bl);
+  }
+
+  if (subSet.size === 0 && Array.isArray(parseData.parse?.links)) {
+    for (const l of parseData.parse.links) {
+      if (subSet.size >= 36) break;
+      if (l.ns === 0 && l.exists !== undefined && l['*']) {
+        addSub(l['*']);
+      }
+    }
   }
 
   return {
-    title: page?.title ?? title,
+    title: resolvedTitle,
     paragraphs,
-    subpages,
+    subpages: Array.from(subSet),
   };
 }
 
@@ -460,29 +618,13 @@ export interface WikisourceFullText {
   chaptersLoaded: number;
 }
 
-async function wikisourceExtract(title: string): Promise<{ title: string; text: string }> {
-  const url = `https://es.wikisource.org/w/api.php?action=query&prop=extracts&explaintext=true&redirects=1&titles=${encodeURIComponent(
-    title
-  )}&format=json&origin=*`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = (await res.json()) as {
-    query?: { pages?: Record<string, { title?: string; extract?: string }> };
+async function wikisourceExtract(title: string): Promise<{ title: string; text: string; subpages: string[] }> {
+  const page = await fetchWikisourcePage(title);
+  return {
+    title: page.title,
+    text: page.paragraphs.join('\n\n').trim(),
+    subpages: page.subpages,
   };
-  const page = Object.values(data.query?.pages ?? {})[0];
-  return { title: page?.title ?? title, text: (page?.extract ?? '').trim() };
-}
-
-async function wikisourceSubpages(title: string, limit = 60): Promise<string[]> {
-  const url = `https://es.wikisource.org/w/api.php?action=query&list=prefixsearch&pssearch=${encodeURIComponent(
-    title + '/'
-  )}&pslimit=${limit}&format=json&origin=*`;
-  const res = await fetch(url);
-  if (!res.ok) return [];
-  const data = (await res.json()) as { query?: { prefixsearch?: Array<{ title: string }> } };
-  return (data.query?.prefixsearch ?? [])
-    .map((s) => s.title)
-    .sort((a, b) => a.localeCompare(b, 'es', { numeric: true }));
 }
 
 /** Downloads a Wikisource work: the main page plus its chapters (subpages), up to `maxChapters`. */
@@ -492,7 +634,7 @@ export async function fetchWikisourceFullText(
   onProgress?: (done: number, total: number) => void
 ): Promise<WikisourceFullText> {
   const main = await wikisourceExtract(title);
-  const subs = await wikisourceSubpages(main.title);
+  const subs = main.subpages;
   const sections: Array<{ heading: string; text: string }> = [];
   if (main.text.length > 200 || subs.length === 0) {
     sections.push({ heading: '', text: main.text });
@@ -503,7 +645,10 @@ export async function fetchWikisourceFullText(
     try {
       const ch = await wikisourceExtract(toLoad[i]);
       if (ch.text) {
-        sections.push({ heading: ch.title.slice(main.title.length + 1).replace(/\//g, ' · '), text: ch.text });
+        const cleanHead = ch.title.startsWith(main.title + '/')
+          ? ch.title.slice(main.title.length + 1).replace(/\//g, ' · ')
+          : ch.title;
+        sections.push({ heading: cleanHead, text: ch.text });
       }
     } catch {
       // skip chapter
