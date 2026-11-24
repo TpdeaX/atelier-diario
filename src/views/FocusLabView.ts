@@ -6,13 +6,54 @@ import {
   OratoryPrompt,
 } from '../data/FocusLabBank';
 import { Icons } from '../icons';
-import { lifeStore } from '../state/LifeStore';
-import { DifficultyLevel, FlashcardItem } from '../types';
+import { computeSm2Review, formatSm2IntervalEs, lifeStore } from '../state/LifeStore';
+import { DifficultyLevel, FlashcardItem, Sm2Rating } from '../types';
 import { bindDidacticBar, difficultyLabel, renderDidacticBar } from '../ui/DidacticBar';
 import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
+import { renderYoutubeJumpCard } from '../ui/YoutubeJumpCard';
 
 type SchulteMode = 'normal' | 'inverso' | 'doble';
-type RecallMode = 'repaso' | 'quiz';
+type RecallMode = 'repaso' | 'quiz' | 'feynman';
+
+function analyzeFeynmanExplanation(draft: string, referenceBack: string): {
+  words: number;
+  overlapPct: number;
+  conciseOk: boolean;
+  originalOk: boolean;
+  verdict: string;
+} {
+  const clean = draft.trim();
+  const tokenize = (s: string) =>
+    s
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter((w) => w.length >= 4);
+
+  const words = clean ? clean.split(/\s+/).filter(Boolean).length : 0;
+  const draftTokens = tokenize(clean);
+  const refSet = new Set(tokenize(referenceBack));
+  const shared = draftTokens.filter((t) => refSet.has(t)).length;
+  const overlapPct = draftTokens.length > 0 ? Math.round((shared / draftTokens.length) * 100) : 0;
+
+  const conciseOk = words >= 12 && words <= 75;
+  const originalOk = words >= 12 && overlapPct < 72;
+
+  let verdict = 'Escribe una explicación breve en 2 a 4 líneas como si se la enseñaras a un amigo.';
+  if (words > 0 && words < 12) {
+    verdict = 'Muy corta todavía: amplía con un ejemplo cotidiano o explica el porqué en 2-4 líneas.';
+  } else if (words > 75) {
+    verdict = 'Un poco extensa (>75 palabras): intenta condensar la idea esencial sin rodeos.';
+  } else if (overlapPct >= 72) {
+    verdict = 'Demasiado parecida a la tarjeta original: reescríbela con tus propias palabras o una analogía.';
+  } else if (words >= 12) {
+    verdict = 'Excelente explicación Feynman: concisa, propia y fácil de entender sin jerga.';
+  }
+
+  return { words, overlapPct, conciseOk, originalOk, verdict };
+}
 
 const FOCUSLAB_TUTORIALS: Record<'oratory' | 'schulte' | 'recall', Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
   oratory: {
@@ -156,6 +197,8 @@ export class FocusLabView {
   private recallRevealed = false;
   private recallDraft = '';
   private recallDraftCardId = '';
+  private feynmanDraft = '';
+  private feynmanSavedBanner = '';
   private addCardOpen = false;
   private extraPractice = false;
   private quizSelectedIdx: number | null = null;
@@ -521,21 +564,33 @@ export class FocusLabView {
     if (card && this.recallDraftCardId !== card.id) {
       this.recallDraftCardId = card.id;
       this.recallDraft = pr.recallDrafts[card.id] ?? '';
+      this.feynmanDraft = pr.feynmanNotes[card.id] ?? '';
+      this.feynmanSavedBanner = '';
       this.quizSelectedIdx = null;
     }
 
     const quizOptions = card && recallMode === 'quiz' ? this.buildQuizOptions(card, filtered, allCards) : [];
+    const sm2Previews = card
+      ? {
+          again: formatSm2IntervalEs(computeSm2Review(prog, 'again', now).intervalDays),
+          hard: formatSm2IntervalEs(computeSm2Review(prog, 'hard', now).intervalDays),
+          good: formatSm2IntervalEs(computeSm2Review(prog, 'good', now).intervalDays),
+          easy: formatSm2IntervalEs(computeSm2Review(prog, 'easy', now).intervalDays),
+        }
+      : null;
+    const feynmanEval = card && recallMode === 'feynman' ? analyzeFeynmanExplanation(this.feynmanDraft, card.back) : null;
 
     return `
       <div class="al-panel">
         <div class="al-card-head">
           <div>
-            <h2>Evocación Activa (SM-2 + Quiz de Opción Múltiple)</h2>
-            <p class="al-muted">${dueCards.length} pendientes ahora · ${masteredInDeck}/${filtered.length} al día en este mazo · ${profile.stats.recallReviewed} repasos totales</p>
+            <h2>Evocación Activa (SM-2 Real + Quiz + Modo Feynman)</h2>
+            <p class="al-muted">Vencidas hoy: <strong>${dueCards.length}</strong> · ${masteredInDeck}/${filtered.length} al día · ${profile.stats.recallReviewed} repasos totales</p>
           </div>
           <div class="al-tool-group">
             <div class="al-seg-tabs" role="group" aria-label="Modo de evocación">
               <button type="button" class="al-seg-btn ${recallMode === 'repaso' ? 'is-active' : ''}" data-recall-mode="repaso">Repaso SM-2</button>
+              <button type="button" class="al-seg-btn ${recallMode === 'feynman' ? 'is-active' : ''}" data-recall-mode="feynman">Modo Feynman</button>
               <button type="button" class="al-seg-btn ${recallMode === 'quiz' ? 'is-active' : ''}" data-recall-mode="quiz">Modo Quiz</button>
             </div>
             <button type="button" class="al-btn al-btn-primary" id="fl-add-card-toggle">${Icons.plus(15)}<span>Nueva tarjeta</span></button>
@@ -612,7 +667,7 @@ export class FocusLabView {
               <span class="al-mono-pill">${esc(card.deck)}${card.source ? ` · ${esc(card.source)}` : ''}</span>
               <div class="al-tool-group">
                 ${recallMode === 'quiz' ? `<span class="al-mono-pill">Quiz: ${this.quizCorrectCount}/${this.quizTotalCount}</span>` : ''}
-                ${prog ? `<span class="al-mono-pill">Intervalo: ${prog.intervalDays}d</span>` : '<span class="al-mono-pill">Nueva</span>'}
+                ${prog ? `<span class="al-mono-pill">Intervalo: ${prog.intervalDays}d · EF ${(prog.easeFactor ?? 2.5).toFixed(2)} · Reps ${prog.reps}</span>` : '<span class="al-mono-pill">Nueva · EF 2.50</span>'}
                 ${card.isCustom ? `<button type="button" class="al-icon-btn" id="fl-del-card" data-card-id="${esc(card.id)}" title="Eliminar tarjeta">${Icons.trash(14)}</button>` : ''}
               </div>
             </div>
@@ -634,9 +689,10 @@ export class FocusLabView {
                   <p>${esc(card.back)}</p>
                 </div>
                 <div class="al-tool-group" style="margin-top:12px;">
-                  <button type="button" class="al-btn" data-rate="again">Repasar en 10 min</button>
-                  <button type="button" class="al-btn" data-rate="good">Bien (+2 días)</button>
-                  <button type="button" class="al-btn al-btn-primary" data-rate="easy">Dominado (+5 días)</button>
+                  <button type="button" class="al-btn" data-rate="again">Otra vez (${sm2Previews?.again ?? '10 min'})</button>
+                  <button type="button" class="al-btn" data-rate="hard">Difícil (${sm2Previews?.hard ?? '1 día'})</button>
+                  <button type="button" class="al-btn" data-rate="good">Bien (${sm2Previews?.good ?? '1 día'})</button>
+                  <button type="button" class="al-btn al-btn-primary" data-rate="easy">Fácil (${sm2Previews?.easy ?? '4 días'})</button>
                 </div>
               `
                   : `
@@ -647,7 +703,31 @@ export class FocusLabView {
               `
               }
             `
-                : `
+                : recallMode === 'feynman'
+                  ? `
+              <label style="display:block; margin:10px 0;">
+                <span class="al-muted" style="font-size:0.82rem;"><strong>Modo Feynman:</strong> Explícalo con tus palabras en 2–4 líneas sin jerga ni copiar la tarjeta:</span>
+                <textarea id="fl-feynman-draft" class="al-inline-note" style="margin-top:6px;min-height:90px" placeholder="Imagina que se lo explicas a alguien de 14 años usando un ejemplo real...">${esc(this.feynmanDraft)}</textarea>
+              </label>
+              <div class="al-study-card ${feynmanEval?.conciseOk && feynmanEval?.originalOk ? 'is-done' : ''}" id="fl-feynman-live">
+                <div class="al-didactic-prog-head">
+                  <strong id="fl-feynman-verdict">${esc(feynmanEval?.verdict ?? '')}</strong>
+                  <span class="al-mono-pill" id="fl-feynman-metrics">${feynmanEval?.words ?? 0} pal. · Similitud ${feynmanEval?.overlapPct ?? 0}%</span>
+                </div>
+              </div>
+              <div class="al-tool-group" style="margin-top:10px;">
+                <button type="button" class="al-btn al-btn-primary" id="fl-feynman-save">${Icons.check(15)}<span>Guardar explicación Feynman</span></button>
+                <button type="button" class="al-btn" id="fl-reveal-answer">${Icons.eye(15)}<span>${this.recallRevealed ? 'Ocultar referencia' : 'Comparar con referencia'}</span></button>
+                <button type="button" class="al-btn" id="fl-skip-card">Siguiente tarjeta</button>
+              </div>
+              ${this.feynmanSavedBanner ? `<p class="al-muted" style="margin:6px 0 0;color:var(--accent-primary)">${esc(this.feynmanSavedBanner)}</p>` : ''}
+              ${
+                this.recallRevealed
+                  ? `<div class="al-fl-recall-back" style="margin-top:10px"><strong>Referencia de la tarjeta:</strong><p>${esc(card.back)}</p></div>`
+                  : ''
+              }
+            `
+                  : `
               <div class="al-study-grid" style="margin-top:10px;">
                 ${quizOptions
                   .map((opt, idx) => {
@@ -758,6 +838,8 @@ export class FocusLabView {
               ? this.renderSchulteTab()
               : this.renderRecallTab()
         }
+
+        ${renderYoutubeJumpCard('focuslab')}
       </div>
     `;
 
@@ -1106,8 +1188,29 @@ export class FocusLabView {
       }
     });
 
+    container.querySelector('#fl-feynman-draft')?.addEventListener('input', (e) => {
+      const val = (e.target as HTMLTextAreaElement).value;
+      this.feynmanDraft = val;
+      if (!card) return;
+      const ev = analyzeFeynmanExplanation(val, card.back);
+      const verdictEl = container.querySelector('#fl-feynman-verdict');
+      const metricsEl = container.querySelector('#fl-feynman-metrics');
+      const box = container.querySelector('#fl-feynman-live');
+      if (verdictEl) verdictEl.textContent = ev.verdict;
+      if (metricsEl) metricsEl.textContent = `${ev.words} pal. · Similitud ${ev.overlapPct}%`;
+      if (box) box.classList.toggle('is-done', ev.conciseOk && ev.originalOk);
+    });
+
+    container.querySelector('#fl-feynman-save')?.addEventListener('click', () => {
+      if (!card) return;
+      lifeStore.saveFeynmanNote(card.id, this.feynmanDraft);
+      lifeStore.reviewFlashcard(card.id, 'good');
+      this.feynmanSavedBanner = 'Explicación Feynman guardada y repaso SM-2 registrado como Bien.';
+      this.render(container);
+    });
+
     container.querySelector('#fl-reveal-answer')?.addEventListener('click', () => {
-      this.recallRevealed = true;
+      this.recallRevealed = !this.recallRevealed;
       this.render(container);
     });
 
@@ -1134,7 +1237,7 @@ export class FocusLabView {
       btn.addEventListener('click', () => {
         if (!card) return;
         lifeStore.saveRecallDraft(card.id, '');
-        lifeStore.reviewFlashcard(card.id, btn.dataset.rate as 'again' | 'good' | 'easy');
+        lifeStore.reviewFlashcard(card.id, btn.dataset.rate as Sm2Rating);
         this.recallIdx += 1;
         this.recallRevealed = false;
         this.recallDraft = '';

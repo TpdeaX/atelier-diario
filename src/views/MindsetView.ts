@@ -5,7 +5,38 @@ import { DifficultyLevel, PhraseItem } from '../types';
 import { bindDidacticBar, difficultyLabel, renderDidacticBar } from '../ui/DidacticBar';
 import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
 
-type MindsetMode = 'tarjetas' | 'reto_hoy' | 'reflexion';
+type MindsetMode = 'tarjetas' | 'reto_hoy' | 'reflexion' | 'creatividad';
+
+const SCAMPER_PROMPTS: { letter: string; verb: string; question: string; target: string }[] = [
+  { letter: 'S', verb: 'Sustituir', question: '¿Qué paso, material o herramienta habitual podrías reemplazar por algo más simple o inesperado?', target: 'Tu rutina de estudio o un producto cotidiano' },
+  { letter: 'C', verb: 'Combinar', question: '¿Qué dos hábitos, formatos o habilidades aparentemente lejanas ganarían fuerza si las fusionas?', target: 'Un proyecto personal o de carrera' },
+  { letter: 'A', verb: 'Adaptar', question: '¿Qué principio de otro campo (música, biología, videojuegos, cocina) podrías importar a tu reto actual?', target: 'Un problema técnico o académico' },
+  { letter: 'M', verb: 'Modificar / Magnificar', question: '¿Qué pasaría si multiplicaras por 10 una sola característica o la redujeras a una versión de 2 minutos?', target: 'Tu flujo diario o entregable clave' },
+  { letter: 'P', verb: 'Poner otros usos', question: '¿Para qué otro problema completamente distinto serviría algo que ya construiste o sabes hacer?', target: 'Una habilidad o herramienta que ya dominas' },
+  { letter: 'E', verb: 'Eliminar', question: '¿Qué paso o regla asumida podrías quitar por completo sin perder el valor real?', target: 'Una reunión, proceso o pantalla compleja' },
+  { letter: 'R', verb: 'Reordenar / Invertir', question: '¿Qué ocurre si empiezas por el final, inviertes el orden o haces lo contrario a lo estándar?', target: 'Cómo presentas una idea o planificas tu día' },
+];
+
+const FORCED_CONCEPTS_A = [
+  'Origami modular', 'Reloj de arena', 'Biblioteca silenciosa', 'Juego de ajedrez',
+  'Mapa del metro', 'Semáforo inteligente', 'Diario de bolsillo', 'Cocina en 10 minutos',
+  'Orquesta sinfónica', 'Brújula magnética', 'Estación espacial', 'Cuaderno de bocetos',
+];
+
+const FORCED_CONCEPTS_B = [
+  'App de productividad', 'Preparación de entrevistas', 'Hábito de lectura', 'Estudio universitario',
+  'Finanzas personales', 'Trabajo en equipo remoto', 'Aprendizaje de música', 'Descanso y postura',
+  'Escritura clara', 'Comunicación difícil', 'Organización semanal', 'Proyecto de software',
+];
+
+const SPRINT10_THEMES = [
+  '10 formas de hacer más divertido estudiar un tema denso',
+  '10 micro-herramientas que te ahorrarían 15 minutos cada día',
+  '10 maneras creativas de recordar lo que lees o aprendes',
+  '10 proyectos pequeños de portafolio que puedas construir en 1 fin de semana',
+  '10 formas distintas de explicar tu trabajo a un niño de 10 años',
+  '10 mejoras simples para tu espacio físico de trabajo y postura',
+];
 
 const CAT_LABELS: Record<PhraseItem['category'], string> = {
   hablar: 'Hablar mejor',
@@ -102,6 +133,16 @@ const MINDSET_TUTORIALS: Record<string, Omit<SectionTutorialSpec, 'id' | 'module
     ],
     tip: 'Una lista corta de 8 a 12 favoritas vivas es más útil que cien guardadas sin releer.',
   },
+  creatividad: {
+    sectionName: 'Creatividad y Pensamiento Lateral',
+    summary: 'Desbloquea ideas nuevas con SCAMPER diario, Combinaciones Forzadas y sprints de 10 ideas en 3 minutos.',
+    steps: [
+      'Usa el generador SCAMPER o gira un par de Combinación Forzada para salir del pensamiento lineal.',
+      'Arranca el sprint «10 ideas en 3 min» y suelta ideas rápidas sin juzgarlas hasta completar 10.',
+      'Guarda tus mejores hallazgos en tu Banco de Ideas sincronizado.',
+    ],
+    tip: 'Las primeras 4 ideas suelen ser obvias; las realmente originales aparecen entre la idea 7 y la 10.',
+  },
 };
 
 function esc(raw: string): string {
@@ -136,6 +177,24 @@ export class MindsetView {
   private onlyWithReflection = false;
   private openInlineReflectionId: string | null = null;
   private saveTimers = new Map<string, number>();
+
+  // Creatividad (Pensamiento Lateral) state
+  private scamperIdx = daySeed() % SCAMPER_PROMPTS.length;
+  private comboSeed = daySeed();
+  private sprintThemeIdx = daySeed() % SPRINT10_THEMES.length;
+  private sprintRunning = false;
+  private sprintRemainingSec = 180;
+  private sprintTimerId = 0;
+  private sprintDraftIdeas: string[] = [];
+  private creativeMsg = '';
+
+  private stopSprintTimer(): void {
+    if (this.sprintTimerId) {
+      window.clearInterval(this.sprintTimerId);
+      this.sprintTimerId = 0;
+    }
+    this.sprintRunning = false;
+  }
 
   private getAllPhrases(): { phrase: PhraseItem; diff: DifficultyLevel }[] {
     const profile = lifeStore.get();
@@ -220,6 +279,8 @@ export class MindsetView {
       modeBodyHtml = this.renderRetoHoyHtml(diff);
     } else if (mode === 'reflexion') {
       modeBodyHtml = this.renderReflexionHtml(allEntries, diff);
+    } else if (mode === 'creatividad') {
+      modeBodyHtml = this.renderCreatividadHtml();
     } else {
       modeBodyHtml = this.renderTarjetasHtml(allEntries, diff);
     }
@@ -229,7 +290,9 @@ export class MindsetView {
         ? 'reto_hoy'
         : mode === 'reflexion'
           ? 'reflexion'
-          : prefs.category;
+          : mode === 'creatividad'
+            ? 'creatividad'
+            : prefs.category;
 
     container.innerHTML = `
       <div class="al-page">
@@ -296,16 +359,19 @@ export class MindsetView {
             <button type="button" class="al-seg-btn ${mode === 'tarjetas' ? 'is-active' : ''}" data-mmode="tarjetas">Cuaderno completo (${allEntries.length})</button>
             <button type="button" class="al-seg-btn ${mode === 'reto_hoy' ? 'is-active' : ''}" data-mmode="reto_hoy">Reto de hoy (3 ideas)</button>
             <button type="button" class="al-seg-btn ${mode === 'reflexion' ? 'is-active' : ''}" data-mmode="reflexion">Diario de reflexión (${reflectionsCount})</button>
+            <button type="button" class="al-seg-btn ${mode === 'creatividad' ? 'is-active' : ''}" data-mmode="creatividad">Creatividad (${mProg.ideaBank.length})</button>
           </div>
           ${
-            mode !== 'reto_hoy'
+            mode !== 'reto_hoy' && mode !== 'creatividad'
               ? `<input type="search" id="al-phrase-search" class="al-filter-input" value="${esc(prefs.searchQuery)}" placeholder="Filtrar ideas o autores..." />`
-              : `<button type="button" class="al-btn al-btn-sm" id="al-mind-rotate-mission">${Icons.refresh(14)}<span>Rotar 3 ideas</span></button>`
+              : mode === 'reto_hoy'
+                ? `<button type="button" class="al-btn al-btn-sm" id="al-mind-rotate-mission">${Icons.refresh(14)}<span>Rotar 3 ideas</span></button>`
+                : ''
           }
         </div>
 
         ${
-          mode !== 'reto_hoy'
+          mode !== 'reto_hoy' && mode !== 'creatividad'
             ? `
           <div class="al-toolbar">
             <div class="al-seg-tabs">
@@ -564,6 +630,121 @@ export class MindsetView {
     `;
   }
 
+  private renderCreatividadHtml(): string {
+    const mProg = lifeStore.get().progress.mindset;
+    const scamper = SCAMPER_PROMPTS[this.scamperIdx % SCAMPER_PROMPTS.length];
+    const conceptA = FORCED_CONCEPTS_A[this.comboSeed % FORCED_CONCEPTS_A.length];
+    const conceptB = FORCED_CONCEPTS_B[(this.comboSeed * 3 + 5) % FORCED_CONCEPTS_B.length];
+    const sprintTheme = SPRINT10_THEMES[this.sprintThemeIdx % SPRINT10_THEMES.length];
+    const mm = String(Math.floor(this.sprintRemainingSec / 60)).padStart(2, '0');
+    const ss = String(this.sprintRemainingSec % 60).padStart(2, '0');
+
+    return `
+      <div class="al-two-col">
+        <section class="al-panel">
+          <div class="al-card-head">
+            <div>
+              <h2>Generador SCAMPER (${scamper.letter} · ${scamper.verb})</h2>
+              <p class="al-muted" style="margin:2px 0 0">Aplica una lente lateral sobre: <strong>${esc(scamper.target)}</strong></p>
+            </div>
+            <button type="button" class="al-btn al-btn-sm" id="al-cr-next-scamper">${Icons.refresh(14)}<span>Otra lente</span></button>
+          </div>
+          <div class="al-study-card is-done" style="margin:10px 0">
+            <strong>${esc(scamper.question)}</strong>
+          </div>
+          <form id="al-cr-scamper-form" class="al-vault-form-stack">
+            <textarea id="al-cr-scamper-input" class="al-inline-note" placeholder="Anota una idea provocada por esta lente SCAMPER..." required></textarea>
+            <div>
+              <button type="submit" class="al-btn al-btn-primary al-btn-sm">${Icons.sparkles(14)}<span>Guardar en Banco de Ideas</span></button>
+            </div>
+          </form>
+        </section>
+
+        <section class="al-panel">
+          <div class="al-card-head">
+            <div>
+              <h2>Combinaciones Forzadas</h2>
+              <p class="al-muted" style="margin:2px 0 0">Fusiona dos conceptos distintos en una sola solución original.</p>
+            </div>
+            <button type="button" class="al-btn al-btn-sm" id="al-cr-roll-combo">${Icons.refresh(14)}<span>Girar par</span></button>
+          </div>
+          <div class="al-combo-pair">
+            <span class="al-step-pill is-active">${esc(conceptA)}</span>
+            <strong>+</strong>
+            <span class="al-step-pill is-active">${esc(conceptB)}</span>
+          </div>
+          <form id="al-cr-combo-form" class="al-vault-form-stack" style="margin-top:10px">
+            <textarea id="al-cr-combo-input" class="al-inline-note" placeholder="¿Qué crearías combinando ambos conceptos?" required></textarea>
+            <div>
+              <button type="submit" class="al-btn al-btn-primary al-btn-sm">${Icons.sparkles(14)}<span>Guardar combinación</span></button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <section class="al-panel">
+        <div class="al-card-head">
+          <div>
+            <h2>Sprint Creativo: 10 ideas en 3 minutos (${this.sprintDraftIdeas.length}/10)</h2>
+            <p class="al-muted" style="margin:2px 0 0">Tema: <strong>${esc(sprintTheme)}</strong></p>
+          </div>
+          <div class="al-tool-group">
+            <span class="al-fl-clock" id="al-cr-sprint-clock" style="font-size:1.5rem">${mm}:${ss}</span>
+            <button type="button" class="al-btn al-btn-primary al-btn-sm" id="al-cr-sprint-toggle">
+              ${this.sprintRunning ? Icons.pause(14) : Icons.play(14)}<span>${this.sprintRunning ? 'Pausar' : 'Iniciar 3 min'}</span>
+            </button>
+            <button type="button" class="al-btn al-btn-sm" id="al-cr-sprint-theme">${Icons.refresh(14)}<span>Otro tema</span></button>
+          </div>
+        </div>
+
+        <form id="al-cr-sprint-add" class="al-vault-note-form" style="margin-top:10px">
+          <input type="text" id="al-cr-sprint-input" class="al-vault-note-input" placeholder="Escribe una idea rápida y pulsa Enter (sin filtrar ni juzgar)..." />
+          <button type="submit" class="al-btn al-btn-primary al-btn-sm">${Icons.plus(14)}<span>Agregar (#${this.sprintDraftIdeas.length + 1})</span></button>
+        </form>
+
+        ${
+          this.sprintDraftIdeas.length > 0
+            ? `
+          <ol class="al-fl-steps" style="margin-top:10px">
+            ${this.sprintDraftIdeas.map((idea) => `<li>${esc(idea)}</li>`).join('')}
+          </ol>
+          <div class="al-tool-group" style="margin-top:10px">
+            <button type="button" class="al-btn al-btn-primary al-btn-sm" id="al-cr-sprint-save-all">${Icons.check(14)}<span>Guardar sprint en Banco de Ideas</span></button>
+            <button type="button" class="al-btn al-btn-sm" id="al-cr-sprint-clear">Limpiar borrador</button>
+          </div>`
+            : ''
+        }
+        ${this.creativeMsg ? `<p class="al-muted" style="margin:8px 0 0;color:var(--accent-primary)">${esc(this.creativeMsg)}</p>` : ''}
+      </section>
+
+      <section class="al-panel">
+        <div class="al-card-head">
+          <h2>Tu Banco de Ideas (${mProg.ideaBank.length})</h2>
+          <span class="al-muted" style="font-size:0.8rem">Sincronizado automáticamente en tu perfil</span>
+        </div>
+        ${
+          mProg.ideaBank.length === 0
+            ? '<p class="al-muted" style="margin-top:8px">Aún no guardas ideas creativas. Usa SCAMPER, Combinaciones o el Sprint arriba.</p>'
+            : `<div class="al-study-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top:10px">
+                ${mProg.ideaBank
+                  .map(
+                    (it) => `
+                  <article class="al-study-card is-done">
+                    <div class="al-card-head">
+                      <span class="al-mono-pill">${it.technique === 'scamper' ? 'SCAMPER' : it.technique === 'combinacion' ? 'Combinación' : 'Sprint 10'}</span>
+                      <button type="button" class="al-icon-btn" data-cr-del="${esc(it.id)}" title="Eliminar idea">${Icons.trash(13)}</button>
+                    </div>
+                    <small class="al-muted">${esc(it.prompt)}</small>
+                    <p style="margin:4px 0 0;font-size:0.88rem;white-space:pre-line">${esc(it.idea)}</p>
+                  </article>`
+                  )
+                  .join('')}
+              </div>`
+        }
+      </section>
+    `;
+  }
+
   private bindEvents(container: HTMLElement): void {
     container.querySelector('#al-mind-add-btn')?.addEventListener('click', () => {
       this.addFormOpen = !this.addFormOpen;
@@ -705,9 +886,103 @@ export class MindsetView {
         this.render(container);
       });
     });
+
+    // Creatividad events
+    container.querySelector('#al-cr-next-scamper')?.addEventListener('click', () => {
+      this.scamperIdx = (this.scamperIdx + 1) % SCAMPER_PROMPTS.length;
+      this.render(container);
+    });
+    container.querySelector('#al-cr-scamper-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const txt = container.querySelector<HTMLTextAreaElement>('#al-cr-scamper-input')?.value.trim() ?? '';
+      if (!txt) return;
+      const sc = SCAMPER_PROMPTS[this.scamperIdx % SCAMPER_PROMPTS.length];
+      lifeStore.addCreativeIdea({ technique: 'scamper', prompt: `SCAMPER (${sc.verb}): ${sc.target}`, idea: txt });
+      this.creativeMsg = 'Idea SCAMPER guardada en tu Banco.';
+      this.render(container);
+    });
+    container.querySelector('#al-cr-roll-combo')?.addEventListener('click', () => {
+      this.comboSeed += 1;
+      this.render(container);
+    });
+    container.querySelector('#al-cr-combo-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const txt = container.querySelector<HTMLTextAreaElement>('#al-cr-combo-input')?.value.trim() ?? '';
+      if (!txt) return;
+      const a = FORCED_CONCEPTS_A[this.comboSeed % FORCED_CONCEPTS_A.length];
+      const b = FORCED_CONCEPTS_B[(this.comboSeed * 3 + 5) % FORCED_CONCEPTS_B.length];
+      lifeStore.addCreativeIdea({ technique: 'combinacion', prompt: `${a} + ${b}`, idea: txt });
+      this.creativeMsg = 'Combinación guardada en tu Banco.';
+      this.render(container);
+    });
+    container.querySelector('#al-cr-sprint-theme')?.addEventListener('click', () => {
+      this.stopSprintTimer();
+      this.sprintThemeIdx = (this.sprintThemeIdx + 1) % SPRINT10_THEMES.length;
+      this.sprintRemainingSec = 180;
+      this.sprintDraftIdeas = [];
+      this.render(container);
+    });
+    container.querySelector('#al-cr-sprint-toggle')?.addEventListener('click', () => {
+      if (this.sprintRunning) {
+        this.stopSprintTimer();
+        this.render(container);
+      } else {
+        if (this.sprintRemainingSec <= 0) this.sprintRemainingSec = 180;
+        this.sprintRunning = true;
+        this.sprintTimerId = window.setInterval(() => {
+          this.sprintRemainingSec = Math.max(0, this.sprintRemainingSec - 1);
+          const el = container.querySelector('#al-cr-sprint-clock');
+          if (el) {
+            el.textContent = `${String(Math.floor(this.sprintRemainingSec / 60)).padStart(2, '0')}:${String(this.sprintRemainingSec % 60).padStart(2, '0')}`;
+          }
+          if (this.sprintRemainingSec <= 0) {
+            this.stopSprintTimer();
+            this.creativeMsg = `Tiempo cumplido: lograste ${this.sprintDraftIdeas.length} ideas.`;
+            this.render(container);
+          }
+        }, 1000);
+        this.render(container);
+      }
+    });
+    container.querySelector('#al-cr-sprint-add')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const inp = container.querySelector<HTMLInputElement>('#al-cr-sprint-input');
+      const val = inp?.value.trim() ?? '';
+      if (!val) return;
+      this.sprintDraftIdeas.push(val);
+      this.render(container);
+      container.querySelector<HTMLInputElement>('#al-cr-sprint-input')?.focus();
+    });
+    container.querySelector('#al-cr-sprint-save-all')?.addEventListener('click', () => {
+      if (this.sprintDraftIdeas.length === 0) return;
+      this.stopSprintTimer();
+      const theme = SPRINT10_THEMES[this.sprintThemeIdx % SPRINT10_THEMES.length];
+      lifeStore.addCreativeIdea({
+        technique: 'sprint10',
+        prompt: theme,
+        idea: this.sprintDraftIdeas.map((s, i) => `${i + 1}. ${s}`).join('\n'),
+      });
+      this.sprintDraftIdeas = [];
+      this.sprintRemainingSec = 180;
+      this.creativeMsg = 'Sprint guardado en tu Banco de Ideas.';
+      this.render(container);
+    });
+    container.querySelector('#al-cr-sprint-clear')?.addEventListener('click', () => {
+      this.stopSprintTimer();
+      this.sprintDraftIdeas = [];
+      this.sprintRemainingSec = 180;
+      this.render(container);
+    });
+    container.querySelectorAll<HTMLButtonElement>('[data-cr-del]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        lifeStore.deleteCreativeIdea(btn.dataset.crDel!);
+        this.render(container);
+      });
+    });
   }
 
   public unmount(): void {
+    this.stopSprintTimer();
     this.saveTimers.forEach((t) => window.clearTimeout(t));
     this.saveTimers.clear();
   }

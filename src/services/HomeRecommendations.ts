@@ -47,7 +47,10 @@ const MODULE_TITLES: Record<PracticeModuleId, string> = {
   critical: 'Pensamiento Crítico',
   writing: 'Escritura Clara',
   finance: 'Finanzas Personales',
-  vitality: 'Energía y Postura',
+  vitality: 'Postura Pro y Energía',
+  compass: 'Brújula Personal',
+  career: 'Social y Carrera',
+  guides: 'Rutas y YouTube',
 };
 
 const MODULE_TO_HABIT: Partial<Record<PracticeModuleId, HabitKey>> = {
@@ -65,6 +68,9 @@ const MODULE_TO_HABIT: Partial<Record<PracticeModuleId, HabitKey>> = {
   writing: 'writing',
   finance: 'finance',
   vitality: 'vitality',
+  compass: 'compass',
+  career: 'career',
+  guides: 'guides',
 };
 
 export function formatRelativeTimeEs(ts: number, now = Date.now()): string {

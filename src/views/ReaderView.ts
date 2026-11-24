@@ -1,7 +1,7 @@
 import { CLASSIC_WIKISOURCE_SUGGESTIONS, READER_COMPREHENSION_PROMPTS } from '../data/KnowledgeBank';
 import { Icons } from '../icons';
 import { cloudSync } from '../services/CloudSync';
-import { saveNotebook, savePdfBytes } from '../services/NotebookStore';
+import { listNotebooks, saveNotebook, savePdfBytes } from '../services/NotebookStore';
 import {
   fetchRandomWikiSummary,
   fetchWikisourceFullText,
@@ -15,9 +15,23 @@ import {
 } from '../services/OnlineApi';
 import { buildBookPdf } from '../services/PdfTools';
 import { lifeStore } from '../state/LifeStore';
-import { DifficultyLevel, NotebookDoc } from '../types';
+import { BoardTextElement, DifficultyLevel, NotebookDoc } from '../types';
 import { bindDidacticBar, renderDidacticBar } from '../ui/DidacticBar';
 import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
+
+function formatOrpChunkHtml(wordsChunk: string): string {
+  const safe = wordsChunk.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const trimmed = wordsChunk.trim();
+  if (!trimmed) return '<span class="al-rsvp-pivot">·</span>';
+  // Find pivot index on first word (classic Optimal Recognition Point ~30% into word)
+  const len = trimmed.length;
+  const pivotIdx = len <= 1 ? 0 : len <= 5 ? 1 : len <= 9 ? 2 : len <= 13 ? 3 : 4;
+  const pre = trimmed.slice(0, pivotIdx).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const mid = trimmed[pivotIdx].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const post = trimmed.slice(pivotIdx + 1).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (!safe) return '';
+  return `<span class="al-rsvp-pre">${pre}</span><span class="al-rsvp-pivot">${mid}</span><span class="al-rsvp-post">${post}</span>`;
+}
 
 const READER_TUTORIALS: Record<'wikisource' | 'wikipedia' | 'openlibrary', Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
   wikisource: {
@@ -73,6 +87,44 @@ export class ReaderView {
   private pdfBusy = false;
   private autoLoadedLast = false;
   private guidedChunkIdx = 0;
+
+  // RSVP speed reader state
+  private rsvpWords: string[] = [];
+  private rsvpIdx = 0;
+  private rsvpPlaying = false;
+  private rsvpTimerId = 0;
+  private rsvpArticleTitle = '';
+  private closureStatus = '';
+
+  public unmount(): void {
+    this.stopRsvp();
+  }
+
+  private stopRsvp(): void {
+    if (this.rsvpTimerId) {
+      window.clearInterval(this.rsvpTimerId);
+      this.rsvpTimerId = 0;
+    }
+    this.rsvpPlaying = false;
+  }
+
+  private syncRsvpWords(): void {
+    if (!this.activeArticle) {
+      this.rsvpWords = [];
+      this.rsvpIdx = 0;
+      this.rsvpArticleTitle = '';
+      return;
+    }
+    if (this.rsvpArticleTitle !== this.activeArticle.title) {
+      this.stopRsvp();
+      this.rsvpArticleTitle = this.activeArticle.title;
+      this.rsvpWords = this.activeArticle.paragraphs
+        .join(' ')
+        .split(/\s+/)
+        .filter(Boolean);
+      this.rsvpIdx = 0;
+    }
+  }
 
   private chunkSizeFor(diff: DifficultyLevel): number {
     return diff === 'basico' ? 2 : diff === 'intermedio' ? 4 : 6;
@@ -148,9 +200,10 @@ export class ReaderView {
           <div class="al-seg-tabs" role="group" aria-label="Modo de estudio lector">
             <button type="button" class="al-seg-btn ${prog.mode === 'lectura' ? 'is-active' : ''}" data-rmode="lectura">Lectura completa</button>
             <button type="button" class="al-seg-btn ${prog.mode === 'guiada' ? 'is-active' : ''}" data-rmode="guiada">Lectura guiada por bloques</button>
-            <button type="button" class="al-seg-btn ${prog.mode === 'comprension' ? 'is-active' : ''}" data-rmode="comprension">Comprensión y notas</button>
+            <button type="button" class="al-seg-btn ${prog.mode === 'rsvp' ? 'is-active' : ''}" data-rmode="rsvp">Lectura rápida (RSVP)</button>
+            <button type="button" class="al-seg-btn ${prog.mode === 'comprension' ? 'is-active' : ''}" data-rmode="comprension">Comprensión y cierre</button>
           </div>
-          <span class="al-muted">Modo actual: <strong>${prog.mode === 'lectura' ? 'Texto continuo' : prog.mode === 'guiada' ? `Bloques de ${this.chunkSizeFor(diff)} párrafos` : 'Guía de síntesis guardada'}</strong></span>
+          <span class="al-muted">Modo actual: <strong>${prog.mode === 'lectura' ? 'Texto continuo' : prog.mode === 'guiada' ? `Bloques de ${this.chunkSizeFor(diff)} párrafos` : prog.mode === 'rsvp' ? `RSVP ${prog.rsvpWpm} PPM` : 'Cierre de comprensión activa'}</strong></span>
         </div>
 
         ${renderTutorialBanner({
@@ -272,6 +325,7 @@ export class ReaderView {
       : '';
 
     let bodyHtml = '';
+    this.syncRsvpWords();
     if (totalParas === 0) {
       const firstSub = this.activeArticle.subpages[0];
       bodyHtml = `
@@ -281,6 +335,46 @@ export class ReaderView {
             ? `<button type="button" class="al-btn al-btn-primary" data-open-ws="${firstSub.replace(/"/g, '&quot;')}">Abrir primer capítulo: ${firstSub.split('/').pop()}</button>`
             : ''
         }
+      `;
+    } else if (prog.mode === 'rsvp') {
+      const chunk = prog.rsvpChunk || 1;
+      const totalW = Math.max(1, this.rsvpWords.length);
+      const curChunkText = this.rsvpWords.slice(this.rsvpIdx, this.rsvpIdx + chunk).join(' ');
+      const pct = Math.min(100, Math.round((this.rsvpIdx / totalW) * 100));
+      bodyHtml = `
+        <div class="al-rsvp-stage">
+          <div class="al-rsvp-head">
+            <span class="al-mono-pill" id="al-rsvp-counter">Palabra ${Math.min(this.rsvpIdx + 1, totalW)} / ${totalW} (${pct}%)</span>
+            <div class="al-seg-tabs" role="group" aria-label="Palabras por golpe">
+              <button type="button" class="al-seg-btn ${chunk === 1 ? 'is-active' : ''}" data-rsvp-chunk="1">1 palabra</button>
+              <button type="button" class="al-seg-btn ${chunk === 2 ? 'is-active' : ''}" data-rsvp-chunk="2">2 palabras</button>
+            </div>
+          </div>
+
+          <div class="al-rsvp-window" aria-live="off">
+            <div class="al-rsvp-guide-top"></div>
+            <div class="al-rsvp-word" id="al-rsvp-word">${formatOrpChunkHtml(curChunkText)}</div>
+            <div class="al-rsvp-guide-bot"></div>
+          </div>
+
+          <progress class="al-didactic-meter" id="al-rsvp-prog" value="${pct}" max="100"></progress>
+
+          <div class="al-rsvp-controls">
+            <div class="al-tool-group">
+              <button type="button" class="al-btn" id="al-rsvp-rewind">${Icons.undo(14)}<span>-15 pal.</span></button>
+              <button type="button" class="al-btn al-btn-primary" id="al-rsvp-toggle">
+                ${this.rsvpPlaying ? Icons.pause(15) : Icons.play(15)}<span>${this.rsvpPlaying ? 'Pausar' : 'Reproducir'}</span>
+              </button>
+              <button type="button" class="al-btn" id="al-rsvp-restart">${Icons.refresh(14)}<span>Reiniciar</span></button>
+            </div>
+
+            <label class="al-inline-range">
+              <span>Velocidad: <strong id="al-rsvp-wpm-val">${prog.rsvpWpm} PPM</strong></span>
+              <input type="range" id="al-rsvp-wpm" min="180" max="550" step="10" value="${prog.rsvpWpm}" />
+            </label>
+          </div>
+          <p class="al-muted" style="margin:0;font-size:0.82rem">Fija la vista en la letra roja central (punto ORP) sin mover los ojos lateralmente. Al terminar, cambia a <strong>Comprensión y cierre</strong> para fijar la idea.</p>
+        </div>
       `;
     } else if (prog.mode === 'guiada') {
       const size = this.chunkSizeFor(diff);
@@ -308,19 +402,28 @@ export class ReaderView {
     }
 
     const prompts = READER_COMPREHENSION_PROMPTS[diff];
+    const closure = prog.activeClosures[this.activeArticle.title] ?? {
+      mainIdea: savedNote,
+      howToApply: '',
+      updatedAt: 0,
+    };
     const comprehensionHtml =
       prog.mode === 'comprension'
         ? `
         <div class="al-study-card" style="margin-top:16px">
-          <h3>Guía de comprensión (${diff === 'basico' ? 'Básico' : diff === 'intermedio' ? 'Intermedio' : 'Avanzado'})</h3>
+          <h3>Cierre de Comprensión Activa (${diff === 'basico' ? 'Básico' : diff === 'intermedio' ? 'Intermedio' : 'Avanzado'})</h3>
           <ul class="al-muted" style="margin:0;padding-left:18px">
             ${prompts.map((pr) => `<li>${pr}</li>`).join('')}
           </ul>
-          <label for="al-reader-note-input" style="font-size:0.85rem;font-weight:600">Tu síntesis y notas personales (se guardan por obra):</label>
-          <textarea id="al-reader-note-input" class="al-inline-note" placeholder="Escribe con tus palabras qué entendiste y cómo lo aplicarás...">${savedNote.replace(/</g, '&lt;')}</textarea>
+          <label for="al-reader-main-idea" style="font-size:0.85rem;font-weight:600">1. Idea principal (en 2-3 líneas con tus propias palabras):</label>
+          <textarea id="al-reader-main-idea" class="al-inline-note" placeholder="¿Qué sostiene el autor o cuál es el núcleo del texto?">${closure.mainIdea.replace(/</g, '&lt;')}</textarea>
+          <label for="al-reader-apply" style="font-size:0.85rem;font-weight:600">2. Cómo lo aplico (en mi estudio, trabajo o criterio diario):</label>
+          <textarea id="al-reader-apply" class="al-inline-note" placeholder="Una decisión, ejemplo o hábito donde aplicarás esta lectura...">${closure.howToApply.replace(/</g, '&lt;')}</textarea>
           <div class="al-tool-group">
-            <button type="button" class="al-btn al-btn-primary" id="al-save-reader-note">${Icons.check(15)}<span>Guardar síntesis y completar</span></button>
+            <button type="button" class="al-btn al-btn-primary" id="al-save-reader-note">${Icons.check(15)}<span>Guardar cierre y completar</span></button>
+            <button type="button" class="al-btn" id="al-export-closure-notebook">${Icons.tablet(15)}<span>Exportar página a Cuaderno</span></button>
           </div>
+          ${this.closureStatus ? `<span class="al-muted" style="font-size:0.82rem;color:var(--accent-primary)">${this.closureStatus}</span>` : ''}
         </div>
       `
         : '';
@@ -473,10 +576,83 @@ export class ReaderView {
 
     container.querySelectorAll<HTMLButtonElement>('[data-rmode]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const mode = btn.dataset.rmode as 'lectura' | 'guiada' | 'comprension';
+        this.stopRsvp();
+        const mode = btn.dataset.rmode as 'lectura' | 'guiada' | 'rsvp' | 'comprension';
         lifeStore.updateProgress('reader', { mode });
         this.render(container, opts);
       });
+    });
+
+    // RSVP controls
+    const startRsvpLoop = () => {
+      this.stopRsvp();
+      if (this.rsvpWords.length === 0) return;
+      if (this.rsvpIdx >= this.rsvpWords.length) this.rsvpIdx = 0;
+      const prog = lifeStore.get().progress.reader;
+      const chunk = prog.rsvpChunk || 1;
+      const msPerStep = Math.max(60, Math.round((60000 / Math.max(180, prog.rsvpWpm)) * chunk));
+      this.rsvpPlaying = true;
+      this.rsvpTimerId = window.setInterval(() => {
+        this.rsvpIdx += chunk;
+        const total = Math.max(1, this.rsvpWords.length);
+        if (this.rsvpIdx >= total) {
+          this.rsvpIdx = total - 1;
+          this.stopRsvp();
+          if (this.activeArticle) {
+            lifeStore.saveReaderScroll(this.activeArticle.title, 100);
+          }
+          this.render(container, opts);
+          return;
+        }
+        const wordEl = container.querySelector('#al-rsvp-word');
+        const cntEl = container.querySelector('#al-rsvp-counter');
+        const progEl = container.querySelector<HTMLProgressElement>('#al-rsvp-prog');
+        const pct = Math.min(100, Math.round((this.rsvpIdx / total) * 100));
+        if (wordEl) {
+          wordEl.innerHTML = formatOrpChunkHtml(this.rsvpWords.slice(this.rsvpIdx, this.rsvpIdx + chunk).join(' '));
+        }
+        if (cntEl) cntEl.textContent = `Palabra ${this.rsvpIdx + 1} / ${total} (${pct}%)`;
+        if (progEl) progEl.value = pct;
+      }, msPerStep);
+      this.render(container, opts);
+    };
+
+    container.querySelector('#al-rsvp-toggle')?.addEventListener('click', () => {
+      if (this.rsvpPlaying) {
+        this.stopRsvp();
+        if (this.activeArticle && this.rsvpWords.length > 0) {
+          lifeStore.saveReaderScroll(this.activeArticle.title, (this.rsvpIdx / this.rsvpWords.length) * 100);
+        }
+        this.render(container, opts);
+      } else {
+        startRsvpLoop();
+      }
+    });
+    container.querySelector('#al-rsvp-rewind')?.addEventListener('click', () => {
+      this.rsvpIdx = Math.max(0, this.rsvpIdx - 15);
+      this.render(container, opts);
+    });
+    container.querySelector('#al-rsvp-restart')?.addEventListener('click', () => {
+      this.stopRsvp();
+      this.rsvpIdx = 0;
+      this.render(container, opts);
+    });
+    container.querySelectorAll<HTMLButtonElement>('[data-rsvp-chunk]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const wasPlaying = this.rsvpPlaying;
+        this.stopRsvp();
+        lifeStore.updateProgress('reader', { rsvpChunk: Number(btn.dataset.rsvpChunk) === 2 ? 2 : 1 });
+        if (wasPlaying) startRsvpLoop();
+        else this.render(container, opts);
+      });
+    });
+    container.querySelector<HTMLInputElement>('#al-rsvp-wpm')?.addEventListener('change', (e) => {
+      const wpm = Math.max(180, Math.min(550, Number((e.target as HTMLInputElement).value) || 280));
+      const wasPlaying = this.rsvpPlaying;
+      this.stopRsvp();
+      lifeStore.updateProgress('reader', { rsvpWpm: wpm });
+      if (wasPlaying) startRsvpLoop();
+      else this.render(container, opts);
     });
 
     container.querySelector('#al-chunk-prev')?.addEventListener('click', () => {
@@ -513,12 +689,87 @@ export class ReaderView {
 
     container.querySelector('#al-save-reader-note')?.addEventListener('click', () => {
       if (!this.activeArticle) return;
-      const note = container.querySelector<HTMLTextAreaElement>('#al-reader-note-input')?.value ?? '';
-      lifeStore.saveReaderNote(this.activeArticle.title, note);
+      const mainIdea = container.querySelector<HTMLTextAreaElement>('#al-reader-main-idea')?.value ?? '';
+      const howToApply = container.querySelector<HTMLTextAreaElement>('#al-reader-apply')?.value ?? '';
+      lifeStore.saveReaderActiveClosure(this.activeArticle.title, mainIdea, howToApply);
       const words = this.activeArticle.paragraphs.join(' ').split(/\s+/).filter(Boolean).length;
-      const score = note.trim().length >= 40 ? 100 : note.trim().length >= 15 ? 80 : 60;
+      const combinedLen = mainIdea.trim().length + howToApply.trim().length;
+      const score = combinedLen >= 50 ? 100 : combinedLen >= 20 ? 85 : 65;
       lifeStore.recordReaderArticle(this.activeArticle.title, words, score);
+      this.closureStatus = 'Cierre de comprensión guardado en tus notas y sincronizado.';
       this.render(container, opts);
+    });
+
+    container.querySelector('#al-export-closure-notebook')?.addEventListener('click', async () => {
+      if (!this.activeArticle) return;
+      const mainIdea = container.querySelector<HTMLTextAreaElement>('#al-reader-main-idea')?.value.trim() ?? '';
+      const howToApply = container.querySelector<HTMLTextAreaElement>('#al-reader-apply')?.value.trim() ?? '';
+      if (!mainIdea && !howToApply) {
+        this.closureStatus = 'Escribe primero tu idea principal o aplicación antes de exportar.';
+        this.render(container, opts);
+        return;
+      }
+      lifeStore.saveReaderActiveClosure(this.activeArticle.title, mainIdea, howToApply);
+      try {
+        const docs = await listNotebooks();
+        let target = docs.find((d) => d.kind === 'notebook' && d.title === 'Síntesis de Lectura');
+        const nextPageNum = target ? target.pageCount + 1 : 1;
+        const elements: BoardTextElement[] = [
+          {
+            id: `txt-${Date.now()}-h`,
+            type: 'text',
+            x: 60,
+            y: 90,
+            text: `Lectura: ${this.activeArticle.title}`,
+            color: '#166534',
+            fontSize: 24,
+          },
+          {
+            id: `txt-${Date.now()}-m`,
+            type: 'text',
+            x: 60,
+            y: 170,
+            text: `Idea principal:\n${mainIdea || '—'}`,
+            color: '#141C2B',
+            fontSize: 18,
+          },
+          {
+            id: `txt-${Date.now()}-a`,
+            type: 'text',
+            x: 60,
+            y: 420,
+            text: `Cómo lo aplico:\n${howToApply || '—'}`,
+            color: '#0F766E',
+            fontSize: 18,
+          },
+        ];
+        if (!target) {
+          target = {
+            id: `nb-reader-${Date.now()}`,
+            title: 'Síntesis de Lectura',
+            kind: 'notebook',
+            paper: 'lined',
+            pageCount: 1,
+            pages: { 1: elements },
+            updatedAt: Date.now(),
+          };
+        } else {
+          target = {
+            ...target,
+            pageCount: nextPageNum,
+            pages: { ...target.pages, [nextPageNum]: elements },
+            updatedAt: Date.now(),
+          };
+        }
+        await saveNotebook(target);
+        lifeStore.updateModulePrefs('studio', { activeId: target.id, currentPage: nextPageNum });
+        void cloudSync.pushNotebook(target);
+        this.closureStatus = `Exportado a Cuaderno «Síntesis de Lectura» (pág. ${nextPageNum}).`;
+        this.render(container, opts);
+      } catch {
+        this.closureStatus = 'No se pudo exportar al Cuaderno local.';
+        this.render(container, opts);
+      }
     });
 
     container.querySelectorAll<HTMLButtonElement>('[data-src]').forEach((btn) => {

@@ -23,6 +23,7 @@ import {
 import { lifeStore } from '../state/LifeStore';
 import type { DifficultyLevel, DrawingGridMode, DrawingSymmetry, SavedCanvasStroke } from '../types';
 import { bindDidacticBar, difficultyLabel, renderDidacticBar } from '../ui/DidacticBar';
+import { renderYoutubeJumpCard } from '../ui/YoutubeJumpCard';
 import { bindTutorialBanners, renderTutorialBanner, type SectionTutorialSpec } from '../ui/TutorialBanner';
 
 const DRAWING_DIFF_HINTS: Record<DifficultyLevel, string> = {
@@ -651,6 +652,8 @@ export class DrawingView {
             </div>
           </div>
         </section>
+
+        ${renderYoutubeJumpCard('drawing')}
       </div>
     `;
 

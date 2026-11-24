@@ -18,6 +18,9 @@ export const DEFAULT_DIRECTORY_ORDER = [
   'mod-writing',
   'mod-finance',
   'mod-vitality',
+  'mod-compass',
+  'mod-career',
+  'mod-guides',
   'app-unumbral',
   'app-arena',
 ];

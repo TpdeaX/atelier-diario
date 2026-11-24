@@ -13,7 +13,10 @@ export type ModuleId =
   | 'critical'
   | 'writing'
   | 'finance'
-  | 'vitality';
+  | 'vitality'
+  | 'compass'
+  | 'career'
+  | 'guides';
 
 export type HabitKey =
   | 'read'
@@ -29,7 +32,10 @@ export type HabitKey =
   | 'critical'
   | 'writing'
   | 'finance'
-  | 'vitality';
+  | 'vitality'
+  | 'compass'
+  | 'career'
+  | 'guides';
 
 export type CalmPatternId = '478' | 'box' | 'sigh' | 'exhale36' | 'coherence';
 
@@ -119,12 +125,106 @@ export interface FinanceGoal {
   saved: number;
 }
 
+export type BodyZoneId =
+  | 'ojos'
+  | 'cuello'
+  | 'hombros'
+  | 'espalda_alta'
+  | 'lumbar'
+  | 'munecas'
+  | 'caderas';
+
 export interface VitalityDayLog {
   day: string;
   waterCups: number;
   sleepHours: number;
   energyLevel: number;
   breaksDone: number;
+  workoutType?: 'none' | 'fuerza' | 'cardio' | 'movilidad';
+  workoutIntensity?: 'suave' | 'media' | 'alta';
+  sorenessNote?: string;
+}
+
+export interface CompassDailyLog {
+  day: string;
+  win: string;
+  friction: string;
+  adjustment: string;
+  gratitude: string;
+  updatedAt: number;
+}
+
+export interface CompassWheelSnapshot {
+  month: string; // YYYY-MM
+  scores: Record<string, number>;
+  savedAt: number;
+}
+
+export interface CompassOkrMilestone {
+  id: string;
+  title: string;
+  done: boolean;
+}
+
+export interface CompassOkrGoal {
+  id: string;
+  title: string;
+  area: string;
+  targetDate: string;
+  milestones: CompassOkrMilestone[];
+  createdAt: number;
+}
+
+export interface AntiHabitTriggerLog {
+  at: number;
+  trigger: string;
+  replacement: string;
+  resisted: boolean;
+}
+
+export interface AntiHabitEntry {
+  id: string;
+  title: string;
+  cleanDays: number;
+  lastCleanDay: string;
+  replacementDefault: string;
+  logs: AntiHabitTriggerLog[];
+}
+
+export interface InterviewSessionEntry {
+  at: number;
+  questionId: string;
+  question: string;
+  category: 'star' | 'tecnica';
+  durationSec: number;
+  rubricScore: number;
+  note: string;
+}
+
+export type BragCategory = 'tecnico' | 'liderazgo' | 'academico' | 'personal';
+
+export interface BragLogEntry {
+  id: string;
+  date: string;
+  context: string;
+  action: string;
+  impact: string;
+  category: BragCategory;
+  createdAt: number;
+}
+
+export interface CreativeIdeaEntry {
+  id: string;
+  technique: 'scamper' | 'combinacion' | 'sprint10';
+  prompt: string;
+  idea: string;
+  createdAt: number;
+}
+
+export interface ReaderClosureEntry {
+  mainIdea: string;
+  howToApply: string;
+  updatedAt: number;
 }
 
 export interface LearningProgress {
@@ -143,12 +243,15 @@ export interface LearningProgress {
     studyChecklist: Record<string, boolean>;
   };
   reader: {
-    mode: 'lectura' | 'guiada' | 'comprension';
+    mode: 'lectura' | 'guiada' | 'rsvp' | 'comprension';
     readArticles: string[];
     scrollByTitle: Record<string, number>;
     quizScores: Record<string, number>;
     readingNotes: Record<string, string>;
     wordsRead: number;
+    rsvpWpm: number;
+    rsvpChunk: 1 | 2;
+    activeClosures: Record<string, ReaderClosureEntry>;
   };
   calligraphy: {
     modeExtra: 'trazos' | 'imprenta' | 'cursiva' | 'frase' | 'numeros' | 'ritmo';
@@ -190,10 +293,11 @@ export interface LearningProgress {
     wordNotes: Record<string, string>;
   };
   mindset: {
-    mode: 'tarjetas' | 'reto_hoy' | 'reflexion';
+    mode: 'tarjetas' | 'reto_hoy' | 'reflexion' | 'creatividad';
     completedActionIds: string[];
     reflections: Record<string, string>;
     dailyCheckins: number;
+    ideaBank: CreativeIdeaEntry[];
   };
   vault: {
     mode: 'explorar' | 'estudiar_hoy' | 'quiz_accion';
@@ -210,9 +314,10 @@ export interface LearningProgress {
     schulteMode: 'normal' | 'inverso' | 'doble';
     schulteBestByKey: Record<string, number>;
     oratoryHistory: OratorySessionEntry[];
-    recallMode: 'repaso' | 'quiz';
+    recallMode: 'repaso' | 'quiz' | 'feynman';
     recallDrafts: Record<string, string>;
     recallMasteredDecks: string[];
+    feynmanNotes: Record<string, string>;
   };
   singing: {
     activeTab: 'karaoke' | 'routines' | 'ear';
@@ -268,12 +373,46 @@ export interface LearningProgress {
     quizIdx: number;
   };
   vitality: {
-    activeTab: 'pausas' | 'registro' | 'postura';
+    activeTab: 'pausas' | 'monitor' | 'plan21' | 'registro';
     selectedRoutineId: string;
+    selectedZone: BodyZoneId | 'all';
     completedRoutines: number;
     routineHistory: Record<string, number>;
     postureChecks: Record<string, boolean>;
     dayLogs: VitalityDayLog[];
+    reminderIntervalMin: 0 | 20 | 30 | 45 | 60;
+    reminderNotify: boolean;
+    reminderSound: boolean;
+    uprightMinutes: number;
+    assessmentAnswers: Record<string, number>;
+    plan21DoneDays: number[];
+    nutritionChecksByDay: Record<string, Record<string, boolean>>;
+  };
+  compass: {
+    activeTab: 'diario' | 'metas' | 'antihabitos';
+    dailyLogs: Record<string, CompassDailyLog>;
+    weeklyChecks: Record<string, boolean>;
+    wheelScores: Record<string, number>;
+    wheelHistory: CompassWheelSnapshot[];
+    okrs: CompassOkrGoal[];
+    antiHabits: AntiHabitEntry[];
+    urgeSurfsCompleted: number;
+  };
+  career: {
+    activeTab: 'social' | 'entrevistas' | 'logros';
+    scenarioIdx: number;
+    masteredScenarioIds: string[];
+    interviewCategory: 'all' | 'star' | 'tecnica';
+    interviewIdx: number;
+    interviewDurationSec: 60 | 90 | 120;
+    interviewHistory: InterviewSessionEntry[];
+    bragLogs: BragLogEntry[];
+  };
+  guides: {
+    selectedTopicId: string;
+    searchQuery: string;
+    completedSteps: string[];
+    topicNotes: Record<string, string>;
   };
 }
 
@@ -293,6 +432,9 @@ const MODULE_IDS: readonly ModuleId[] = [
   'writing',
   'finance',
   'vitality',
+  'compass',
+  'career',
+  'guides',
 ];
 
 /** Interpreta `#calm?sos=1`, `#sos` y `#<modulo>`; cualquier otra cosa cae a home. */
@@ -394,10 +536,14 @@ export interface FlashcardItem {
   isCustom?: boolean;
 }
 
+export type Sm2Rating = 'again' | 'hard' | 'good' | 'easy';
+
 export interface FlashcardProgress {
   nextReviewAt: number;
   intervalDays: number;
   reps: number;
+  easeFactor?: number;
+  lapses?: number;
 }
 
 export interface ModulePreferences {

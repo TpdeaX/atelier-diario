@@ -1,8 +1,15 @@
 import { cloudSync } from '../services/CloudSync.ts';
 import type {
+  AntiHabitEntry,
+  BodyZoneId,
   BookBookmark,
+  BragLogEntry,
   CalmCheckinEntry,
   CalmPatternId,
+  CompassDailyLog,
+  CompassOkrGoal,
+  CompassWheelSnapshot,
+  CreativeIdeaEntry,
   DeviceProfile,
   DifficultyLevel,
   DrawingGridMode,
@@ -10,7 +17,9 @@ import type {
   FinanceGoal,
   FinanceTransaction,
   FlashcardItem,
+  FlashcardProgress,
   HabitKey,
+  InterviewSessionEntry,
   LearningProgress,
   LifeProfile,
   ModuleActivityEntry,
@@ -18,17 +27,79 @@ import type {
   OratorySessionEntry,
   PhraseItem,
   PracticeModuleId,
+  ReaderClosureEntry,
   ReframeEntry,
   SavedCalligraphyStroke,
   SavedCanvasStroke,
   SavedDecisionMatrix,
   SavedWord,
+  Sm2Rating,
   ThemeMode,
   TypingHistoryEntry,
   VaultItem,
   VaultStatus,
   VitalityDayLog,
 } from '../types.ts';
+
+export function computeSm2Review(
+  cur: FlashcardProgress | undefined,
+  rating: Sm2Rating,
+  now = Date.now()
+): Required<FlashcardProgress> {
+  const prevEf = typeof cur?.easeFactor === 'number' && Number.isFinite(cur.easeFactor) ? cur.easeFactor : 2.5;
+  const prevInterval = typeof cur?.intervalDays === 'number' && Number.isFinite(cur.intervalDays) ? Math.max(0, cur.intervalDays) : 0;
+  const prevReps = typeof cur?.reps === 'number' && Number.isFinite(cur.reps) ? Math.max(0, Math.floor(cur.reps)) : 0;
+  const prevLapses = typeof cur?.lapses === 'number' && Number.isFinite(cur.lapses) ? Math.max(0, Math.floor(cur.lapses)) : 0;
+
+  // Map 4 buttons to SM-2 quality q: again=1, hard=3, good=4, easy=5
+  const q = rating === 'again' ? 1 : rating === 'hard' ? 3 : rating === 'good' ? 4 : 5;
+  let ef = prevEf + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+  ef = Math.round(Math.max(1.3, Math.min(3.0, ef)) * 100) / 100;
+
+  if (rating === 'again') {
+    return {
+      reps: 0,
+      intervalDays: 0,
+      easeFactor: ef,
+      lapses: prevLapses + 1,
+      nextReviewAt: now + 10 * 60 * 1000,
+    };
+  }
+
+  let intervalDays: number;
+  const nextReps = prevReps + 1;
+  if (rating === 'hard') {
+    if (prevReps === 0) intervalDays = 1;
+    else if (prevReps === 1) intervalDays = Math.max(2, Math.round(prevInterval * 1.2));
+    else intervalDays = Math.max(prevInterval + 1, Math.round(prevInterval * 1.2));
+  } else if (rating === 'good') {
+    if (prevReps === 0) intervalDays = 1;
+    else if (prevReps === 1) intervalDays = 6;
+    else intervalDays = Math.max(prevInterval + 1, Math.round(prevInterval * ef));
+  } else {
+    // easy
+    if (prevReps === 0) intervalDays = 4;
+    else if (prevReps === 1) intervalDays = 8;
+    else intervalDays = Math.max(prevInterval + 2, Math.round(prevInterval * ef * 1.3));
+  }
+
+  intervalDays = Math.min(365, intervalDays);
+  return {
+    reps: nextReps,
+    intervalDays,
+    easeFactor: ef,
+    lapses: prevLapses,
+    nextReviewAt: now + intervalDays * 24 * 3600 * 1000,
+  };
+}
+
+export function formatSm2IntervalEs(intervalDays: number): string {
+  if (intervalDays <= 0) return '10 min';
+  if (intervalDays === 1) return '1 día';
+  if (intervalDays < 30) return `${intervalDays} días`;
+  const months = Math.round((intervalDays / 30) * 10) / 10;
+  return months === 1 ? '1 mes' : `${months} meses`;
+}
 
 const STORAGE_KEY = 'atelier_diario_profile_v1';
 const ECO_THEME_KEY = 'umbral-theme';
@@ -62,6 +133,9 @@ function emptyHabits(): Record<HabitKey, boolean> {
     writing: false,
     finance: false,
     vitality: false,
+    compass: false,
+    career: false,
+    guides: false,
   };
 }
 
@@ -153,6 +227,9 @@ export function defaultLearningProgress(): LearningProgress {
       writing: 'intermedio',
       finance: 'basico',
       vitality: 'basico',
+      compass: 'basico',
+      career: 'intermedio',
+      guides: 'basico',
     },
     activity: {
       lastModule: null,
@@ -172,6 +249,9 @@ export function defaultLearningProgress(): LearningProgress {
       quizScores: {},
       readingNotes: {},
       wordsRead: 0,
+      rsvpWpm: 280,
+      rsvpChunk: 1,
+      activeClosures: {},
     },
     calligraphy: {
       modeExtra: 'trazos',
@@ -217,6 +297,7 @@ export function defaultLearningProgress(): LearningProgress {
       completedActionIds: [],
       reflections: {},
       dailyCheckins: 0,
+      ideaBank: [],
     },
     vault: {
       mode: 'explorar',
@@ -236,6 +317,7 @@ export function defaultLearningProgress(): LearningProgress {
       recallMode: 'repaso',
       recallDrafts: {},
       recallMasteredDecks: [],
+      feynmanNotes: {},
     },
     singing: {
       activeTab: 'karaoke',
@@ -295,10 +377,78 @@ export function defaultLearningProgress(): LearningProgress {
     vitality: {
       activeTab: 'pausas',
       selectedRoutineId: 'vr-202020',
+      selectedZone: 'all',
       completedRoutines: 0,
       routineHistory: {},
       postureChecks: {},
       dayLogs: [],
+      reminderIntervalMin: 0,
+      reminderNotify: false,
+      reminderSound: true,
+      uprightMinutes: 0,
+      assessmentAnswers: {},
+      plan21DoneDays: [],
+      nutritionChecksByDay: {},
+    },
+    compass: {
+      activeTab: 'diario',
+      dailyLogs: {},
+      weeklyChecks: {},
+      wheelScores: {
+        salud: 7,
+        carrera: 7,
+        finanzas: 6,
+        relaciones: 7,
+        mente: 7,
+        creatividad: 6,
+        descanso: 6,
+        proposito: 7,
+      },
+      wheelHistory: [],
+      okrs: [],
+      antiHabits: [
+        {
+          id: 'ah-scroll',
+          title: 'Scrolling nocturno sin propósito',
+          cleanDays: 0,
+          lastCleanDay: '',
+          replacementDefault: 'Dejar el celular cargando lejos de la cama y leer 5 minutos.',
+          logs: [],
+        },
+        {
+          id: 'ah-late',
+          title: 'Trasnochar innecesariamente',
+          cleanDays: 0,
+          lastCleanDay: '',
+          replacementDefault: 'Cerrar pantallas 30 min antes y activar respiración 3-6.',
+          logs: [],
+        },
+        {
+          id: 'ah-procrast',
+          title: 'Procrastinar la tarea clave del día',
+          cleanDays: 0,
+          lastCleanDay: '',
+          replacementDefault: 'Aplicar regla de 5 minutos: abrir el archivo y hacer solo el primer paso.',
+          logs: [],
+        },
+      ],
+      urgeSurfsCompleted: 0,
+    },
+    career: {
+      activeTab: 'social',
+      scenarioIdx: 0,
+      masteredScenarioIds: [],
+      interviewCategory: 'all',
+      interviewIdx: 0,
+      interviewDurationSec: 90,
+      interviewHistory: [],
+      bragLogs: [],
+    },
+    guides: {
+      selectedTopicId: 'origami',
+      searchQuery: '',
+      completedSteps: [],
+      topicNotes: {},
     },
   };
 }
@@ -360,6 +510,9 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
     writing: normDiff(rd.writing, base.difficulty.writing),
     finance: normDiff(rd.finance, base.difficulty.finance),
     vitality: normDiff(rd.vitality, base.difficulty.vitality),
+    compass: normDiff(rd.compass, base.difficulty.compass),
+    career: normDiff(rd.career, base.difficulty.career),
+    guides: normDiff(rd.guides, base.difficulty.guides),
   };
 
   const rStudio = (raw.studio ?? {}) as Partial<LearningProgress['studio']>;
@@ -378,6 +531,9 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
   const rWrit = (raw.writing ?? {}) as Partial<LearningProgress['writing']>;
   const rFin = (raw.finance ?? {}) as Partial<LearningProgress['finance']>;
   const rVit = (raw.vitality ?? {}) as Partial<LearningProgress['vitality']>;
+  const rComp = (raw.compass ?? {}) as Partial<LearningProgress['compass']>;
+  const rCar = (raw.career ?? {}) as Partial<LearningProgress['career']>;
+  const rGui = (raw.guides ?? {}) as Partial<LearningProgress['guides']>;
 
   const VALID_PRACTICE_MODS: readonly PracticeModuleId[] = [
     'reader',
@@ -394,6 +550,9 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
     'writing',
     'finance',
     'vitality',
+    'compass',
+    'career',
+    'guides',
   ];
   const normMod = (v: unknown): PracticeModuleId | null =>
     VALID_PRACTICE_MODS.includes(v as PracticeModuleId) ? (v as PracticeModuleId) : null;
@@ -433,12 +592,20 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
     },
     reader: {
       mode:
-        rReader.mode === 'guiada' || rReader.mode === 'comprension' ? rReader.mode : 'lectura',
+        rReader.mode === 'guiada' || rReader.mode === 'comprension' || rReader.mode === 'rsvp'
+          ? rReader.mode
+          : 'lectura',
       readArticles: normStrArr(rReader.readArticles, 300),
       scrollByTitle: normNumRecord(rReader.scrollByTitle),
       quizScores: normNumRecord(rReader.quizScores),
       readingNotes: normStrRecord(rReader.readingNotes),
       wordsRead: clampNum(rReader.wordsRead, 0, 10000000, 0),
+      rsvpWpm: clampNum(rReader.rsvpWpm, 180, 550, 280),
+      rsvpChunk: rReader.rsvpChunk === 2 ? 2 : 1,
+      activeClosures:
+        rReader.activeClosures && typeof rReader.activeClosures === 'object'
+          ? { ...(rReader.activeClosures as Record<string, ReaderClosureEntry>) }
+          : {},
     },
     calligraphy: {
       modeExtra: ['trazos', 'imprenta', 'cursiva', 'frase', 'numeros', 'ritmo'].includes(
@@ -510,10 +677,13 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
     },
     mindset: {
       mode:
-        rMind.mode === 'reto_hoy' || rMind.mode === 'reflexion' ? rMind.mode : 'tarjetas',
+        rMind.mode === 'reto_hoy' || rMind.mode === 'reflexion' || rMind.mode === 'creatividad'
+          ? rMind.mode
+          : 'tarjetas',
       completedActionIds: normStrArr(rMind.completedActionIds, 300),
       reflections: normStrRecord(rMind.reflections),
       dailyCheckins: clampNum(rMind.dailyCheckins, 0, 100000, 0),
+      ideaBank: Array.isArray(rMind.ideaBank) ? (rMind.ideaBank as CreativeIdeaEntry[]).slice(0, 120) : [],
     },
     vault: {
       mode:
@@ -536,9 +706,13 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
           : 'normal',
       schulteBestByKey: normNumRecord(rFocus.schulteBestByKey),
       oratoryHistory: Array.isArray(rFocus.oratoryHistory) ? rFocus.oratoryHistory.slice(0, 40) : [],
-      recallMode: rFocus.recallMode === 'quiz' ? 'quiz' : 'repaso',
+      recallMode:
+        rFocus.recallMode === 'quiz' || rFocus.recallMode === 'feynman'
+          ? rFocus.recallMode
+          : 'repaso',
       recallDrafts: normStrRecord(rFocus.recallDrafts),
       recallMasteredDecks: normStrArr(rFocus.recallMasteredDecks, 100),
+      feynmanNotes: normStrRecord(rFocus.feynmanNotes),
     },
     singing: {
       activeTab:
@@ -617,15 +791,99 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
     },
     vitality: {
       activeTab:
-        rVit.activeTab === 'registro' || rVit.activeTab === 'postura' ? rVit.activeTab : 'pausas',
+        rVit.activeTab === 'monitor' || rVit.activeTab === 'plan21' || rVit.activeTab === 'registro'
+          ? rVit.activeTab
+          : (rVit.activeTab as string) === 'postura'
+            ? 'plan21'
+            : 'pausas',
       selectedRoutineId:
         typeof rVit.selectedRoutineId === 'string' && rVit.selectedRoutineId
           ? rVit.selectedRoutineId
           : base.vitality.selectedRoutineId,
+      selectedZone: (
+        ['all', 'ojos', 'cuello', 'hombros', 'espalda_alta', 'lumbar', 'munecas', 'caderas'] as const
+      ).includes(rVit.selectedZone as BodyZoneId | 'all')
+        ? (rVit.selectedZone as BodyZoneId | 'all')
+        : 'all',
       completedRoutines: clampNum(rVit.completedRoutines, 0, 100000, 0),
       routineHistory: normNumRecord(rVit.routineHistory),
       postureChecks: normBoolRecord(rVit.postureChecks),
       dayLogs: Array.isArray(rVit.dayLogs) ? rVit.dayLogs.slice(0, 60) : [],
+      reminderIntervalMin: ([0, 20, 30, 45, 60] as const).includes(
+        rVit.reminderIntervalMin as 0 | 20 | 30 | 45 | 60
+      )
+        ? (rVit.reminderIntervalMin as 0 | 20 | 30 | 45 | 60)
+        : 0,
+      reminderNotify: typeof rVit.reminderNotify === 'boolean' ? rVit.reminderNotify : false,
+      reminderSound: typeof rVit.reminderSound === 'boolean' ? rVit.reminderSound : true,
+      uprightMinutes: clampNum(rVit.uprightMinutes, 0, 1000000, 0),
+      assessmentAnswers: normNumRecord(rVit.assessmentAnswers),
+      plan21DoneDays: Array.isArray(rVit.plan21DoneDays)
+        ? Array.from(
+            new Set(
+              rVit.plan21DoneDays
+                .filter((n): n is number => typeof n === 'number' && Number.isInteger(n) && n >= 1 && n <= 21)
+            )
+          ).sort((a, b) => a - b)
+        : [],
+      nutritionChecksByDay:
+        rVit.nutritionChecksByDay && typeof rVit.nutritionChecksByDay === 'object'
+          ? Object.fromEntries(
+              Object.entries(rVit.nutritionChecksByDay as Record<string, unknown>)
+                .slice(0, 60)
+                .map(([day, rec]) => [day, normBoolRecord(rec)])
+            )
+          : {},
+    },
+    compass: {
+      activeTab:
+        rComp.activeTab === 'metas' || rComp.activeTab === 'antihabitos' ? rComp.activeTab : 'diario',
+      dailyLogs:
+        rComp.dailyLogs && typeof rComp.dailyLogs === 'object'
+          ? { ...(rComp.dailyLogs as Record<string, CompassDailyLog>) }
+          : {},
+      weeklyChecks: normBoolRecord(rComp.weeklyChecks),
+      wheelScores: {
+        ...base.compass.wheelScores,
+        ...Object.fromEntries(
+          Object.entries(normNumRecord(rComp.wheelScores)).map(([k, v]) => [k, Math.max(1, Math.min(10, Math.round(v)))])
+        ),
+      },
+      wheelHistory: Array.isArray(rComp.wheelHistory) ? (rComp.wheelHistory as CompassWheelSnapshot[]).slice(0, 24) : [],
+      okrs: Array.isArray(rComp.okrs) ? (rComp.okrs as CompassOkrGoal[]).slice(0, 3) : [],
+      antiHabits:
+        Array.isArray(rComp.antiHabits) && rComp.antiHabits.length > 0
+          ? (rComp.antiHabits as AntiHabitEntry[]).slice(0, 12)
+          : base.compass.antiHabits,
+      urgeSurfsCompleted: clampNum(rComp.urgeSurfsCompleted, 0, 100000, 0),
+    },
+    career: {
+      activeTab:
+        rCar.activeTab === 'entrevistas' || rCar.activeTab === 'logros' ? rCar.activeTab : 'social',
+      scenarioIdx: clampNum(rCar.scenarioIdx, 0, 200, 0),
+      masteredScenarioIds: normStrArr(rCar.masteredScenarioIds, 200),
+      interviewCategory:
+        rCar.interviewCategory === 'star' || rCar.interviewCategory === 'tecnica'
+          ? rCar.interviewCategory
+          : 'all',
+      interviewIdx: clampNum(rCar.interviewIdx, 0, 200, 0),
+      interviewDurationSec:
+        rCar.interviewDurationSec === 60 || rCar.interviewDurationSec === 120
+          ? rCar.interviewDurationSec
+          : 90,
+      interviewHistory: Array.isArray(rCar.interviewHistory)
+        ? (rCar.interviewHistory as InterviewSessionEntry[]).slice(0, 60)
+        : [],
+      bragLogs: Array.isArray(rCar.bragLogs) ? (rCar.bragLogs as BragLogEntry[]).slice(0, 120) : [],
+    },
+    guides: {
+      selectedTopicId:
+        typeof rGui.selectedTopicId === 'string' && rGui.selectedTopicId
+          ? rGui.selectedTopicId
+          : base.guides.selectedTopicId,
+      searchQuery: typeof rGui.searchQuery === 'string' ? rGui.searchQuery.slice(0, 120) : '',
+      completedSteps: normStrArr(rGui.completedSteps, 400),
+      topicNotes: normStrRecord(rGui.topicNotes),
     },
   };
 }
@@ -1218,23 +1476,13 @@ class LifeStore {
     this.save();
   }
 
-  public reviewFlashcard(id: string, rating: 'again' | 'good' | 'easy'): void {
-    const cur = this.profile.flashcardProgress[id] ?? { nextReviewAt: 0, intervalDays: 0, reps: 0 };
-    const nextReps = rating === 'again' ? 0 : cur.reps + 1;
-    const intervalDays =
-      rating === 'again'
-        ? 0
-        : rating === 'good'
-          ? Math.max(2, cur.intervalDays * 2 || 2)
-          : Math.max(5, cur.intervalDays * 3 || 5);
-    const nextReviewAt =
-      intervalDays === 0
-        ? Date.now() + 10 * 60 * 1000
-        : Date.now() + intervalDays * 24 * 3600 * 1000;
-    this.profile.flashcardProgress[id] = { nextReviewAt, intervalDays, reps: nextReps };
+  public reviewFlashcard(id: string, rating: Sm2Rating): Required<FlashcardProgress> {
+    const next = computeSm2Review(this.profile.flashcardProgress[id], rating);
+    this.profile.flashcardProgress[id] = next;
     this.profile.stats.recallReviewed += 1;
     this.markHabit('focuslab');
     this.save();
+    return next;
   }
 
   public addCustomFlashcard(deck: string, front: string, back: string): FlashcardItem {
@@ -1392,8 +1640,23 @@ class LifeStore {
         };
       case 'vitality':
         return {
-          label: `Energía y Postura · ${pr.vitality.activeTab === 'registro' ? 'Registro diario' : pr.vitality.activeTab === 'postura' ? 'Ergonomía' : 'Pausas activas'}`,
-          detail: `${pr.vitality.completedRoutines} pausas completadas · ${pr.vitality.dayLogs.length} días registrados`,
+          label: `Postura Pro y Energía · ${pr.vitality.activeTab === 'monitor' ? 'Monitor Live' : pr.vitality.activeTab === 'plan21' ? 'Plan 21 Días' : pr.vitality.activeTab === 'registro' ? 'Recuperación y Nutrición' : 'Mapa Corporal'}`,
+          detail: `${pr.vitality.completedRoutines} pausas · ${pr.vitality.plan21DoneDays.length}/21 días correctivos`,
+        };
+      case 'compass':
+        return {
+          label: `Brújula Personal · ${pr.compass.activeTab === 'metas' ? 'OKRs 90 días' : pr.compass.activeTab === 'antihabitos' ? 'Anti-Hábitos' : 'Diario y Rueda'}`,
+          detail: `${Object.keys(pr.compass.dailyLogs).length} diarios · ${pr.compass.okrs.length}/3 metas activas`,
+        };
+      case 'career':
+        return {
+          label: `Social y Carrera · ${pr.career.activeTab === 'entrevistas' ? 'Entrevistas STAR' : pr.career.activeTab === 'logros' ? 'Brag Document' : 'Habilidades Sociales'}`,
+          detail: `${pr.career.masteredScenarioIds.length} casos · ${pr.career.bragLogs.length} logros registrados`,
+        };
+      case 'guides':
+        return {
+          label: `Rutas y YouTube · ${pr.guides.selectedTopicId}`,
+          detail: `${pr.guides.completedSteps.length} etapas completadas`,
         };
     }
   }
@@ -1890,9 +2153,327 @@ class LifeStore {
     if (typeof patch.sleepHours === 'number') entry.sleepHours = Math.max(0, Math.min(16, Math.round(patch.sleepHours * 2) / 2));
     if (typeof patch.energyLevel === 'number') entry.energyLevel = Math.max(1, Math.min(10, Math.round(patch.energyLevel)));
     if (typeof patch.breaksDone === 'number') entry.breaksDone = Math.max(0, Math.round(patch.breaksDone));
+    if (patch.workoutType !== undefined) entry.workoutType = patch.workoutType;
+    if (patch.workoutIntensity !== undefined) entry.workoutIntensity = patch.workoutIntensity;
+    if (typeof patch.sorenessNote === 'string') entry.sorenessNote = patch.sorenessNote.trim().slice(0, 220);
     this.markHabit('vitality');
     this.save();
     return entry;
+  }
+
+  public toggleVitalityPlan21Day(dayNum: number): boolean {
+    if (dayNum < 1 || dayNum > 21) return false;
+    const arr = this.profile.progress.vitality.plan21DoneDays;
+    const idx = arr.indexOf(dayNum);
+    if (idx >= 0) {
+      arr.splice(idx, 1);
+      this.save();
+      return false;
+    }
+    arr.push(dayNum);
+    arr.sort((a, b) => a - b);
+    this.markHabit('vitality');
+    this.save();
+    return true;
+  }
+
+  public setVitalityAssessmentAnswer(testId: string, score: number): void {
+    this.profile.progress.vitality.assessmentAnswers[testId] = Math.max(0, Math.min(10, Math.round(score)));
+    this.markHabit('vitality');
+    this.save();
+  }
+
+  public addVitalityUprightMinutes(minutes: number): void {
+    if (minutes <= 0) return;
+    this.profile.progress.vitality.uprightMinutes = Math.round(
+      (this.profile.progress.vitality.uprightMinutes + minutes) * 10
+    ) / 10;
+    this.markHabit('vitality');
+    this.save();
+  }
+
+  public toggleVitalityNutritionCheck(itemId: string): boolean {
+    const today = todayStamp();
+    const map = this.profile.progress.vitality.nutritionChecksByDay;
+    if (!map[today]) map[today] = {};
+    const next = !map[today][itemId];
+    map[today][itemId] = next;
+    // Prune older than 30 days
+    const keys = Object.keys(map).sort().reverse();
+    for (const k of keys.slice(30)) delete map[k];
+    this.markHabit('vitality');
+    this.save();
+    return next;
+  }
+
+  /* ==================== READER CLOSURE, FEYNMAN & CREATIVITY ==================== */
+
+  public saveReaderActiveClosure(title: string, mainIdea: string, howToApply: string): void {
+    const key = title.trim();
+    if (!key) return;
+    this.profile.progress.reader.activeClosures[key] = {
+      mainIdea: mainIdea.trim().slice(0, 600),
+      howToApply: howToApply.trim().slice(0, 600),
+      updatedAt: Date.now(),
+    };
+    const combined = [
+      mainIdea.trim() ? `Idea principal: ${mainIdea.trim()}` : '',
+      howToApply.trim() ? `Cómo lo aplico: ${howToApply.trim()}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+    if (combined) {
+      this.profile.progress.reader.readingNotes[key] = combined;
+    }
+    this.markHabit('read');
+    this.save();
+  }
+
+  public saveFeynmanNote(cardId: string, text: string): void {
+    const clean = text.trim();
+    if (!clean) delete this.profile.progress.focuslab.feynmanNotes[cardId];
+    else {
+      this.profile.progress.focuslab.feynmanNotes[cardId] = clean.slice(0, 1200);
+      this.markHabit('focuslab');
+    }
+    this.save();
+  }
+
+  public addCreativeIdea(input: Omit<CreativeIdeaEntry, 'id' | 'createdAt'>): CreativeIdeaEntry {
+    const item: CreativeIdeaEntry = {
+      ...input,
+      prompt: input.prompt.trim().slice(0, 220),
+      idea: input.idea.trim().slice(0, 600),
+      id: `idea-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+      createdAt: Date.now(),
+    };
+    this.profile.progress.mindset.ideaBank.unshift(item);
+    this.profile.progress.mindset.ideaBank = this.profile.progress.mindset.ideaBank.slice(0, 120);
+    this.markHabit('mindset');
+    this.save();
+    return item;
+  }
+
+  public deleteCreativeIdea(id: string): void {
+    this.profile.progress.mindset.ideaBank = this.profile.progress.mindset.ideaBank.filter((x) => x.id !== id);
+    this.save();
+  }
+
+  /* ==================== COMPASS (BRÚJULA PERSONAL) ==================== */
+
+  public saveCompassDailyLog(patch: Partial<Omit<CompassDailyLog, 'day' | 'updatedAt'>>, day = todayStamp()): CompassDailyLog {
+    const map = this.profile.progress.compass.dailyLogs;
+    const prev = map[day] ?? { day, win: '', friction: '', adjustment: '', gratitude: '', updatedAt: 0 };
+    const next: CompassDailyLog = {
+      day,
+      win: patch.win !== undefined ? patch.win.trim().slice(0, 400) : prev.win,
+      friction: patch.friction !== undefined ? patch.friction.trim().slice(0, 400) : prev.friction,
+      adjustment: patch.adjustment !== undefined ? patch.adjustment.trim().slice(0, 400) : prev.adjustment,
+      gratitude: patch.gratitude !== undefined ? patch.gratitude.trim().slice(0, 400) : prev.gratitude,
+      updatedAt: Date.now(),
+    };
+    map[day] = next;
+    // Keep up to 90 recent days
+    const keys = Object.keys(map).sort().reverse();
+    for (const k of keys.slice(90)) delete map[k];
+    this.markHabit('compass');
+    this.save();
+    return next;
+  }
+
+  public setCompassWheelScore(areaId: string, score: number): void {
+    this.profile.progress.compass.wheelScores[areaId] = Math.max(1, Math.min(10, Math.round(score)));
+    this.markHabit('compass');
+    this.save();
+  }
+
+  public saveCompassWheelSnapshot(): CompassWheelSnapshot {
+    const d = new Date();
+    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const snap: CompassWheelSnapshot = {
+      month,
+      scores: { ...this.profile.progress.compass.wheelScores },
+      savedAt: Date.now(),
+    };
+    const hist = this.profile.progress.compass.wheelHistory.filter((h) => h.month !== month);
+    hist.unshift(snap);
+    this.profile.progress.compass.wheelHistory = hist.slice(0, 24);
+    this.markHabit('compass');
+    this.save();
+    return snap;
+  }
+
+  public addCompassOkr(input: { title: string; area: string; targetDate: string; milestones: string[] }): CompassOkrGoal | null {
+    const list = this.profile.progress.compass.okrs;
+    if (list.length >= 3) return null;
+    const goal: CompassOkrGoal = {
+      id: `okr-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+      title: input.title.trim().slice(0, 140),
+      area: input.area.trim().slice(0, 60) || 'Propósito',
+      targetDate: input.targetDate || todayStamp(),
+      milestones: input.milestones
+        .map((m) => m.trim())
+        .filter(Boolean)
+        .slice(0, 8)
+        .map((m, i) => ({ id: `ms-${Date.now()}-${i}`, title: m.slice(0, 140), done: false })),
+      createdAt: Date.now(),
+    };
+    list.push(goal);
+    this.markHabit('compass');
+    this.save();
+    return goal;
+  }
+
+  public toggleCompassOkrMilestone(okrId: string, milestoneId: string): void {
+    const goal = this.profile.progress.compass.okrs.find((o) => o.id === okrId);
+    if (!goal) return;
+    const ms = goal.milestones.find((m) => m.id === milestoneId);
+    if (!ms) return;
+    ms.done = !ms.done;
+    this.markHabit('compass');
+    this.save();
+  }
+
+  public addCompassOkrMilestone(okrId: string, title: string): void {
+    const goal = this.profile.progress.compass.okrs.find((o) => o.id === okrId);
+    if (!goal || !title.trim() || goal.milestones.length >= 10) return;
+    goal.milestones.push({
+      id: `ms-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+      title: title.trim().slice(0, 140),
+      done: false,
+    });
+    this.markHabit('compass');
+    this.save();
+  }
+
+  public deleteCompassOkr(okrId: string): void {
+    this.profile.progress.compass.okrs = this.profile.progress.compass.okrs.filter((o) => o.id !== okrId);
+    this.save();
+  }
+
+  public addAntiHabit(title: string, replacementDefault: string): AntiHabitEntry {
+    const item: AntiHabitEntry = {
+      id: `ah-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+      title: title.trim().slice(0, 120),
+      cleanDays: 0,
+      lastCleanDay: '',
+      replacementDefault: replacementDefault.trim().slice(0, 200) || 'Respirar 90s y cambiar de actividad.',
+      logs: [],
+    };
+    this.profile.progress.compass.antiHabits.unshift(item);
+    this.profile.progress.compass.antiHabits = this.profile.progress.compass.antiHabits.slice(0, 12);
+    this.markHabit('compass');
+    this.save();
+    return item;
+  }
+
+  public deleteAntiHabit(id: string): void {
+    this.profile.progress.compass.antiHabits = this.profile.progress.compass.antiHabits.filter((a) => a.id !== id);
+    this.save();
+  }
+
+  public markAntiHabitCleanDay(id: string): void {
+    const item = this.profile.progress.compass.antiHabits.find((a) => a.id === id);
+    if (!item) return;
+    const today = todayStamp();
+    if (item.lastCleanDay !== today) {
+      item.cleanDays += 1;
+      item.lastCleanDay = today;
+      this.markHabit('compass');
+      this.save();
+    }
+  }
+
+  public logAntiHabitTrigger(id: string, trigger: string, replacement: string, resisted: boolean): void {
+    const item = this.profile.progress.compass.antiHabits.find((a) => a.id === id);
+    if (!item) return;
+    item.logs.unshift({
+      at: Date.now(),
+      trigger: trigger.trim().slice(0, 180),
+      replacement: replacement.trim().slice(0, 180),
+      resisted,
+    });
+    item.logs = item.logs.slice(0, 25);
+    if (!resisted) {
+      item.cleanDays = 0;
+      item.lastCleanDay = '';
+    }
+    this.markHabit('compass');
+    this.save();
+  }
+
+  public recordUrgeSurfComplete(): void {
+    this.profile.progress.compass.urgeSurfsCompleted += 1;
+    this.markHabit('compass');
+    this.save();
+  }
+
+  /* ==================== CAREER (SOCIAL Y CARRERA) ==================== */
+
+  public recordCareerScenario(scenarioId: string, correct: boolean): void {
+    const c = this.profile.progress.career;
+    if (correct && !c.masteredScenarioIds.includes(scenarioId)) {
+      c.masteredScenarioIds.push(scenarioId);
+    }
+    this.markHabit('career');
+    this.save();
+  }
+
+  public recordInterviewSession(entry: Omit<InterviewSessionEntry, 'at'>): InterviewSessionEntry {
+    const item: InterviewSessionEntry = { ...entry, at: Date.now() };
+    this.profile.progress.career.interviewHistory.unshift(item);
+    this.profile.progress.career.interviewHistory = this.profile.progress.career.interviewHistory.slice(0, 60);
+    this.markHabit('career');
+    this.save();
+    return item;
+  }
+
+  public addBragLog(input: Omit<BragLogEntry, 'id' | 'createdAt'>): BragLogEntry {
+    const item: BragLogEntry = {
+      ...input,
+      date: input.date || todayStamp(),
+      context: input.context.trim().slice(0, 140),
+      action: input.action.trim().slice(0, 400),
+      impact: input.impact.trim().slice(0, 260),
+      id: `brag-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+      createdAt: Date.now(),
+    };
+    this.profile.progress.career.bragLogs.unshift(item);
+    this.profile.progress.career.bragLogs = this.profile.progress.career.bragLogs.slice(0, 120);
+    this.markHabit('career');
+    this.save();
+    return item;
+  }
+
+  public deleteBragLog(id: string): void {
+    this.profile.progress.career.bragLogs = this.profile.progress.career.bragLogs.filter((b) => b.id !== id);
+    this.save();
+  }
+
+  /* ==================== GUIDES (RUTAS Y YOUTUBE) ==================== */
+
+  public toggleGuideStep(stepKey: string): boolean {
+    const arr = this.profile.progress.guides.completedSteps;
+    const idx = arr.indexOf(stepKey);
+    if (idx >= 0) {
+      arr.splice(idx, 1);
+      this.save();
+      return false;
+    }
+    arr.push(stepKey);
+    this.markHabit('guides');
+    this.save();
+    return true;
+  }
+
+  public saveGuideTopicNote(topicId: string, note: string): void {
+    const clean = note.trim();
+    if (!clean) delete this.profile.progress.guides.topicNotes[topicId];
+    else {
+      this.profile.progress.guides.topicNotes[topicId] = clean.slice(0, 1200);
+      this.markHabit('guides');
+    }
+    this.save();
   }
 
   public getOverallMasterySummary(): {
@@ -1928,11 +2509,13 @@ class LifeStore {
       mindset: clamp(
         (pr.mindset.completedActionIds.length * 4 +
           Object.keys(pr.mindset.reflections).length * 6 +
+          pr.mindset.ideaBank.length * 4 +
           p.favoritePhraseIds.length * 2)
       ),
       focuslab: clamp(
         p.stats.oratorySessions * 6 +
           Object.keys(pr.focuslab.schulteBestByKey).length * 8 +
+          Object.keys(pr.focuslab.feynmanNotes).length * 5 +
           p.stats.recallReviewed * 1.5
       ),
       singing: clamp(
@@ -1956,9 +2539,25 @@ class LifeStore {
           Math.min(25, pr.finance.goals.filter((g) => g.saved > 0).length * 12)
       ),
       vitality: clamp(
-        pr.vitality.completedRoutines * 10 +
-          Object.values(pr.vitality.postureChecks).filter(Boolean).length * 6 +
-          pr.vitality.dayLogs.length * 8
+        pr.vitality.completedRoutines * 6 +
+          Object.values(pr.vitality.postureChecks).filter(Boolean).length * 4 +
+          pr.vitality.plan21DoneDays.length * 2.5 +
+          pr.vitality.dayLogs.length * 5
+      ),
+      compass: clamp(
+        Object.keys(pr.compass.dailyLogs).length * 8 +
+          pr.compass.okrs.length * 12 +
+          pr.compass.wheelHistory.length * 10 +
+          pr.compass.urgeSurfsCompleted * 6
+      ),
+      career: clamp(
+        (pr.career.masteredScenarioIds.length / 18) * 55 +
+          pr.career.interviewHistory.length * 7 +
+          pr.career.bragLogs.length * 6
+      ),
+      guides: clamp(
+        (pr.guides.completedSteps.length / 36) * 80 +
+          Object.keys(pr.guides.topicNotes).length * 5
       ),
     };
 

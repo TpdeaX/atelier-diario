@@ -4,6 +4,7 @@ import {
   VibratoReading,
   voiceStudio,
 } from '../audio/VoiceStudio';
+import { renderYoutubeJumpCard } from '../ui/YoutubeJumpCard';
 import {
   EAR_INTERVALS,
   EAR_INTERVALS_FULL,
@@ -385,6 +386,8 @@ export class SingingView {
             </div>
           </div>
         </section>
+
+        ${renderYoutubeJumpCard('singing')}
       </div>
     `;
 

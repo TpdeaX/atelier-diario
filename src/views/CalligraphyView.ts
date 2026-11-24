@@ -3,6 +3,7 @@ import { lifeStore } from '../state/LifeStore';
 import { DifficultyLevel, SavedCalligraphyStroke } from '../types';
 import { bindDidacticBar, renderDidacticBar } from '../ui/DidacticBar';
 import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
+import { renderYoutubeJumpCard } from '../ui/YoutubeJumpCard';
 
 type DrillMode = 'trazos' | 'imprenta' | 'cursiva' | 'frase' | 'numeros' | 'ritmo';
 
@@ -287,6 +288,8 @@ export class CalligraphyView {
               .join('')}
           </div>
         </div>
+
+        ${renderYoutubeJumpCard('calligraphy')}
       </div>
     `;
 

@@ -9,10 +9,13 @@ import { ModuleId, parseHashRoute } from './types';
 import { EcosystemModals } from './ui/EcosystemModals';
 import { CalligraphyView } from './views/CalligraphyView';
 import { CalmView } from './views/CalmView';
+import { CareerView } from './views/CareerView';
+import { CompassView } from './views/CompassView';
 import { CriticalView } from './views/CriticalView';
 import { DrawingView } from './views/DrawingView';
 import { FinanceView } from './views/FinanceView';
 import { FocusLabView } from './views/FocusLabView';
+import { GuidesView } from './views/GuidesView';
 import { HomeView } from './views/HomeView';
 import { LanguageView } from './views/LanguageView';
 import { MindsetView } from './views/MindsetView';
@@ -38,7 +41,10 @@ const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[]
   { id: 'critical', label: 'Crítico', icon: Icons.scale },
   { id: 'writing', label: 'Escritura', icon: Icons.feather },
   { id: 'finance', label: 'Finanzas', icon: Icons.wallet },
-  { id: 'vitality', label: 'Postura', icon: Icons.activity },
+  { id: 'vitality', label: 'Postura Pro', icon: Icons.activity },
+  { id: 'compass', label: 'Brújula', icon: Icons.compass },
+  { id: 'career', label: 'Social/Carrera', icon: Icons.briefcase },
+  { id: 'guides', label: 'Rutas YouTube', icon: Icons.youtube },
 ];
 
 const root = document.getElementById('app')!;
@@ -57,6 +63,9 @@ const criticalView = new CriticalView();
 const writingView = new WritingView();
 const financeView = new FinanceView();
 const vitalityView = new VitalityView();
+const compassView = new CompassView();
+const careerView = new CareerView();
+const guidesView = new GuidesView();
 
 const initialRoute = parseHashRoute(window.location.hash);
 let currentModule: ModuleId = initialRoute.moduleId;
@@ -93,6 +102,18 @@ function navigate(next: ModuleId, options?: { sos?: boolean }): void {
   }
   if (currentModule === 'vitality' && next !== 'vitality') {
     vitalityView.unmount();
+  }
+  if (currentModule === 'compass' && next !== 'compass') {
+    compassView.unmount();
+  }
+  if (currentModule === 'career' && next !== 'career') {
+    careerView.unmount();
+  }
+  if (currentModule === 'reader' && next !== 'reader') {
+    readerView.unmount();
+  }
+  if (currentModule === 'mindset' && next !== 'mindset') {
+    mindsetView.unmount();
   }
   currentModule = next;
   if (next !== 'home') {
@@ -282,6 +303,15 @@ function renderApp(): void {
       break;
     case 'vitality':
       vitalityView.render(mainEl);
+      break;
+    case 'compass':
+      compassView.render(mainEl, navigate);
+      break;
+    case 'career':
+      careerView.render(mainEl);
+      break;
+    case 'guides':
+      guidesView.render(mainEl, navigate);
       break;
   }
 }
