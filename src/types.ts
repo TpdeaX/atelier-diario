@@ -73,10 +73,22 @@ export interface SavedCalligraphyStroke {
   points: [number, number, number][];
 }
 
+export interface ModuleActivityEntry {
+  moduleId: PracticeModuleId;
+  at: number;
+  label: string;
+  detail: string;
+}
+
 export interface LearningProgress {
   tutorialsDone: string[];
   tutorialsOpen: Record<string, boolean>;
   difficulty: Record<PracticeModuleId, DifficultyLevel>;
+  activity: {
+    lastModule: PracticeModuleId | null;
+    lastVisitedAt: number;
+    recent: ModuleActivityEntry[];
+  };
   studio: {
     mode: 'libre' | 'plantilla' | 'repaso';
     templateId: string;

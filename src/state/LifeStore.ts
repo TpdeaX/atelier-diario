@@ -11,6 +11,7 @@ import type {
   HabitKey,
   LearningProgress,
   LifeProfile,
+  ModuleActivityEntry,
   ModulePreferences,
   OratorySessionEntry,
   PhraseItem,
@@ -141,6 +142,11 @@ export function defaultLearningProgress(): LearningProgress {
       focuslab: 'intermedio',
       singing: 'basico',
       calm: 'intermedio',
+    },
+    activity: {
+      lastModule: null,
+      lastVisitedAt: 0,
+      recent: [],
     },
     studio: {
       mode: 'libre',
@@ -316,6 +322,37 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
   const rFocus = (raw.focuslab ?? {}) as Partial<LearningProgress['focuslab']>;
   const rSing = (raw.singing ?? {}) as Partial<LearningProgress['singing']>;
   const rCalm = (raw.calm ?? {}) as Partial<LearningProgress['calm']>;
+  const rAct = (raw.activity ?? {}) as Partial<LearningProgress['activity']>;
+
+  const VALID_PRACTICE_MODS: readonly PracticeModuleId[] = [
+    'reader',
+    'calligraphy',
+    'studio',
+    'typing',
+    'language',
+    'mindset',
+    'vault',
+    'focuslab',
+    'singing',
+    'drawing',
+    'calm',
+  ];
+  const normMod = (v: unknown): PracticeModuleId | null =>
+    VALID_PRACTICE_MODS.includes(v as PracticeModuleId) ? (v as PracticeModuleId) : null;
+  const normRecent: ModuleActivityEntry[] = Array.isArray(rAct.recent)
+    ? rAct.recent
+        .filter(
+          (e): e is ModuleActivityEntry =>
+            Boolean(e && typeof e === 'object' && normMod((e as ModuleActivityEntry).moduleId))
+        )
+        .map((e) => ({
+          moduleId: e.moduleId,
+          at: typeof e.at === 'number' && Number.isFinite(e.at) ? e.at : 0,
+          label: typeof e.label === 'string' ? e.label.slice(0, 120) : '',
+          detail: typeof e.detail === 'string' ? e.detail.slice(0, 140) : '',
+        }))
+        .slice(0, 8)
+    : [];
 
   const clampNum = (v: unknown, min: number, max: number, fb: number): number =>
     typeof v === 'number' && Number.isFinite(v) ? Math.min(max, Math.max(min, v)) : fb;
@@ -324,6 +361,11 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
     tutorialsDone: normStrArr(raw.tutorialsDone, 200),
     tutorialsOpen: normBoolRecord(raw.tutorialsOpen),
     difficulty,
+    activity: {
+      lastModule: normMod(rAct.lastModule),
+      lastVisitedAt: typeof rAct.lastVisitedAt === 'number' && Number.isFinite(rAct.lastVisitedAt) ? rAct.lastVisitedAt : 0,
+      recent: normRecent,
+    },
     studio: {
       mode:
         rStudio.mode === 'plantilla' || rStudio.mode === 'repaso' ? rStudio.mode : 'libre',
@@ -1123,12 +1165,130 @@ class LifeStore {
   }
 
   public updateProgress<
-    K extends Exclude<keyof LearningProgress, 'tutorialsDone' | 'tutorialsOpen' | 'difficulty'>,
+    K extends Exclude<keyof LearningProgress, 'tutorialsDone' | 'tutorialsOpen' | 'difficulty' | 'activity'>,
   >(section: K, patch: Partial<LearningProgress[K]>): void {
     this.profile.progress[section] = {
       ...this.profile.progress[section],
       ...patch,
     } as LearningProgress[K];
+    this.save();
+  }
+
+  public describeModuleState(moduleId: PracticeModuleId): { label: string; detail: string } {
+    const p = this.profile;
+    const pr = p.progress;
+    const diff = pr.difficulty[moduleId] ?? 'intermedio';
+    const diffName = diff === 'basico' ? 'Básico' : diff === 'intermedio' ? 'Intermedio' : 'Avanzado';
+
+    switch (moduleId) {
+      case 'studio': {
+        const mode = pr.studio.mode === 'plantilla' ? 'Plantillas didácticas' : pr.studio.mode === 'repaso' ? 'Checklist de estudio' : 'Hoja libre';
+        return {
+          label: `Cuaderno y PDF · ${mode}`,
+          detail: `Página ${p.modulePrefs.studio.currentPage} · Dificultad ${diffName}`,
+        };
+      }
+      case 'reader': {
+        const title = p.modulePrefs.reader.lastArticleTitle;
+        const pct = title ? pr.reader.scrollByTitle[title] : undefined;
+        return {
+          label: title ? `Lectura · ${title.slice(0, 48)}` : 'Biblioteca y Lector',
+          detail:
+            typeof pct === 'number' && pct > 0
+              ? `Avance ${pct}% · ${pr.reader.readArticles.length} textos completados`
+              : `Modo ${pr.reader.mode} · Dificultad ${diffName}`,
+        };
+      }
+      case 'calligraphy': {
+        const mode = pr.calligraphy.modeExtra;
+        const idx = p.modulePrefs.calligraphy.sampleIdx + 1;
+        return {
+          label: `Caligrafía · ${mode} (muestra ${idx})`,
+          detail: `${pr.calligraphy.completedTemplates.length} muestras dominadas · ${diffName}`,
+        };
+      }
+      case 'drawing': {
+        const mode = pr.drawing.modeExtra;
+        const drafts = Object.keys(pr.drawing.savedDrafts).length;
+        return {
+          label:
+            mode === 'challenge'
+              ? 'Taller de Dibujo · Retos creativos'
+              : mode === 'free'
+                ? 'Taller de Dibujo · Lienzo libre'
+                : `Taller de Dibujo · ${p.modulePrefs.drawing.lessonId}`,
+          detail: `${pr.drawing.completedLessons.length}/56 láminas · ${drafts} borrador(es) · ${diffName}`,
+        };
+      }
+      case 'typing': {
+        const mode = p.deviceMode === 'mobile' ? pr.typing.mobileExtraMode : pr.typing.pcExtraMode;
+        return {
+          label: `Mecanografía · Modo ${mode}`,
+          detail: `Récord PC ${p.stats.bestWpmPc} / Móvil ${p.stats.bestWpmMobile} PPM · ${diffName}`,
+        };
+      }
+      case 'language': {
+        const missed = pr.language.missedOrthoIds.length;
+        return {
+          label: `Ortografía y Léxico · ${p.modulePrefs.language.tab === 'vocab' ? 'Vocabulario' : p.modulePrefs.language.tab === 'dict' ? 'Diccionario' : 'Ortografía'}`,
+          detail:
+            missed > 0
+              ? `${missed} fallo(s) por repasar · ${pr.language.masteredOrthoIds.length} dominadas`
+              : `${pr.language.masteredOrthoIds.length} reglas dominadas · ${diffName}`,
+        };
+      }
+      case 'mindset':
+        return {
+          label: `Frases y Criterio · ${pr.mindset.mode === 'reto_hoy' ? 'Reto de hoy' : pr.mindset.mode === 'reflexion' ? 'Diario de reflexión' : 'Cuaderno'}`,
+          detail: `${pr.mindset.completedActionIds.length} acciones cumplidas · ${Object.keys(pr.mindset.reflections).length} reflexiones`,
+        };
+      case 'vault':
+        return {
+          label: `Baúl de Guardados · ${pr.vault.mode === 'estudiar_hoy' ? 'Estudiar hoy' : pr.vault.mode === 'quiz_accion' ? 'Reto de aplicación' : 'Explorar'}`,
+          detail: `Meta hoy: ${pr.vault.reviewedToday}/${pr.vault.dailyGoal} · ${Object.keys(pr.vault.actionPlans).length} planes`,
+        };
+      case 'focuslab': {
+        const tabLabel =
+          p.modulePrefs.focuslab.tab === 'schulte'
+            ? `Schulte ${p.modulePrefs.focuslab.schulteSize}x${p.modulePrefs.focuslab.schulteSize} (${pr.focuslab.schulteMode})`
+            : p.modulePrefs.focuslab.tab === 'recall'
+              ? `Evocación Activa (${pr.focuslab.recallMode})`
+              : 'Oratoria y Dicción';
+        return {
+          label: `Oratoria y Enfoque · ${tabLabel}`,
+          detail: `${p.stats.oratorySessions} exposiciones · ${p.stats.recallReviewed} evocaciones`,
+        };
+      }
+      case 'singing': {
+        const tab = pr.singing.activeTab;
+        return {
+          label: `Estudio de Canto · ${tab === 'karaoke' ? 'Karaoke guiado' : tab === 'ear' ? `Oído (${pr.singing.earMode})` : 'Rutinas vocales'}`,
+          detail: `${Object.keys(p.stats.singingSongBest).length} canciones · Oído ${pr.singing.earCorrect}/${pr.singing.earTotal}`,
+        };
+      }
+      case 'calm': {
+        const tab = pr.calm.activeTab;
+        return {
+          label: `Centro de Calma · ${tab === 'sos' ? 'SOS Pánico' : tab === 'checkin' ? 'Registro emocional' : 'Reencuadre'}`,
+          detail: `${p.stats.calmSessions} sesiones · ${pr.calm.checkins.length} registros emocionales`,
+        };
+      }
+    }
+  }
+
+  public recordModuleVisit(moduleId: PracticeModuleId, customLabel?: string, customDetail?: string): void {
+    const now = Date.now();
+    const desc = this.describeModuleState(moduleId);
+    const entry: ModuleActivityEntry = {
+      moduleId,
+      at: now,
+      label: customLabel || desc.label,
+      detail: customDetail || desc.detail,
+    };
+    const act = this.profile.progress.activity;
+    act.lastModule = moduleId;
+    act.lastVisitedAt = now;
+    act.recent = [entry, ...act.recent.filter((x) => x.moduleId !== moduleId)].slice(0, 6);
     this.save();
   }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'atelier-diario-v9';
+const CACHE_NAME = 'atelier-diario-v10';
 const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {

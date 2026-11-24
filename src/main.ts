@@ -61,6 +61,9 @@ function applyTheme(): void {
 }
 
 function navigate(next: ModuleId, options?: { sos?: boolean }): void {
+  if (currentModule !== 'home' && currentModule !== next) {
+    lifeStore.recordModuleVisit(currentModule);
+  }
   if (currentModule === 'singing' && next !== 'singing') {
     singingView.unmount();
   }
@@ -80,6 +83,9 @@ function navigate(next: ModuleId, options?: { sos?: boolean }): void {
     focusLabView.unmount();
   }
   currentModule = next;
+  if (next !== 'home') {
+    lifeStore.recordModuleVisit(next);
+  }
   pendingSos = Boolean(options?.sos && next === 'calm');
   const nextHash =
     next === 'home' ? './' : next === 'calm' && pendingSos ? '#calm?sos=1' : `#${next}`;

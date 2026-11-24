@@ -19,6 +19,7 @@ let drawing: typeof import('../src/data/DrawingBank.ts');
 let focus: typeof import('../src/data/FocusLabBank.ts');
 let singing: typeof import('../src/data/SingingBank.ts');
 let calm: typeof import('../src/data/CalmBank.ts');
+let homeRecs: typeof import('../src/services/HomeRecommendations.ts');
 
 before(async () => {
   store = await import('../src/state/LifeStore.ts');
@@ -27,6 +28,7 @@ before(async () => {
   focus = await import('../src/data/FocusLabBank.ts');
   singing = await import('../src/data/SingingBank.ts');
   calm = await import('../src/data/CalmBank.ts');
+  homeRecs = await import('../src/services/HomeRecommendations.ts');
 });
 
 describe('LearningProgress: normalizacion, dificultad y guardado completo', () => {
@@ -180,5 +182,23 @@ describe('Bancos didacticos ampliados (0 emojis e integridad)', () => {
     for (const ex of calm.REFRAME_EXAMPLES) {
       assert.ok(!EMOJI_RE.test(`${ex.label} ${ex.worry} ${ex.control} ${ex.nextStep}`));
     }
+  });
+});
+
+describe('HomeRecommendations: lo que dejaste, pendientes y recomendaciones', () => {
+  it('registra visitas, detecta pendientes reales y genera recomendaciones', () => {
+    const ls = store.lifeStore;
+    ls.recordModuleVisit('drawing');
+    ls.recordOrthoResult('o82', false);
+    ls.saveReaderScroll('Cartas a Lucilio', 45);
+    const summary = ls.getOverallMasterySummary();
+    const cockpit = homeRecs.buildHomeCockpit(ls.get(), summary.byModule, null, Date.now());
+
+    assert.ok(cockpit.resume, 'debe existir tarjeta resume');
+    assert.equal(cockpit.resume?.moduleId, 'drawing');
+    assert.ok(cockpit.pending.some((p) => p.id === 'pend-reader'), 'debe detectar lectura a medias');
+    assert.ok(cockpit.pending.some((p) => p.id === 'pend-ortho'), 'debe detectar fallos de ortografia');
+    assert.ok(cockpit.recommended.length >= 2, 'debe sugerir recomendaciones de hoy');
+    assert.ok(cockpit.recent.length >= 1, 'debe guardar historial reciente');
   });
 });
