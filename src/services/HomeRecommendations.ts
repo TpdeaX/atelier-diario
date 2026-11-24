@@ -44,6 +44,10 @@ const MODULE_TITLES: Record<PracticeModuleId, string> = {
   focuslab: 'Oratoria y Enfoque',
   singing: 'Estudio de Canto',
   calm: 'Centro de Calma',
+  critical: 'Pensamiento Crítico',
+  writing: 'Escritura Clara',
+  finance: 'Finanzas Personales',
+  vitality: 'Energía y Postura',
 };
 
 const MODULE_TO_HABIT: Partial<Record<PracticeModuleId, HabitKey>> = {
@@ -57,6 +61,10 @@ const MODULE_TO_HABIT: Partial<Record<PracticeModuleId, HabitKey>> = {
   focuslab: 'focuslab',
   singing: 'singing',
   calm: 'calm',
+  critical: 'critical',
+  writing: 'writing',
+  finance: 'finance',
+  vitality: 'vitality',
 };
 
 export function formatRelativeTimeEs(ts: number, now = Date.now()): string {
@@ -247,6 +255,35 @@ export function buildHomeCockpit(
       subtitle: 'Dejaste tu sesión sensorial a medias; puedes completarla en 2 minutos.',
       badge: `${groundCount}/15`,
       cta: 'Continuar calma',
+      priority: 'normal',
+      durationLabel: '2 min',
+    });
+  }
+
+  // Casos fallados en Pensamiento Crítico
+  if (pr.critical.missedIds.length > 0) {
+    const n = pr.critical.missedIds.length;
+    pending.push({
+      id: 'pend-critical',
+      moduleId: 'critical',
+      title: `Repasar ${n} ${n === 1 ? 'sesgo fallado' : 'sesgos fallados'} en Criterio Crítico`,
+      subtitle: 'Tienes casos pendientes en la cola de repaso para afinar tu criterio.',
+      badge: `${n} ${n === 1 ? 'pendiente' : 'pendientes'}`,
+      cta: 'Repasar casos',
+      priority: 'high',
+      durationLabel: '3 min',
+    });
+  }
+
+  // Pausa activa recomendada si hoy aún no hizo pausas
+  if (!profile.todayHabits.vitality) {
+    pending.push({
+      id: 'pend-vitality',
+      moduleId: 'vitality',
+      title: 'Pausa activa y descanso visual 20-20-20',
+      subtitle: 'Aún no registras pausas de postura o agua hoy. Haz una rutina guiada de 2 min.',
+      badge: 'Salud PC',
+      cta: 'Hacer pausa',
       priority: 'normal',
       durationLabel: '2 min',
     });

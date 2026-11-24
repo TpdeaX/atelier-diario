@@ -7,6 +7,8 @@ import type {
   DifficultyLevel,
   DrawingGridMode,
   DrawingSymmetry,
+  FinanceGoal,
+  FinanceTransaction,
   FlashcardItem,
   HabitKey,
   LearningProgress,
@@ -19,11 +21,13 @@ import type {
   ReframeEntry,
   SavedCalligraphyStroke,
   SavedCanvasStroke,
+  SavedDecisionMatrix,
   SavedWord,
   ThemeMode,
   TypingHistoryEntry,
   VaultItem,
   VaultStatus,
+  VitalityDayLog,
 } from '../types.ts';
 
 const STORAGE_KEY = 'atelier_diario_profile_v1';
@@ -54,6 +58,10 @@ function emptyHabits(): Record<HabitKey, boolean> {
     singing: false,
     drawing: false,
     calm: false,
+    critical: false,
+    writing: false,
+    finance: false,
+    vitality: false,
   };
 }
 
@@ -141,6 +149,10 @@ export function defaultLearningProgress(): LearningProgress {
       focuslab: 'intermedio',
       singing: 'basico',
       calm: 'intermedio',
+      critical: 'intermedio',
+      writing: 'intermedio',
+      finance: 'basico',
+      vitality: 'basico',
     },
     activity: {
       lastModule: null,
@@ -251,6 +263,43 @@ export function defaultLearningProgress(): LearningProgress {
       cardIdx: 0,
       checkins: [],
     },
+    critical: {
+      activeTab: 'casos',
+      caseIdx: 0,
+      masteredIds: [],
+      missedIds: [],
+      decisions: [],
+    },
+    writing: {
+      activeTab: 'retos',
+      challengeIdx: 0,
+      completedIds: [],
+      bestScores: {},
+      drafts: {},
+      freeDraft: '',
+    },
+    finance: {
+      activeTab: 'presupuesto',
+      currency: 'S/',
+      transactions: [],
+      goals: [
+        { id: 'goal-emerg', title: 'Fondo de emergencia', target: 3000, saved: 0 },
+      ],
+      calcInitial: 500,
+      calcMonthly: 200,
+      calcRate: 7,
+      calcYears: 10,
+      quizMasteredIds: [],
+      quizIdx: 0,
+    },
+    vitality: {
+      activeTab: 'pausas',
+      selectedRoutineId: 'vr-202020',
+      completedRoutines: 0,
+      routineHistory: {},
+      postureChecks: {},
+      dayLogs: [],
+    },
   };
 }
 
@@ -307,6 +356,10 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
     focuslab: normDiff(rd.focuslab, base.difficulty.focuslab),
     singing: normDiff(rd.singing, base.difficulty.singing),
     calm: normDiff(rd.calm, base.difficulty.calm),
+    critical: normDiff(rd.critical, base.difficulty.critical),
+    writing: normDiff(rd.writing, base.difficulty.writing),
+    finance: normDiff(rd.finance, base.difficulty.finance),
+    vitality: normDiff(rd.vitality, base.difficulty.vitality),
   };
 
   const rStudio = (raw.studio ?? {}) as Partial<LearningProgress['studio']>;
@@ -321,6 +374,10 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
   const rSing = (raw.singing ?? {}) as Partial<LearningProgress['singing']>;
   const rCalm = (raw.calm ?? {}) as Partial<LearningProgress['calm']>;
   const rAct = (raw.activity ?? {}) as Partial<LearningProgress['activity']>;
+  const rCrit = (raw.critical ?? {}) as Partial<LearningProgress['critical']>;
+  const rWrit = (raw.writing ?? {}) as Partial<LearningProgress['writing']>;
+  const rFin = (raw.finance ?? {}) as Partial<LearningProgress['finance']>;
+  const rVit = (raw.vitality ?? {}) as Partial<LearningProgress['vitality']>;
 
   const VALID_PRACTICE_MODS: readonly PracticeModuleId[] = [
     'reader',
@@ -333,6 +390,10 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
     'singing',
     'drawing',
     'calm',
+    'critical',
+    'writing',
+    'finance',
+    'vitality',
   ];
   const normMod = (v: unknown): PracticeModuleId | null =>
     VALID_PRACTICE_MODS.includes(v as PracticeModuleId) ? (v as PracticeModuleId) : null;
@@ -516,6 +577,55 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
       pmrStep: clampNum(rCalm.pmrStep, 0, 12, 0),
       cardIdx: clampNum(rCalm.cardIdx, 0, 200, 0),
       checkins: Array.isArray(rCalm.checkins) ? rCalm.checkins.slice(0, 60) : [],
+    },
+    critical: {
+      activeTab:
+        rCrit.activeTab === 'matriz' || rCrit.activeTab === 'repaso' ? rCrit.activeTab : 'casos',
+      caseIdx: clampNum(rCrit.caseIdx, 0, 200, 0),
+      masteredIds: normStrArr(rCrit.masteredIds, 200),
+      missedIds: normStrArr(rCrit.missedIds, 200),
+      decisions: Array.isArray(rCrit.decisions) ? rCrit.decisions.slice(0, 30) : [],
+    },
+    writing: {
+      activeTab:
+        rWrit.activeTab === 'analizador' || rWrit.activeTab === 'plantillas'
+          ? rWrit.activeTab
+          : 'retos',
+      challengeIdx: clampNum(rWrit.challengeIdx, 0, 200, 0),
+      completedIds: normStrArr(rWrit.completedIds, 200),
+      bestScores: normNumRecord(rWrit.bestScores),
+      drafts: normStrRecord(rWrit.drafts),
+      freeDraft: typeof rWrit.freeDraft === 'string' ? rWrit.freeDraft.slice(0, 5000) : '',
+    },
+    finance: {
+      activeTab:
+        rFin.activeTab === 'metas' || rFin.activeTab === 'compuesto' || rFin.activeTab === 'criterio'
+          ? rFin.activeTab
+          : 'presupuesto',
+      currency: rFin.currency === '$' || rFin.currency === '€' ? rFin.currency : 'S/',
+      transactions: Array.isArray(rFin.transactions) ? rFin.transactions.slice(0, 120) : [],
+      goals:
+        Array.isArray(rFin.goals) && rFin.goals.length > 0
+          ? rFin.goals.slice(0, 20)
+          : base.finance.goals,
+      calcInitial: clampNum(rFin.calcInitial, 0, 10000000, base.finance.calcInitial),
+      calcMonthly: clampNum(rFin.calcMonthly, 0, 1000000, base.finance.calcMonthly),
+      calcRate: clampNum(rFin.calcRate, 0, 40, base.finance.calcRate),
+      calcYears: clampNum(rFin.calcYears, 1, 40, base.finance.calcYears),
+      quizMasteredIds: normStrArr(rFin.quizMasteredIds, 100),
+      quizIdx: clampNum(rFin.quizIdx, 0, 100, 0),
+    },
+    vitality: {
+      activeTab:
+        rVit.activeTab === 'registro' || rVit.activeTab === 'postura' ? rVit.activeTab : 'pausas',
+      selectedRoutineId:
+        typeof rVit.selectedRoutineId === 'string' && rVit.selectedRoutineId
+          ? rVit.selectedRoutineId
+          : base.vitality.selectedRoutineId,
+      completedRoutines: clampNum(rVit.completedRoutines, 0, 100000, 0),
+      routineHistory: normNumRecord(rVit.routineHistory),
+      postureChecks: normBoolRecord(rVit.postureChecks),
+      dayLogs: Array.isArray(rVit.dayLogs) ? rVit.dayLogs.slice(0, 60) : [],
     },
   };
 }
@@ -1265,6 +1375,26 @@ class LifeStore {
           detail: `${p.stats.calmSessions} sesiones · ${pr.calm.checkins.length} registros emocionales`,
         };
       }
+      case 'critical':
+        return {
+          label: `Pensamiento Crítico · ${pr.critical.activeTab === 'matriz' ? 'Matriz ponderada' : pr.critical.activeTab === 'repaso' ? 'Repaso de fallos' : 'Sesgos y falacias'}`,
+          detail: `${pr.critical.masteredIds.length} casos dominados · ${pr.critical.decisions.length} decisiones`,
+        };
+      case 'writing':
+        return {
+          label: `Escritura Clara · ${pr.writing.activeTab === 'analizador' ? 'Analizador libre' : pr.writing.activeTab === 'plantillas' ? 'Plantillas' : 'Retos de síntesis'}`,
+          detail: `${pr.writing.completedIds.length} retos completados · Dificultad ${diffName}`,
+        };
+      case 'finance':
+        return {
+          label: `Finanzas Personales · ${pr.finance.activeTab === 'metas' ? 'Metas' : pr.finance.activeTab === 'compuesto' ? 'Interés compuesto' : pr.finance.activeTab === 'criterio' ? 'Criterio financiero' : 'Presupuesto 50/30/20'}`,
+          detail: `${pr.finance.transactions.length} movimientos · ${pr.finance.goals.length} metas`,
+        };
+      case 'vitality':
+        return {
+          label: `Energía y Postura · ${pr.vitality.activeTab === 'registro' ? 'Registro diario' : pr.vitality.activeTab === 'postura' ? 'Ergonomía' : 'Pausas activas'}`,
+          detail: `${pr.vitality.completedRoutines} pausas completadas · ${pr.vitality.dayLogs.length} días registrados`,
+        };
     }
   }
 
@@ -1627,6 +1757,144 @@ class LifeStore {
     this.save();
   }
 
+  /* ==================== NEW PERSONAL DEVELOPMENT MODULES ==================== */
+
+  public recordCriticalResult(caseId: string, correct: boolean): void {
+    const c = this.profile.progress.critical;
+    if (correct) {
+      if (!c.masteredIds.includes(caseId)) c.masteredIds.push(caseId);
+      c.missedIds = c.missedIds.filter((id) => id !== caseId);
+    } else {
+      if (!c.missedIds.includes(caseId)) c.missedIds.push(caseId);
+    }
+    this.markHabit('critical');
+    this.save();
+  }
+
+  public saveDecisionMatrix(input: Omit<SavedDecisionMatrix, 'id' | 'updatedAt'>): SavedDecisionMatrix {
+    const entry: SavedDecisionMatrix = {
+      ...input,
+      id: `dec-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+      updatedAt: Date.now(),
+    };
+    this.profile.progress.critical.decisions.unshift(entry);
+    this.profile.progress.critical.decisions = this.profile.progress.critical.decisions.slice(0, 30);
+    this.markHabit('critical');
+    this.save();
+    return entry;
+  }
+
+  public deleteDecisionMatrix(id: string): void {
+    this.profile.progress.critical.decisions = this.profile.progress.critical.decisions.filter(
+      (d) => d.id !== id
+    );
+    this.save();
+  }
+
+  public saveWritingResult(challengeId: string, draft: string, clarityScore: number): void {
+    const w = this.profile.progress.writing;
+    w.drafts[challengeId] = draft;
+    const clean = Math.max(0, Math.min(100, Math.round(clarityScore)));
+    w.bestScores[challengeId] = Math.max(w.bestScores[challengeId] ?? 0, clean);
+    if (clean >= 75 && !w.completedIds.includes(challengeId)) {
+      w.completedIds.push(challengeId);
+    }
+    this.markHabit('writing');
+    this.save();
+  }
+
+  public addFinanceTransaction(input: Omit<FinanceTransaction, 'id' | 'at'>): FinanceTransaction {
+    const tx: FinanceTransaction = {
+      ...input,
+      amount: Math.max(0, Math.round(input.amount * 100) / 100),
+      id: `tx-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+      at: Date.now(),
+    };
+    this.profile.progress.finance.transactions.unshift(tx);
+    this.profile.progress.finance.transactions = this.profile.progress.finance.transactions.slice(0, 120);
+    this.markHabit('finance');
+    this.save();
+    return tx;
+  }
+
+  public deleteFinanceTransaction(id: string): void {
+    this.profile.progress.finance.transactions = this.profile.progress.finance.transactions.filter(
+      (t) => t.id !== id
+    );
+    this.save();
+  }
+
+  public upsertFinanceGoal(goal: Omit<FinanceGoal, 'id'> & { id?: string }): void {
+    const list = this.profile.progress.finance.goals;
+    const cleanTarget = Math.max(1, Math.round(goal.target));
+    const cleanSaved = Math.max(0, Math.round(goal.saved));
+    if (goal.id) {
+      const idx = list.findIndex((g) => g.id === goal.id);
+      if (idx >= 0) {
+        list[idx] = { id: goal.id, title: goal.title.trim() || list[idx].title, target: cleanTarget, saved: cleanSaved };
+        this.markHabit('finance');
+        this.save();
+        return;
+      }
+    }
+    list.unshift({
+      id: `goal-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+      title: goal.title.trim() || 'Nueva meta',
+      target: cleanTarget,
+      saved: cleanSaved,
+    });
+    this.profile.progress.finance.goals = list.slice(0, 20);
+    this.markHabit('finance');
+    this.save();
+  }
+
+  public deleteFinanceGoal(id: string): void {
+    this.profile.progress.finance.goals = this.profile.progress.finance.goals.filter((g) => g.id !== id);
+    this.save();
+  }
+
+  public recordFinanceQuiz(quizId: string, correct: boolean): void {
+    if (correct && !this.profile.progress.finance.quizMasteredIds.includes(quizId)) {
+      this.profile.progress.finance.quizMasteredIds.push(quizId);
+    }
+    this.markHabit('finance');
+    this.save();
+  }
+
+  public recordVitalityRoutine(routineId: string): void {
+    const v = this.profile.progress.vitality;
+    v.completedRoutines += 1;
+    v.routineHistory[routineId] = (v.routineHistory[routineId] ?? 0) + 1;
+    const today = todayStamp();
+    const existing = v.dayLogs.find((d) => d.day === today);
+    if (existing) {
+      existing.breaksDone += 1;
+    } else {
+      v.dayLogs.unshift({ day: today, waterCups: 0, sleepHours: 7, energyLevel: 7, breaksDone: 1 });
+      v.dayLogs = v.dayLogs.slice(0, 60);
+    }
+    this.markHabit('vitality');
+    this.save();
+  }
+
+  public saveVitalityDayLog(patch: Partial<Omit<VitalityDayLog, 'day'>>): VitalityDayLog {
+    const v = this.profile.progress.vitality;
+    const today = todayStamp();
+    let entry = v.dayLogs.find((d) => d.day === today);
+    if (!entry) {
+      entry = { day: today, waterCups: 0, sleepHours: 7, energyLevel: 7, breaksDone: 0 };
+      v.dayLogs.unshift(entry);
+      v.dayLogs = v.dayLogs.slice(0, 60);
+    }
+    if (typeof patch.waterCups === 'number') entry.waterCups = Math.max(0, Math.min(20, Math.round(patch.waterCups)));
+    if (typeof patch.sleepHours === 'number') entry.sleepHours = Math.max(0, Math.min(16, Math.round(patch.sleepHours * 2) / 2));
+    if (typeof patch.energyLevel === 'number') entry.energyLevel = Math.max(1, Math.min(10, Math.round(patch.energyLevel)));
+    if (typeof patch.breaksDone === 'number') entry.breaksDone = Math.max(0, Math.round(patch.breaksDone));
+    this.markHabit('vitality');
+    this.save();
+    return entry;
+  }
+
   public getOverallMasterySummary(): {
     totalXp: number;
     level: number;
@@ -1675,6 +1943,22 @@ class LifeStore {
       ),
       calm: clamp(
         p.stats.calmSessions * 5 + p.reframeLog.length * 5 + pr.calm.checkins.length * 6
+      ),
+      critical: clamp(
+        (pr.critical.masteredIds.length / 18) * 70 + pr.critical.decisions.length * 10
+      ),
+      writing: clamp(
+        (pr.writing.completedIds.length / 9) * 75 + (pr.writing.freeDraft.trim().length > 40 ? 25 : 0)
+      ),
+      finance: clamp(
+        (pr.finance.quizMasteredIds.length / 10) * 50 +
+          Math.min(25, pr.finance.transactions.length * 5) +
+          Math.min(25, pr.finance.goals.filter((g) => g.saved > 0).length * 12)
+      ),
+      vitality: clamp(
+        pr.vitality.completedRoutines * 10 +
+          Object.values(pr.vitality.postureChecks).filter(Boolean).length * 6 +
+          pr.vitality.dayLogs.length * 8
       ),
     };
 

@@ -9,7 +9,9 @@ import { ModuleId, parseHashRoute } from './types';
 import { EcosystemModals } from './ui/EcosystemModals';
 import { CalligraphyView } from './views/CalligraphyView';
 import { CalmView } from './views/CalmView';
+import { CriticalView } from './views/CriticalView';
 import { DrawingView } from './views/DrawingView';
+import { FinanceView } from './views/FinanceView';
 import { FocusLabView } from './views/FocusLabView';
 import { HomeView } from './views/HomeView';
 import { LanguageView } from './views/LanguageView';
@@ -18,6 +20,8 @@ import { ReaderView } from './views/ReaderView';
 import { SingingView } from './views/SingingView';
 import { StudioView } from './views/StudioView';
 import { TypingView } from './views/TypingView';
+import { VitalityView } from './views/VitalityView';
+import { WritingView } from './views/WritingView';
 
 const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[] = [
   { id: 'home', label: 'Directorio', icon: Icons.grid },
@@ -31,6 +35,10 @@ const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[]
   { id: 'focuslab', label: 'Oratoria/Foco', icon: Icons.mic },
   { id: 'singing', label: 'Canto', icon: Icons.mic },
   { id: 'calm', label: 'Calma', icon: Icons.wind },
+  { id: 'critical', label: 'Crítico', icon: Icons.scale },
+  { id: 'writing', label: 'Escritura', icon: Icons.feather },
+  { id: 'finance', label: 'Finanzas', icon: Icons.wallet },
+  { id: 'vitality', label: 'Postura', icon: Icons.activity },
 ];
 
 const root = document.getElementById('app')!;
@@ -45,6 +53,10 @@ const mindsetView = new MindsetView();
 const focusLabView = new FocusLabView();
 const singingView = new SingingView();
 const calmView = new CalmView();
+const criticalView = new CriticalView();
+const writingView = new WritingView();
+const financeView = new FinanceView();
+const vitalityView = new VitalityView();
 
 const initialRoute = parseHashRoute(window.location.hash);
 let currentModule: ModuleId = initialRoute.moduleId;
@@ -78,6 +90,9 @@ function navigate(next: ModuleId, options?: { sos?: boolean }): void {
   }
   if (currentModule === 'focuslab' && next !== 'focuslab') {
     focusLabView.unmount();
+  }
+  if (currentModule === 'vitality' && next !== 'vitality') {
+    vitalityView.unmount();
   }
   currentModule = next;
   if (next !== 'home') {
@@ -255,6 +270,18 @@ function renderApp(): void {
       } else {
         calmView.render(mainEl);
       }
+      break;
+    case 'critical':
+      criticalView.render(mainEl);
+      break;
+    case 'writing':
+      writingView.render(mainEl);
+      break;
+    case 'finance':
+      financeView.render(mainEl);
+      break;
+    case 'vitality':
+      vitalityView.render(mainEl);
       break;
   }
 }

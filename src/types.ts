@@ -9,7 +9,11 @@ export type ModuleId =
   | 'focuslab'
   | 'singing'
   | 'drawing'
-  | 'calm';
+  | 'calm'
+  | 'critical'
+  | 'writing'
+  | 'finance'
+  | 'vitality';
 
 export type HabitKey =
   | 'read'
@@ -21,7 +25,11 @@ export type HabitKey =
   | 'focuslab'
   | 'singing'
   | 'drawing'
-  | 'calm';
+  | 'calm'
+  | 'critical'
+  | 'writing'
+  | 'finance'
+  | 'vitality';
 
 export type CalmPatternId = '478' | 'box' | 'sigh' | 'exhale36' | 'coherence';
 
@@ -77,6 +85,46 @@ export interface ModuleActivityEntry {
   at: number;
   label: string;
   detail: string;
+}
+
+export interface DecisionCriterion {
+  name: string;
+  weight: number;
+  scoreA: number;
+  scoreB: number;
+}
+
+export interface SavedDecisionMatrix {
+  id: string;
+  title: string;
+  optionA: string;
+  optionB: string;
+  criteria: DecisionCriterion[];
+  winner: string;
+  updatedAt: number;
+}
+
+export interface FinanceTransaction {
+  id: string;
+  kind: 'income' | 'need' | 'want' | 'saving';
+  label: string;
+  amount: number;
+  at: number;
+}
+
+export interface FinanceGoal {
+  id: string;
+  title: string;
+  target: number;
+  saved: number;
+}
+
+export interface VitalityDayLog {
+  day: string;
+  waterCups: number;
+  sleepHours: number;
+  energyLevel: number;
+  breaksDone: number;
 }
 
 export interface LearningProgress {
@@ -192,6 +240,41 @@ export interface LearningProgress {
     cardIdx: number;
     checkins: CalmCheckinEntry[];
   };
+  critical: {
+    activeTab: 'casos' | 'matriz' | 'repaso';
+    caseIdx: number;
+    masteredIds: string[];
+    missedIds: string[];
+    decisions: SavedDecisionMatrix[];
+  };
+  writing: {
+    activeTab: 'retos' | 'analizador' | 'plantillas';
+    challengeIdx: number;
+    completedIds: string[];
+    bestScores: Record<string, number>;
+    drafts: Record<string, string>;
+    freeDraft: string;
+  };
+  finance: {
+    activeTab: 'presupuesto' | 'metas' | 'compuesto' | 'criterio';
+    currency: 'S/' | '$' | '€';
+    transactions: FinanceTransaction[];
+    goals: FinanceGoal[];
+    calcInitial: number;
+    calcMonthly: number;
+    calcRate: number;
+    calcYears: number;
+    quizMasteredIds: string[];
+    quizIdx: number;
+  };
+  vitality: {
+    activeTab: 'pausas' | 'registro' | 'postura';
+    selectedRoutineId: string;
+    completedRoutines: number;
+    routineHistory: Record<string, number>;
+    postureChecks: Record<string, boolean>;
+    dayLogs: VitalityDayLog[];
+  };
 }
 
 const MODULE_IDS: readonly ModuleId[] = [
@@ -206,6 +289,10 @@ const MODULE_IDS: readonly ModuleId[] = [
   'singing',
   'drawing',
   'calm',
+  'critical',
+  'writing',
+  'finance',
+  'vitality',
 ];
 
 /** Interpreta `#calm?sos=1`, `#sos` y `#<modulo>`; cualquier otra cosa cae a home. */

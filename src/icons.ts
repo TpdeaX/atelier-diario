@@ -98,6 +98,14 @@ export const Icons = {
     svgWrap('<line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="12" x2="3" y2="4"/><line x1="12" y1="12" x2="21" y2="4"/><line x1="12" y1="12" x2="3" y2="20"/><line x1="12" y1="12" x2="21" y2="20"/>', s),
   layers: (s = 16) =>
     svgWrap('<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>', s),
+  scale: (s = 20) =>
+    svgWrap('<line x1="12" y1="3" x2="12" y2="21"/><path d="M5 7h14"/><path d="M6 7l-3 6a3 3 0 0 0 6 0l-3-6z"/><path d="M18 7l-3 6a3 3 0 0 0 6 0l-3-6z"/><line x1="8" y1="21" x2="16" y2="21"/>', s),
+  feather: (s = 20) =>
+    svgWrap('<path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/>', s),
+  wallet: (s = 20) =>
+    svgWrap('<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>', s),
+  activity: (s = 20) =>
+    svgWrap('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>', s),
   redo: (s = 16) =>
     svgWrap('<path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/>', s),
   play: (s = 16) => svgWrap('<polygon points="6 4 20 12 6 20 6 4"/>', s),
