@@ -138,7 +138,6 @@ export function defaultLearningProgress(): LearningProgress {
       typing: 'intermedio',
       language: 'intermedio',
       mindset: 'intermedio',
-      vault: 'intermedio',
       focuslab: 'intermedio',
       singing: 'basico',
       calm: 'intermedio',
@@ -305,7 +304,6 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
     typing: normDiff(rd.typing, base.difficulty.typing),
     language: normDiff(rd.language, base.difficulty.language),
     mindset: normDiff(rd.mindset, base.difficulty.mindset),
-    vault: normDiff(rd.vault, base.difficulty.vault),
     focuslab: normDiff(rd.focuslab, base.difficulty.focuslab),
     singing: normDiff(rd.singing, base.difficulty.singing),
     calm: normDiff(rd.calm, base.difficulty.calm),
@@ -331,7 +329,6 @@ export function normalizeLearningProgress(raw: Partial<LearningProgress> | null 
     'typing',
     'language',
     'mindset',
-    'vault',
     'focuslab',
     'singing',
     'drawing',
@@ -1242,11 +1239,6 @@ class LifeStore {
           label: `Frases y Criterio · ${pr.mindset.mode === 'reto_hoy' ? 'Reto de hoy' : pr.mindset.mode === 'reflexion' ? 'Diario de reflexión' : 'Cuaderno'}`,
           detail: `${pr.mindset.completedActionIds.length} acciones cumplidas · ${Object.keys(pr.mindset.reflections).length} reflexiones`,
         };
-      case 'vault':
-        return {
-          label: `Baúl de Guardados · ${pr.vault.mode === 'estudiar_hoy' ? 'Estudiar hoy' : pr.vault.mode === 'quiz_accion' ? 'Reto de aplicación' : 'Explorar'}`,
-          detail: `Meta hoy: ${pr.vault.reviewedToday}/${pr.vault.dailyGoal} · ${Object.keys(pr.vault.actionPlans).length} planes`,
-        };
       case 'focuslab': {
         const tabLabel =
           p.modulePrefs.focuslab.tab === 'schulte'
@@ -1669,10 +1661,6 @@ class LifeStore {
         (pr.mindset.completedActionIds.length * 4 +
           Object.keys(pr.mindset.reflections).length * 6 +
           p.favoritePhraseIds.length * 2)
-      ),
-      vault: clamp(
-        Object.values(p.vaultStatuses).filter((s) => s === 'applied').length * 3 +
-          Object.keys(pr.vault.actionPlans).length * 5
       ),
       focuslab: clamp(
         p.stats.oratorySessions * 6 +

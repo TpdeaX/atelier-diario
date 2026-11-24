@@ -1,6 +1,5 @@
 import { DRAWING_LESSONS } from '../data/DrawingBank';
 import { PHRASES_BANK, VOCABULARY_DECK } from '../data/KnowledgeBank';
-import { VAULT_BANK } from '../data/SavedVaultBank';
 import { SINGING_DRILLS, SINGING_SONGS } from '../data/SingingBank';
 import { Icons } from '../icons';
 import { cloudSync } from '../services/CloudSync';
@@ -278,18 +277,6 @@ export class HomeView {
         icon: Icons.bulb,
         route: 'mindset',
         badgeText: profile.todayHabits.mindset ? 'Hecho hoy' : 'Ideas',
-      },
-      {
-        id: 'mod-vault',
-        prefix: 'Módulo',
-        title: 'Baúl de Guardados',
-        subtitle: `${VAULT_BANK.length + profile.customVaultItems.length} recursos · ${Object.values(profile.vaultStatuses).filter((s) => s === 'applied').length} aplicados`,
-        category: 'atelier',
-        c1: '#0F4C81',
-        c2: '#38BDF8',
-        icon: Icons.archive,
-        route: 'vault',
-        badgeText: 'Recursos',
       },
       {
         id: 'mod-focuslab',

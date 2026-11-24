@@ -11,7 +11,7 @@ export const DEFAULT_DIRECTORY_ORDER = [
   'mod-typing',
   'mod-language',
   'mod-mindset',
-  'mod-vault',
+  'mod-focuslab',
   'mod-singing',
   'mod-calm',
   'app-unumbral',

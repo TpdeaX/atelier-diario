@@ -6,7 +6,6 @@ export type ModuleId =
   | 'typing'
   | 'language'
   | 'mindset'
-  | 'vault'
   | 'focuslab'
   | 'singing'
   | 'drawing'
@@ -203,7 +202,6 @@ const MODULE_IDS: readonly ModuleId[] = [
   'typing',
   'language',
   'mindset',
-  'vault',
   'focuslab',
   'singing',
   'drawing',

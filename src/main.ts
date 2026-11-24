@@ -18,7 +18,6 @@ import { ReaderView } from './views/ReaderView';
 import { SingingView } from './views/SingingView';
 import { StudioView } from './views/StudioView';
 import { TypingView } from './views/TypingView';
-import { VaultView } from './views/VaultView';
 
 const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[] = [
   { id: 'home', label: 'Directorio', icon: Icons.grid },
@@ -29,7 +28,6 @@ const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[]
   { id: 'typing', label: 'Mecanografía', icon: Icons.keyboard },
   { id: 'language', label: 'Léxico', icon: Icons.spell },
   { id: 'mindset', label: 'Criterio', icon: Icons.bulb },
-  { id: 'vault', label: 'Baúl', icon: Icons.archive },
   { id: 'focuslab', label: 'Oratoria/Foco', icon: Icons.mic },
   { id: 'singing', label: 'Canto', icon: Icons.mic },
   { id: 'calm', label: 'Calma', icon: Icons.wind },
@@ -44,7 +42,6 @@ const drawingView = new DrawingView();
 const typingView = new TypingView();
 const languageView = new LanguageView();
 const mindsetView = new MindsetView();
-const vaultView = new VaultView();
 const focusLabView = new FocusLabView();
 const singingView = new SingingView();
 const calmView = new CalmView();
@@ -244,9 +241,6 @@ function renderApp(): void {
       break;
     case 'mindset':
       mindsetView.render(mainEl);
-      break;
-    case 'vault':
-      vaultView.render(mainEl);
       break;
     case 'focuslab':
       focusLabView.render(mainEl);

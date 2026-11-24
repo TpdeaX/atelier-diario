@@ -41,7 +41,6 @@ const MODULE_TITLES: Record<PracticeModuleId, string> = {
   typing: 'Mecanografía',
   language: 'Ortografía y Léxico',
   mindset: 'Frases y Criterio',
-  vault: 'Baúl de Guardados',
   focuslab: 'Oratoria y Enfoque',
   singing: 'Estudio de Canto',
   calm: 'Centro de Calma',
@@ -250,22 +249,6 @@ export function buildHomeCockpit(
       cta: 'Continuar calma',
       priority: 'normal',
       durationLabel: '2 min',
-    });
-  }
-
-  // Meta diaria del Baúl en curso
-  const todayStr = new Date(now).toISOString().slice(0, 10);
-  const reviewedToday = pr.vault.lastReviewDay === todayStr ? pr.vault.reviewedToday : 0;
-  if (reviewedToday > 0 && reviewedToday < pr.vault.dailyGoal) {
-    pending.push({
-      id: 'pend-vault',
-      moduleId: 'vault',
-      title: `Meta del Baúl hoy (${reviewedToday}/${pr.vault.dailyGoal} recursos)`,
-      subtitle: `Te faltan ${pr.vault.dailyGoal - reviewedToday} recursos en Estudiar hoy.`,
-      badge: `${reviewedToday}/${pr.vault.dailyGoal}`,
-      cta: 'Seguir revisando',
-      priority: 'normal',
-      durationLabel: '4 min',
     });
   }
 
