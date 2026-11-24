@@ -27,7 +27,7 @@ import { VitalityView } from './views/VitalityView';
 import { WritingView } from './views/WritingView';
 
 const NAV_ITEMS: { id: ModuleId; label: string; icon: (s?: number) => string }[] = [
-  { id: 'home', label: 'Directorio', icon: Icons.grid },
+  { id: 'home', label: 'Inicio Atelier', icon: Icons.home },
   { id: 'reader', label: 'Lectura', icon: Icons.book },
   { id: 'studio', label: 'Cuaderno/PDF', icon: Icons.tablet },
   { id: 'calligraphy', label: 'Caligrafía', icon: Icons.pen },
@@ -76,6 +76,10 @@ const modals = new EcosystemModals(() => renderApp());
 function applyTheme(): void {
   const theme = lifeStore.get().theme;
   document.documentElement.setAttribute('data-theme', theme);
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) {
+    metaTheme.setAttribute('content', theme === 'night' ? '#0F1311' : '#FAFBF8');
+  }
 }
 
 function navigate(next: ModuleId, options?: { sos?: boolean }): void {
@@ -129,23 +133,24 @@ function navigate(next: ModuleId, options?: { sos?: boolean }): void {
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
-const ECO_ARENA_ICON = (s = 16) =>
-  `<svg class="al-icon" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 21 7 21 17 12 22 3 17 3 7"/><circle cx="12" cy="12" r="3"/></svg>`;
-
 function renderEcoSwitch(): string {
   return `
     <nav class="eco-switch" aria-label="Aplicaciones del ecosistema">
       <a class="eco-switch-link" data-eco-app="directorio" href="${resolveEcoUrl('directorio')}">
-        ${Icons.grid(16)}<span class="eco-label-full">Directorio</span><span class="eco-label-short">Directorio</span>
+        <span class="eco-swatch is-dir" aria-hidden="true"></span>
+        <span class="eco-label-full">Directorio</span><span class="eco-label-short">Directorio</span>
       </a>
       <a class="eco-switch-link is-current" data-eco-app="atelier" aria-current="page" href="${resolveEcoUrl('atelier')}">
-        ${Icons.book(16)}<span class="eco-label-full">Atelier Diario</span><span class="eco-label-short">Atelier</span>
+        <span class="eco-swatch is-atelier" aria-hidden="true"></span>
+        <span class="eco-label-full">Atelier Diario</span><span class="eco-label-short">Atelier</span>
       </a>
       <a class="eco-switch-link" data-eco-app="unumbral" href="${resolveEcoUrl('unumbral')}">
-        ${Icons.graduation(16)}<span class="eco-label-full">UNUmbral</span><span class="eco-label-short">UNUmbral</span>
+        <span class="eco-swatch is-unu" aria-hidden="true"></span>
+        <span class="eco-label-full">UNUmbral</span><span class="eco-label-short">UNUmbral</span>
       </a>
       <a class="eco-switch-link" data-eco-app="arena" href="${resolveEcoUrl('arena')}">
-        ${ECO_ARENA_ICON(16)}<span class="eco-label-full">OMNI ARENA</span><span class="eco-label-short">Arena</span>
+        <span class="eco-swatch is-arena" aria-hidden="true"></span>
+        <span class="eco-label-full">OMNI ARENA</span><span class="eco-label-short">Arena</span>
       </a>
     </nav>
   `;
@@ -158,39 +163,34 @@ function renderApp(): void {
   const syncMeta = cloudSync.getSyncMeta();
   const cloudLabel = syncMeta.configured
     ? syncMeta.lastError
-      ? 'Nube con aviso'
+      ? 'Nube aviso'
       : `Supabase · ${syncMeta.spaceCode}`
-    : 'Conectar Supabase';
+    : 'Supabase';
 
   root.innerHTML = `
     <div class="al-shell">
       ${renderEcoSwitch()}
       <header class="al-topbar">
         <div class="al-topbar-main">
-          <div class="al-brand">
-            <span class="al-brand-emblem">
-              <span class="al-brand-emblem-core">${Icons.grid(18)}</span>
+          <button type="button" class="al-brand" data-route="home" aria-label="Ir al inicio de Atelier Diario">
+            <span class="al-brand-emblem" aria-hidden="true">
+              <span class="al-brand-emblem-core">${Icons.book(17)}</span>
             </span>
-            <div class="al-brand-copy">
-              <span class="al-brand-name">${dir.ecosystemTitle}</span>
-              <span class="al-brand-sub">${dir.ecosystemSubtitle}</span>
-            </div>
-          </div>
+            <span class="al-brand-copy">
+              <span class="al-brand-name">Atelier Diario</span>
+              <span class="al-brand-sub">17 talleres de estudio, arte y bienestar</span>
+            </span>
+          </button>
 
           <div class="al-topbar-actions">
-            <button type="button" class="al-btn al-sos-pill-btn" id="al-open-sos" title="Abrir modo SOS Pánico Ahora">
-              ${Icons.heartPulse(16)}
-              <span>SOS Calma</span>
-            </button>
-
             <button type="button" class="al-cloud-pill ${syncMeta.configured ? 'is-live' : ''} ${syncMeta.lastError ? 'is-err' : ''}" id="al-open-cloud" title="Configurar y sincronizar todo en Supabase">
-              ${Icons.cloud(15)}
+              ${Icons.cloud(14)}
               <span>${cloudLabel}</span>
             </button>
 
             <button type="button" class="al-btn al-theme-btn" id="al-theme-toggle" title="${theme === 'day' ? 'Cambiar a modo noche' : 'Cambiar a modo día'}" aria-pressed="${theme === 'night'}">
-              ${theme === 'day' ? Icons.moon(16) : Icons.sun(16)}
-              <span>${theme === 'day' ? 'Tema: Día' : 'Tema: Noche'}</span>
+              ${theme === 'day' ? Icons.moon(15) : Icons.sun(15)}
+              <span>${theme === 'day' ? 'Día' : 'Noche'}</span>
             </button>
 
             <button type="button" class="al-profile-chip" id="al-open-profile" title="Editar perfil y preferencias">
@@ -199,7 +199,12 @@ function renderApp(): void {
                 <strong>${dir.userName}</strong>
                 <small>${dir.userSubtitle}</small>
               </span>
-              ${Icons.chevronDown(14)}
+              ${Icons.chevronDown(13)}
+            </button>
+
+            <button type="button" class="al-btn al-sos-pill-btn" id="al-open-sos" title="Abrir modo SOS Pánico Ahora">
+              ${Icons.heartPulse(14)}
+              <span>SOS Calma</span>
             </button>
           </div>
         </div>

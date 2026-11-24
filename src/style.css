@@ -1,47 +1,107 @@
+/* =========================================================================
+   OMNI ECOSISTEMA — CURSO ISOM DESIGN SYSTEM (ATELIER DIARIO)
+   ========================================================================= */
+
 :root,
 :root[data-theme='day'] {
-  --bg-ground: #f1f4f8;
-  --bg-surface: #ffffff;
-  --bg-soft: #e9eef5;
-  --bg-elevated: #f8fafc;
-  --border-subtle: #dde4ee;
-  --border-strong: #c2cede;
-  --ink-primary: #141c2b;
-  --ink-secondary: #435066;
-  --ink-muted: #66758c;
-  --accent-primary: #166534;
-  --accent-primary-ink: #ffffff;
-  --accent-calm: #0f766e;
-  --accent-voice: #6d28d9;
-  --accent-amber: #b45309;
+  color-scheme: light;
+
+  --isom-ground: #fafbf8;
+  --isom-ground-alt: #f3f5f0;
+  --isom-surface: #ffffff;
+  --isom-surface-soft: #edf1ea;
+  --isom-border: #d8dfd4;
+  --isom-border-strong: #bac6b5;
+  --isom-ink: #182019;
+  --isom-ink-2: #445247;
+  --isom-ink-muted: #5d6d61;
+  --isom-course: #7b2cbf;
+  --isom-course-hover: #6721a4;
+  --isom-course-ink: #ffffff;
+  --isom-course-soft: #f5ecfe;
+  --isom-course-ring: rgba(123, 44, 191, 0.16);
+
+  --domain-atelier-ink: #7c560d;
+  --domain-atelier-bg: #fbf2dc;
+  --domain-atelier-swatch: #c89d3c;
+  --domain-unu-ink: #2d4c2a;
+  --domain-unu-bg: #e8f0e5;
+  --domain-unu-swatch: #4d6b4a;
+  --domain-arena-ink: #1d4a6b;
+  --domain-arena-bg: #e6f1f8;
+  --domain-arena-swatch: #335c7d;
+
+  /* Mapped legacy Atelier tokens so all 17 module views inherit Curso ISOM */
+  --bg-ground: var(--isom-ground);
+  --bg-surface: var(--isom-surface);
+  --bg-soft: var(--isom-surface-soft);
+  --bg-elevated: var(--isom-ground-alt);
+  --border-subtle: var(--isom-border);
+  --border-strong: var(--isom-border-strong);
+  --ink-primary: var(--isom-ink);
+  --ink-secondary: var(--isom-ink-2);
+  --ink-muted: var(--isom-ink-muted);
+  --accent-primary: var(--isom-course);
+  --accent-primary-ink: var(--isom-course-ink);
+  --accent-calm: #2d6a4f;
+  --accent-voice: var(--isom-course);
+  --accent-amber: #9a6b12;
   --accent-danger: #b91c1c;
-  --shadow-soft: 0 2px 10px rgba(15, 23, 42, 0.045), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-hover: 0 10px 24px rgba(15, 23, 42, 0.09), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-soft: none;
+  --shadow-hover: none;
 }
 
 :root[data-theme='night'] {
-  --bg-ground: #0b1016;
-  --bg-surface: #131a23;
-  --bg-soft: #1b2431;
-  --bg-elevated: #17202b;
-  --border-subtle: #253142;
-  --border-strong: #36475f;
-  --ink-primary: #eef2f7;
-  --ink-secondary: #adbbd0;
-  --ink-muted: #7f91aa;
-  --accent-primary: #34d399;
-  --accent-primary-ink: #071912;
-  --accent-calm: #2dd4bf;
-  --accent-voice: #a78bfa;
+  color-scheme: dark;
+
+  --isom-ground: #0f1311;
+  --isom-ground-alt: #131916;
+  --isom-surface: #18201c;
+  --isom-surface-soft: #212c26;
+  --isom-border: #2b3730;
+  --isom-border-strong: #3e5045;
+  --isom-ink: #eef2ec;
+  --isom-ink-2: #b8c5ba;
+  --isom-ink-muted: #8ea092;
+  --isom-course: #c084fc;
+  --isom-course-hover: #d1a3fd;
+  --isom-course-ink: #160824;
+  --isom-course-soft: rgba(192, 132, 252, 0.16);
+  --isom-course-ring: rgba(192, 132, 252, 0.24);
+
+  --domain-atelier-ink: #f4d06f;
+  --domain-atelier-bg: #2a2312;
+  --domain-atelier-swatch: #eab308;
+  --domain-unu-ink: #a8d294;
+  --domain-unu-bg: #1c2a1d;
+  --domain-unu-swatch: #7ba66a;
+  --domain-arena-ink: #84c5f0;
+  --domain-arena-bg: #152633;
+  --domain-arena-swatch: #5fa7d6;
+
+  --bg-ground: var(--isom-ground);
+  --bg-surface: var(--isom-surface);
+  --bg-soft: var(--isom-surface-soft);
+  --bg-elevated: var(--isom-ground-alt);
+  --border-subtle: var(--isom-border);
+  --border-strong: var(--isom-border-strong);
+  --ink-primary: var(--isom-ink);
+  --ink-secondary: var(--isom-ink-2);
+  --ink-muted: var(--isom-ink-muted);
+  --accent-primary: var(--isom-course);
+  --accent-primary-ink: var(--isom-course-ink);
+  --accent-calm: #4ade80;
+  --accent-voice: var(--isom-course);
   --accent-amber: #fbbf24;
   --accent-danger: #f87171;
-  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.45);
+  --shadow-soft: none;
+  --shadow-hover: none;
 }
 
 :root {
-  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
-  --font-body: 'Figtree', system-ui, sans-serif;
+  --font-display: 'Archivo', system-ui, sans-serif;
+  --font-condensed: 'Barlow Condensed', 'Archivo', system-ui, sans-serif;
+  --font-body: 'Source Sans 3', system-ui, -apple-system, sans-serif;
   --font-reader: 'Literata', Georgia, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
@@ -52,42 +112,53 @@
   box-sizing: border-box;
 }
 
+html {
+  accent-color: var(--isom-course);
+  scrollbar-color: var(--isom-border-strong) var(--isom-ground);
+  scrollbar-width: thin;
+}
+
+@supports not (scrollbar-color: auto) {
+  html {
+    scrollbar-width: auto;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-ground);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 4px;
+  }
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   width: 100%;
   max-width: 100%;
-  min-height: 100%;
+  min-height: 100dvh;
   background: var(--bg-ground);
   color: var(--ink-primary);
   font-family: var(--font-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  caret-color: var(--isom-course);
 }
 
 ::selection {
-  background: rgba(22, 101, 52, 0.22);
+  background: var(--isom-course-soft);
+  color: var(--isom-ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent-primary);
+  outline: 2px solid var(--isom-course);
   outline-offset: 2px;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-ground);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 4px;
 }
 
 button,
@@ -112,10 +183,10 @@ button {
   display: none !important;
 }
 
-/* ==================== SHELL & PORTAL TOPBAR ==================== */
+/* ==================== SHELL & UNIFIED ISOM SWITCH BAR ==================== */
 
 .al-shell {
-  min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
   max-width: 100%;
   display: flex;
@@ -123,23 +194,15 @@ button {
   overflow-x: clip;
 }
 
-/* ==================== ECOSYSTEM SWITCH BAR ==================== */
-
 .eco-switch {
-  --eco-bg: var(--bg-surface);
-  --eco-ink: var(--ink-primary);
-  --eco-ink-muted: var(--ink-secondary);
-  --eco-accent: var(--accent-primary);
-  --eco-accent-ink: var(--accent-primary-ink);
-  --eco-border: var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 40px;
-  padding: 0 12px;
-  background: var(--eco-bg);
-  border-bottom: 1px solid var(--eco-border);
+  min-height: 44px;
+  padding: 4px 16px;
+  background: var(--isom-surface);
+  border-bottom: 1px solid var(--isom-border);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -152,46 +215,73 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 40px;
-  min-width: 40px;
-  padding: 0 12px;
-  border-radius: 8px;
-  color: var(--eco-ink-muted);
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  color: var(--isom-ink-2);
   text-decoration: none;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
 }
 
 .eco-switch-link:hover {
-  color: var(--eco-ink);
-  background: var(--bg-soft);
-}
-
-.eco-switch-link:focus-visible {
-  outline: 2px solid var(--eco-accent);
-  outline-offset: -2px;
+  color: var(--isom-ink);
+  background: var(--isom-surface-soft);
 }
 
 .eco-switch-link.is-current {
-  background: var(--eco-accent);
-  color: var(--eco-accent-ink);
+  background: var(--isom-course-soft);
+  border-color: var(--isom-course);
+  color: var(--isom-course);
+}
+
+.eco-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.eco-swatch.is-dir {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--isom-course);
+  background: var(--isom-course-soft);
+}
+
+.eco-swatch.is-atelier {
+  background: var(--domain-atelier-swatch);
+}
+
+.eco-swatch.is-unu {
+  background: var(--domain-unu-swatch);
+}
+
+.eco-swatch.is-arena {
+  background: var(--domain-arena-swatch);
 }
 
 .eco-label-short {
   display: none;
 }
 
-@media (max-width: 420px) {
+@media (max-width: 720px) {
   .eco-switch {
-    justify-content: flex-start;
-    padding: 0 8px;
+    padding: 4px 8px;
+    gap: 4px;
   }
   .eco-switch-link {
-    padding: 0 10px;
+    padding: 0 9px;
+    gap: 5px;
     font-size: 0.78rem;
   }
   .eco-label-full {
@@ -212,16 +302,14 @@ button {
   top: 0;
   z-index: 30;
   width: 100%;
-  background: color-mix(in srgb, var(--bg-surface) 92%, transparent);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-subtle);
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+  background: var(--isom-surface);
+  border-bottom: 1.5px solid var(--isom-border);
 }
 
 .al-topbar-main {
-  max-width: 1240px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 10px 20px;
+  padding: 10px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -231,21 +319,25 @@ button {
 .al-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
   cursor: pointer;
   min-width: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
 }
 
 .al-brand-emblem {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #166534, #0d9488);
-  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: var(--domain-atelier-bg);
+  border: 1.5px solid var(--domain-atelier-swatch);
+  color: var(--domain-atelier-ink);
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(22, 101, 52, 0.24);
 }
 
 .al-brand-copy {
@@ -256,9 +348,9 @@ button {
 
 .al-brand-name {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: -0.015em;
+  font-weight: 800;
+  font-size: 1.04rem;
+  letter-spacing: -0.02em;
   line-height: 1.15;
   white-space: nowrap;
   overflow: hidden;
@@ -284,18 +376,20 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 11px;
-  border-radius: 8px;
-  background: var(--bg-soft);
-  border: 1px solid var(--border-subtle);
-  font-size: 0.8rem;
+  min-height: 36px;
+  padding: 0 11px;
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
   font-weight: 600;
   color: var(--ink-secondary);
 }
 
 .al-cloud-pill.is-live {
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
+  border-color: var(--accent-calm);
+  color: var(--accent-calm);
 }
 
 .al-cloud-pill.is-err {
@@ -303,44 +397,52 @@ button {
   color: var(--accent-amber);
 }
 
-.al-sos-btn {
+.al-sos-btn,
+.al-sos-pill-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 12px;
-  border-radius: 8px;
-  background: var(--accent-calm);
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: var(--accent-danger);
   color: #ffffff;
-  border: none;
+  border: 1px solid var(--accent-danger);
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+:root[data-theme='night'] .al-sos-btn,
+:root[data-theme='night'] .al-sos-pill-btn {
+  color: #240707;
 }
 
 .al-profile-chip {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 4px 10px 4px 5px;
-  border-radius: 10px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
+  gap: 8px;
+  min-height: 36px;
+  padding: 3px 10px 3px 4px;
+  border-radius: 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
   text-align: left;
 }
 
 .al-profile-chip:hover {
-  border-color: var(--border-strong);
+  background: var(--bg-soft);
 }
 
 .al-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #4b4237;
-  color: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  background: var(--ink-primary);
+  color: var(--bg-surface);
   display: grid;
   place-items: center;
-  font-family: var(--font-display);
-  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -352,15 +454,13 @@ button {
 }
 
 .al-profile-meta strong {
-  font-size: 0.84rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--ink-primary);
 }
 
 .al-profile-meta small {
-  font-size: 0.68rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-size: 0.7rem;
   color: var(--ink-muted);
 }
 
@@ -368,7 +468,7 @@ button {
 .al-subnav-bar {
   border-top: 1px solid var(--border-subtle);
   background: var(--bg-elevated);
-  padding: 6px 20px;
+  padding: 6px 24px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -379,13 +479,13 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 11px;
-  border-radius: 8px;
+  min-height: 34px;
+  padding: 0 11px;
+  border-radius: 6px;
   background: var(--bg-surface);
   border: 1px solid var(--border-strong);
   font-size: 0.82rem;
   text-decoration: none;
-  color: inherit;
   font-weight: 700;
   color: var(--ink-primary);
   white-space: nowrap;
@@ -410,15 +510,16 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 11px;
-  border-radius: 8px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 6px;
   background: transparent;
   border: 1px solid transparent;
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--ink-secondary);
   white-space: nowrap;
-  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
 }
 
 .al-nav-btn:hover {
@@ -427,18 +528,18 @@ button {
 }
 
 .al-nav-btn.is-active {
-  background: var(--bg-surface);
-  border-color: var(--border-strong);
-  color: var(--accent-primary);
+  background: var(--isom-course-soft);
+  border-color: var(--isom-course);
+  color: var(--isom-course);
 }
 
 .al-main {
   flex: 1;
   width: 100%;
   min-width: 0;
-  max-width: 1240px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 24px 20px 56px;
+  padding: 22px 24px 56px;
 }
 
 .al-page > *,
@@ -449,12 +550,12 @@ button {
   min-width: 0;
 }
 
-/* ==================== COMMON UI ==================== */
+/* ==================== COMMON UI (CURSO ISOM) ==================== */
 
 .al-page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .al-module-hero {
@@ -464,46 +565,47 @@ button {
   flex-wrap: wrap;
   gap: 14px;
   padding: 16px 20px;
-  border-radius: 14px;
+  border-radius: 8px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-soft);
 }
 
 .al-module-hero-id {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   min-width: 0;
 }
 
 .al-module-hero h1 {
   margin: 0 0 3px;
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+  font-size: clamp(1.22rem, 2.2vw, 1.58rem);
+  font-weight: 800;
   line-height: 1.15;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 .al-module-hero p {
   margin: 0;
   color: var(--ink-secondary);
   font-size: 0.9rem;
-  max-width: 64ch;
+  max-width: 66ch;
 }
 
 .al-panel {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: var(--shadow-soft);
+  border-radius: 8px;
+  padding: 18px 20px;
 }
 
 .al-panel h2 {
   margin: 0 0 10px;
   font-family: var(--font-display);
-  font-size: 1.08rem;
+  font-size: 1.04rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
 
 .al-card-head {
@@ -524,35 +626,50 @@ button {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 8px 13px;
-  border-radius: 8px;
-  background: var(--bg-soft);
-  border: 1px solid var(--border-subtle);
-  font-size: 0.85rem;
+  min-height: 36px;
+  padding: 6px 13px;
+  border-radius: 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  font-size: 0.84rem;
   font-weight: 600;
   text-decoration: none;
-  transition: border-color 0.14s ease, transform 0.14s ease;
+  color: var(--ink-primary);
+  transition: background-color 130ms ease, border-color 130ms ease;
 }
 
-.al-btn:hover {
-  border-color: var(--border-strong);
+.al-btn:hover:not(:disabled) {
+  background: var(--bg-soft);
+  border-color: var(--ink-muted);
 }
 
 .al-btn.is-toggled {
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
+  border-color: var(--isom-course);
+  background: var(--isom-course-soft);
+  color: var(--isom-course);
 }
 
 .al-btn-primary {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: var(--accent-primary-ink);
+  background: var(--isom-course);
+  border-color: var(--isom-course);
+  color: var(--isom-course-ink);
+  font-weight: 700;
+}
+
+.al-btn-primary:hover:not(:disabled) {
+  background: var(--isom-course-hover);
+  border-color: var(--isom-course-hover);
+  color: var(--isom-course-ink);
 }
 
 .al-btn-calm {
   background: var(--accent-calm);
   border-color: var(--accent-calm);
   color: #ffffff;
+}
+
+:root[data-theme='night'] .al-btn-calm {
+  color: #072013;
 }
 
 .al-btn-danger {
@@ -566,9 +683,9 @@ button {
   place-items: center;
   width: 34px;
   height: 34px;
-  border-radius: 8px;
-  background: var(--bg-soft);
-  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
 }
 
 .al-icon-btn.is-fav {
@@ -580,9 +697,9 @@ button {
   background: none;
   border: none;
   padding: 0;
-  color: var(--accent-primary);
+  color: var(--isom-course);
   font-size: 0.84rem;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -592,11 +709,11 @@ button {
   align-items: center;
   gap: 6px;
   font-family: var(--font-mono);
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
-  padding: 5px 10px;
-  border-radius: 7px;
-  background: var(--bg-soft);
+  padding: 4px 9px;
+  border-radius: 5px;
+  background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   color: var(--ink-secondary);
 }
@@ -622,8 +739,9 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 12px;
-  border-radius: 8px;
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 6px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   font-size: 0.84rem;
@@ -631,10 +749,15 @@ button {
   color: var(--ink-secondary);
 }
 
+.al-seg-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--ink-primary);
+}
+
 .al-seg-btn.is-active {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: var(--accent-primary-ink);
+  background: var(--ink-primary);
+  border-color: var(--ink-primary);
+  color: var(--bg-surface);
 }
 
 .al-toolbar {
@@ -659,53 +782,48 @@ button {
   align-items: start;
 }
 
-/* ==================== SIGNATURE DIAMOND EMBLEM & DIRECTORY ==================== */
+/* ==================== ISOM MODULE EMBLEM & WORKSHOP GRID ==================== */
+/* Replaces legacy rotated UNU diamonds inside all 17 inner module heroes */
 
 .al-diamond-emblem {
   position: relative;
-  width: 78px;
-  height: 78px;
+  width: 46px;
+  height: 46px;
   display: grid;
   place-items: center;
-  margin: 6px auto 12px;
   flex-shrink: 0;
 }
 
 .al-diamond-emblem.is-sm {
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   margin: 0;
 }
 
 .al-diamond-ring {
   position: absolute;
-  inset: 6px;
-  border-radius: 12px;
-  transform: rotate(45deg);
-  border: 7px solid var(--em-c1, #166534);
-  border-right-color: var(--em-c2, #6ee7b7);
-  border-bottom-color: var(--em-c2, #6ee7b7);
-  background: var(--bg-surface);
-  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.al-diamond-emblem.is-sm .al-diamond-ring {
-  inset: 4px;
-  border-width: 4px;
+  inset: 0;
   border-radius: 8px;
+  transform: none;
+  border: 1.5px solid var(--domain-atelier-swatch);
+  background: var(--domain-atelier-bg);
 }
 
 .al-diamond-core {
   position: relative;
   z-index: 1;
-  color: var(--em-c1, #166534);
+  color: var(--domain-atelier-ink);
   display: grid;
   place-items: center;
 }
 
-:root[data-theme='night'] .al-diamond-core {
-  color: var(--em-c2, #6ee7b7);
+.al-home-h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.32rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
 }
 
 .al-dir-toolbar {
@@ -716,143 +834,162 @@ button {
   gap: 12px;
 }
 
+.al-home-search-wrap {
+  min-width: 240px;
+}
+
+.al-home-search {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface);
+  color: var(--ink-primary);
+  font-size: 0.86rem;
+}
+
+.al-home-search:focus {
+  outline: none;
+  border-color: var(--isom-course);
+  box-shadow: 0 0 0 3px var(--isom-course-ring);
+}
+
 .al-dir-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(198px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+  gap: 12px;
 }
 
 .al-dir-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 8px;
-  padding: 22px 16px 18px;
-  border-radius: 14px;
+  align-items: stretch;
+  text-align: left;
+  gap: 10px;
+  padding: 15px 16px;
+  border-radius: 8px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-soft);
   text-decoration: none;
   color: inherit;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+  min-height: 138px;
+  transition: border-color 140ms ease, transform 140ms ease;
 }
 
 .al-dir-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-hover);
-  border-color: var(--border-strong);
+  transform: translateY(-1px);
+  border-color: var(--isom-course);
 }
 
-.al-dir-card:hover .al-diamond-ring {
-  transform: rotate(45deg) scale(1.06);
+.al-dir-card.is-done-today {
+  border-color: var(--accent-calm);
 }
 
-.al-dir-card.is-dimmed {
-  opacity: 0.48;
+.al-mod-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.al-tile-pin {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: var(--accent-amber);
+.al-track-pill {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--domain-atelier-bg);
+  color: var(--domain-atelier-ink);
+}
+
+.al-dir-card[data-track='estudio'] .al-track-pill {
+  background: var(--bg-elevated);
+  color: var(--ink-secondary);
+}
+
+.al-dir-card[data-track='bienestar'] .al-track-pill {
+  background: var(--domain-unu-bg);
+  color: var(--domain-unu-ink);
+}
+
+.al-mod-icon-box {
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--ink-secondary);
+  display: grid;
+  place-items: center;
+}
+
+.al-dir-card:hover .al-mod-icon-box {
+  border-color: var(--isom-course);
+  background: var(--isom-course-soft);
+  color: var(--isom-course);
 }
 
 .al-tile-title {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  font-family: var(--font-display);
-  line-height: 1.2;
-}
-
-.al-tile-prefix {
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--ink-muted);
+  gap: 3px;
 }
 
 .al-tile-title strong {
-  font-size: 0.98rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
   font-weight: 700;
+  letter-spacing: -0.015em;
   color: var(--ink-primary);
 }
 
 .al-tile-sub {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.81rem;
   color: var(--ink-secondary);
-  line-height: 1.35;
+  line-height: 1.38;
 }
 
-.al-tile-badge {
+.al-tile-progress {
   margin-top: auto;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: var(--bg-soft);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--ink-secondary);
-}
-
-.al-tile-editbar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  margin-top: 6px;
   padding-top: 8px;
   border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   width: 100%;
 }
 
-.al-mini-ctrl {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  border: 1px solid var(--border-subtle);
+.al-tile-prog-track {
+  height: 4px;
+  width: 100%;
+  border-radius: 999px;
   background: var(--bg-soft);
-  display: grid;
-  place-items: center;
-  color: var(--ink-secondary);
+  overflow: hidden;
 }
 
-.al-mini-ctrl.is-on {
-  color: var(--accent-amber);
-  border-color: var(--accent-amber);
+.al-tile-prog-fill {
+  height: 100%;
+  background: var(--isom-course);
 }
 
-.al-mini-ctrl.is-off {
-  color: var(--accent-primary);
-}
-
-.al-mini-ctrl.is-del {
-  color: var(--accent-danger);
-}
-
-.al-add-link-bar {
+.al-tile-prog-meta {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
 }
 
-.al-add-link-bar label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.82rem;
-  font-weight: 600;
+.al-tile-prog-meta strong {
+  color: var(--ink-primary);
 }
 
-.al-add-link-bar input,
-.al-add-link-bar select {
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
-  font-size: 0.88rem;
+.al-cockpit-card.is-active-leg {
+  border: 1.5px solid var(--isom-course);
 }
 
 .al-form-grid-2 {
@@ -865,11 +1002,6 @@ button {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-}
-
-.al-add-link-submit {
-  display: flex;
-  align-items: flex-end;
 }
 
 /* ==================== PULSE ROW & CAPSULES ==================== */
@@ -4553,5 +4685,115 @@ textarea:focus-visible {
   .al-pose-stage {
     grid-template-columns: 1fr;
     justify-items: center;
+  }
+
+  .al-topbar-main {
+    padding: 10px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .al-topbar-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .al-cloud-pill {
+    padding: 0 9px;
+    font-size: 0.74rem;
+  }
+
+  .al-cloud-pill span {
+    max-width: none;
+    overflow: visible;
+    white-space: nowrap;
+  }
+
+  .al-brand-sub,
+  .al-profile-meta,
+  .al-theme-btn span {
+    display: none;
+  }
+
+  .al-main {
+    padding: 16px 14px 44px;
+  }
+
+  .al-home-search-wrap {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Curso ISOM overrides for mastery orb, cockpit and accessibility */
+.al-cockpit-card.is-active-leg .al-cockpit-resume {
+  background: transparent !important;
+  border: none !important;
+  padding: 2px 0 0 !important;
+}
+.al-level-orb {
+  border-radius: 50% !important;
+  border: 2px solid var(--isom-course) !important;
+  background: var(--isom-course-soft) !important;
+  color: var(--isom-course) !important;
+  box-shadow: none !important;
+}
+
+.al-cockpit-item {
+  border-radius: 0 !important;
+  border: none !important;
+  border-top: 1px solid var(--border-subtle) !important;
+  background: transparent !important;
+  padding: 10px 2px !important;
+}
+
+.al-cockpit-item:hover {
+  background: var(--bg-elevated) !important;
+  border-top-color: var(--isom-course) !important;
+}
+
+.al-cockpit-item.is-priority {
+  border-left: none !important;
+  border-top-color: var(--accent-amber) !important;
+}
+
+.al-umbral-chip,
+.al-umbral-chip.is-critical {
+  border-left-width: 1px !important;
+  border-radius: 6px !important;
+}
+
+.al-umbral-chip.is-critical {
+  border-color: var(--accent-danger) !important;
+}
+
+.al-sos-pill-btn {
+  background: var(--accent-danger) !important;
+  border-color: var(--accent-danger) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme='night'] .al-sos-pill-btn {
+  color: #240707 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .al-panel,
+  .al-dir-card,
+  .al-btn,
+  .eco-switch-link.is-current {
+    border: 1px solid CanvasText;
   }
 }
