@@ -128,6 +128,48 @@ export const ORATORY_PROMPTS: OratoryPrompt[] = [
     framework: 'Síntesis en 1 línea → Eco del inicio → Llamado concreto',
     durationSec: 40,
   },
+  {
+    id: 'op-17',
+    title: 'Presentación personal en 30 segundos (Elevator Pitch)',
+    prompt: 'Preséntate indicando qué estudias o construyes, qué problema te interesa resolver y un logro reciente comprobable.',
+    framework: 'Quién soy → Qué resuelvo → Evidencia concreta',
+    durationSec: 30,
+  },
+  {
+    id: 'op-18',
+    title: 'Explica un concepto técnico a alguien no técnico',
+    prompt: 'Explica qué es una API o una base de datos usando una analogía cotidiana sin emplear siglas complejas.',
+    framework: 'Analogía familiar → Puente técnico → Beneficio práctico',
+    durationSec: 50,
+  },
+  {
+    id: 'op-19',
+    title: 'Defiende una decisión de diseño ante objeciones',
+    prompt: 'Responde a alguien que pregunta por qué elegiste una solución más simple en lugar de una arquitectura compleja.',
+    framework: 'Validar inquietud → Criterio de costo/beneficio → Plan si crece',
+    durationSec: 60,
+  },
+  {
+    id: 'op-20',
+    title: 'Resumen ejecutivo de un incidente técnico',
+    prompt: 'Reporta una caída temporal de un servicio explicando impacto, causa raíz, solución aplicada y prevención.',
+    framework: 'Impacto → Causa raíz → Mitigación → Prevención',
+    durationSec: 65,
+  },
+  {
+    id: 'op-21',
+    title: 'Pide ayuda clara cuando te bloqueas',
+    prompt: 'Explica a un mentor qué intentas lograr, qué tres pruebas ya realizaste y qué hipótesis quieres validar.',
+    framework: 'Meta → Intentos previos → Pregunta específica',
+    durationSec: 45,
+  },
+  {
+    id: 'op-22',
+    title: 'Cuenta una historia de aprendizaje real (STAR)',
+    prompt: 'Relata un proyecto difícil resaltando Situación, Tarea, Acción personal y Resultado medible.',
+    framework: 'Situación → Tarea → Acción → Resultado',
+    durationSec: 75,
+  },
 ];
 
 export const DICTION_DRILLS: DictionDrill[] = [
@@ -240,6 +282,39 @@ export const DICTION_DRILLS: DictionDrill[] = [
     ],
     sampleText:
       'Un buen diseño tiene tres cualidades: se entiende en segundos, resiste errores comunes y respeta el tiempo de quien lo usa.',
+  },
+  {
+    id: 'dd-pausas-silencio',
+    title: 'Pausas conscientes en lugar de muletillas',
+    steps: [
+      '1. Lee cada oración y cuenta un segundo completo en silencio al llegar al punto.',
+      '2. Mantén la boca cerrada durante la pausa para evitar decir «eh» o «este».',
+      '3. Reanuda con voz firme y proyección hacia el frente.',
+    ],
+    sampleText:
+      'Primero definimos el alcance real. Luego medimos el rendimiento actual. Finalmente aplicamos la mejora con pruebas verificables.',
+  },
+  {
+    id: 'dd-trabalenguas-precision',
+    title: 'Trabalenguas de consonantes trabadas (pr / tr / cr)',
+    steps: [
+      '1. Pronuncia a cámara lenta golpeando suave la punta de la lengua.',
+      '2. Repite a ritmo medio manteniendo todas las R claras.',
+      '3. Cierra con una lectura rápida sin perder ninguna vocal final.',
+    ],
+    sampleText:
+      'Tres programas prácticos procesan pruebas precisas mientras criterios claros previenen problemas crónicos en producción.',
+  },
+  {
+    id: 'dd-proyeccion-respiracion',
+    title: 'Proyección diafragmática en frases largas',
+    steps: [
+      '1. Toma aire suave por la nariz expandiendo el abdomen sin subir hombros.',
+      '2. Di la frase entera con volumen constante sin quedarte sin aire al final.',
+      '3. Repite bajando el ritmo un 15 por ciento para sonar más seguro.',
+    ],
+    sampleText:
+      'Cuando organizamos nuestras ideas en bloques claros y respiramos antes de cada cambio de tema, nuestra voz transmite serenidad y dominio.',
   },
 ];
 
@@ -552,4 +627,68 @@ export const FLASHCARDS_BANK: FlashcardItem[] = [
     back: 'Indica el objetivo en una línea, el contexto mínimo con datos reproducibles, lo que ya probaste y la pregunta o decisión exacta que necesitas.',
     source: 'Comunicación Técnica',
   },
+  {
+    id: 'fc-db-1',
+    deck: 'Bases de Datos',
+    front: '¿Qué garantizan las propiedades ACID en una transacción SQL?',
+    back: 'Atomicidad (todo o nada), Consistencia (respeta reglas), Aislamiento (transacciones concurrentes no se corrompen) y Durabilidad (persiste tras confirmar).',
+    source: 'Bases de Datos',
+  },
+  {
+    id: 'fc-db-2',
+    deck: 'Bases de Datos',
+    front: '¿Cuándo ayuda y cuándo penaliza un índice B-Tree en una tabla?',
+    back: 'Acelera búsquedas, ordenamientos y filtros selectivos (SELECT/WHERE/JOIN), pero añade espacio en disco y costo extra en cada INSERT, UPDATE o DELETE.',
+    source: 'Bases de Datos',
+  },
+  {
+    id: 'fc-db-3',
+    deck: 'Bases de Datos',
+    front: '¿Qué diferencia a un INNER JOIN de un LEFT JOIN?',
+    back: 'INNER JOIN devuelve solo filas con coincidencia en ambas tablas; LEFT JOIN conserva todas las filas de la tabla izquierda rellenando con NULL si no hay pareja.',
+    source: 'Bases de Datos',
+  },
+  {
+    id: 'fc-db-4',
+    deck: 'Bases de Datos',
+    front: '¿Qué problema evita la Tercera Forma Normal (3FN)?',
+    back: 'Elimina dependencias transitivas entre atributos no clave, reduciendo redundancia y anomalías de actualización.',
+    source: 'Bases de Datos',
+  },
+  {
+    id: 'fc-is-1',
+    deck: 'Ingeniería de Software',
+    front: '¿Qué distingue una prueba unitaria de una prueba de integración?',
+    back: 'La prueba unitaria verifica una función o módulo aislado con rapidez; la de integración comprueba cómo colaboran varios módulos reales entre sí.',
+    source: 'Ingeniería de Software',
+  },
+  {
+    id: 'fc-is-2',
+    deck: 'Ingeniería de Software',
+    front: '¿Qué propone el Principio de Responsabilidad Única (SRP)?',
+    back: 'Cada módulo o clase debe tener una sola razón principal para cambiar, evitando componentes gigantes que mezclan negocio, UI y persistencia.',
+    source: 'Ingeniería de Software',
+  },
+  {
+    id: 'fc-is-3',
+    deck: 'Ingeniería de Software',
+    front: '¿Qué es la idempotencia en una API o script de migración?',
+    back: 'Ejecutar la misma operación una o varias veces produce exactamente el mismo estado final sin duplicar datos ni romper el sistema.',
+    source: 'Ingeniería de Software',
+  },
+  {
+    id: 'fc-is-4',
+    deck: 'Ingeniería de Software',
+    front: '¿Por qué es útil aplicar caché local-first con sincronización diferida?',
+    back: 'La interfaz responde al instante incluso sin conexión y evita perder cambios mientras sincroniza en segundo plano al recuperar red.',
+    source: 'Ingeniería de Software',
+  },
+];
+
+export const ORATORY_RUBRIC_ITEMS: { id: string; label: string }[] = [
+  { id: 'hook', label: 'Abrí con la idea principal en los primeros 10 segundos' },
+  { id: 'structure', label: 'Seguí una estructura clara de 3 bloques' },
+  { id: 'pauses', label: 'Usé pausas silenciosas en lugar de muletillas' },
+  { id: 'voice', label: 'Mantuve ritmo sereno y buena articulación' },
+  { id: 'close', label: 'Cerré con una conclusión o acción concreta' },
 ];

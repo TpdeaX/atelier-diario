@@ -1,4 +1,5 @@
 import { Icons } from '../icons';
+import { lifeStore } from '../state/LifeStore';
 
 export interface SectionTutorialSpec {
   id: string;
@@ -9,8 +10,6 @@ export interface SectionTutorialSpec {
   tip?: string;
 }
 
-const STORAGE_PREFIX = 'al_tut_';
-
 function escHtml(raw: string): string {
   return raw
     .replace(/&/g, '&amp;')
@@ -20,30 +19,13 @@ function escHtml(raw: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function readOpenState(id: string): boolean {
-  try {
-    if (typeof sessionStorage === 'undefined') return false;
-    return sessionStorage.getItem(STORAGE_PREFIX + id) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function writeOpenState(id: string, open: boolean): void {
-  try {
-    if (typeof sessionStorage === 'undefined') return;
-    sessionStorage.setItem(STORAGE_PREFIX + id, open ? '1' : '0');
-  } catch {
-    // ignore storage quota / privacy mode errors
-  }
-}
-
 function stripLeadingStepNumber(step: string): string {
   return step.replace(/^\s*\d+[\.)]\s+/, '').trim();
 }
 
 export function renderTutorialBanner(spec: SectionTutorialSpec): string {
-  const isOpen = readOpenState(spec.id);
+  const isOpen = lifeStore.isTutorialOpen(spec.id);
+  const isDone = lifeStore.isTutorialDone(spec.id);
   const steps = spec.steps
     .map((s) => stripLeadingStepNumber(s))
     .filter((s) => s.length > 0);
@@ -59,24 +41,34 @@ export function renderTutorialBanner(spec: SectionTutorialSpec): string {
 
   return `
     <section
-      class="al-tutorial-box ${isOpen ? 'is-open' : ''}"
+      class="al-tutorial-box ${isOpen ? 'is-open' : ''} ${isDone ? 'is-done' : ''}"
       data-tut-id="${escHtml(spec.id)}"
       data-tut-open="${isOpen ? '1' : '0'}"
       aria-label="Tutorial de ${escHtml(spec.sectionName)}"
     >
       <div class="al-tutorial-head">
         <div class="al-tutorial-title-wrap">
-          <span class="al-tutorial-badge">${Icons.bulb(14)}<span>Guía rápida</span></span>
+          <span class="al-tutorial-badge">${isDone ? Icons.check(14) : Icons.bulb(14)}<span>${isDone ? 'Guía completada' : 'Guía rápida'}</span></span>
           <strong class="al-tutorial-title">${escHtml(spec.moduleName)} · ${escHtml(spec.sectionName)}</strong>
           <span class="al-tutorial-summary">${escHtml(spec.summary)}</span>
         </div>
-        <button
-          type="button"
-          class="al-btn al-btn-sm al-tutorial-toggle"
-          aria-expanded="${isOpen}"
-        >
-          ${Icons.chevronDown(14)}<span class="al-tutorial-toggle-label">${isOpen ? 'Ocultar tutorial' : 'Tutorial'}</span>
-        </button>
+        <div class="al-tutorial-actions">
+          <button
+            type="button"
+            class="al-btn al-btn-sm al-tutorial-done-btn ${isDone ? 'al-btn-primary' : ''}"
+            aria-pressed="${isDone}"
+            title="Marcar esta guía como dominada (se guarda en tu perfil)"
+          >
+            ${Icons.check(13)}<span>${isDone ? 'Dominada' : 'Marcar entendida'}</span>
+          </button>
+          <button
+            type="button"
+            class="al-btn al-btn-sm al-tutorial-toggle"
+            aria-expanded="${isOpen}"
+          >
+            ${Icons.chevronDown(14)}<span class="al-tutorial-toggle-label">${isOpen ? 'Ocultar tutorial' : 'Tutorial'}</span>
+          </button>
+        </div>
       </div>
       <div class="al-tutorial-body"${isOpen ? '' : ' hidden'}>
         ${stepsHtml}
@@ -92,6 +84,7 @@ export function bindTutorialBanners(root: HTMLElement): void {
     box.dataset.tutBound = '1';
     const id = box.dataset.tutId ?? '';
     const toggleBtn = box.querySelector<HTMLButtonElement>('.al-tutorial-toggle');
+    const doneBtn = box.querySelector<HTMLButtonElement>('.al-tutorial-done-btn');
     const labelEl = box.querySelector<HTMLElement>('.al-tutorial-toggle-label');
     const bodyEl = box.querySelector<HTMLElement>('.al-tutorial-body');
     if (!toggleBtn || !bodyEl) return;
@@ -105,7 +98,19 @@ export function bindTutorialBanners(root: HTMLElement): void {
         labelEl.textContent = nextOpen ? 'Ocultar tutorial' : 'Tutorial';
       }
       bodyEl.hidden = !nextOpen;
-      if (id) writeOpenState(id, nextOpen);
+      if (id) lifeStore.setTutorialOpen(id, nextOpen);
+    });
+
+    doneBtn?.addEventListener('click', () => {
+      if (!id) return;
+      const done = lifeStore.toggleTutorialDone(id);
+      box.classList.toggle('is-done', done);
+      doneBtn.classList.toggle('al-btn-primary', done);
+      doneBtn.setAttribute('aria-pressed', String(done));
+      const span = doneBtn.querySelector('span');
+      if (span) span.textContent = done ? 'Dominada' : 'Marcar entendida';
+      const badgeSpan = box.querySelector('.al-tutorial-badge span');
+      if (badgeSpan) badgeSpan.textContent = done ? 'Guía completada' : 'Guía rápida';
     });
   });
 }

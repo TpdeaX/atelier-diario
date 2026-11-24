@@ -3623,3 +3623,416 @@ textarea:focus-visible {
   }
 }
 
+/* ==================== UNIFIED DIDACTIC BAR, DIFFICULTY & MASTERY ==================== */
+
+.al-didactic-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+}
+
+.al-didactic-progress {
+  flex: 1 1 280px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.al-didactic-prog-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.al-didactic-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.al-didactic-pct {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--accent-primary);
+}
+
+.al-didactic-meter {
+  width: 100%;
+  height: 8px;
+  appearance: none;
+  border: none;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+
+.al-didactic-meter::-webkit-progress-bar {
+  background: var(--bg-soft);
+  border-radius: 999px;
+}
+
+.al-didactic-meter::-webkit-progress-value {
+  background: var(--accent-primary);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.al-didactic-meter::-moz-progress-bar {
+  background: var(--accent-primary);
+  border-radius: 999px;
+}
+
+.al-didactic-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.al-didactic-extra {
+  font-family: var(--font-mono);
+  color: var(--ink-secondary);
+}
+
+.al-didactic-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.al-diff-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.al-diff-caption {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+}
+
+.al-diff-pills {
+  display: inline-flex;
+  background: var(--bg-soft);
+  padding: 3px;
+  border-radius: 9px;
+  border: 1px solid var(--border-subtle);
+  gap: 2px;
+}
+
+.al-diff-btn {
+  border: none;
+  background: transparent;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.al-diff-btn:hover {
+  color: var(--ink-primary);
+}
+
+.al-diff-btn.is-active {
+  background: var(--accent-primary);
+  color: var(--accent-primary-ink);
+}
+
+.al-diff-hint {
+  font-size: 0.73rem;
+  color: var(--ink-muted);
+  max-width: 290px;
+}
+
+.al-save-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+}
+
+.al-save-chip.is-cloud {
+  border-color: rgba(22, 101, 52, 0.35);
+  color: var(--accent-primary);
+  background: rgba(22, 101, 52, 0.08);
+}
+
+.al-save-chip.is-saved-flash {
+  border-color: var(--accent-primary);
+  background: var(--accent-primary);
+  color: var(--accent-primary-ink);
+}
+
+.al-tutorial-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.al-tutorial-box.is-done {
+  border-color: rgba(22, 101, 52, 0.35);
+}
+
+/* HomeView tile progress strip & global mastery */
+.al-tile-progress {
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.al-tile-prog-track {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+
+.al-tile-prog-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent-primary);
+}
+
+.al-tile-prog-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--ink-muted);
+}
+
+.al-global-mastery {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+}
+
+.al-global-mastery-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.al-level-orb {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--accent-primary);
+  color: var(--accent-primary-ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  line-height: 1.05;
+  flex-shrink: 0;
+}
+
+.al-level-orb small {
+  font-size: 0.62rem;
+  opacity: 0.85;
+  text-transform: uppercase;
+}
+
+/* Interactive visual keyboard for TypingView */
+.al-vkbd {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+.al-vkbd-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.al-vkbd-key {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+
+.al-vkbd-key.is-space {
+  min-width: 170px;
+}
+
+.al-vkbd-key.is-target {
+  background: var(--accent-primary);
+  color: var(--accent-primary-ink);
+  border-color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.al-vkbd-key.is-weak {
+  border-color: var(--accent-amber);
+  background: rgba(180, 83, 9, 0.14);
+  color: var(--accent-amber);
+}
+
+/* Didactic step chips, quiz cards, checklists & check-in scales */
+.al-step-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.al-step-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+
+.al-step-pill.is-active {
+  background: var(--accent-primary);
+  color: var(--accent-primary-ink);
+  border-color: var(--accent-primary);
+}
+
+.al-step-pill.is-done {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.al-mastery-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: rgba(22, 101, 52, 0.12);
+  color: var(--accent-primary);
+}
+
+.al-mastery-badge.is-warn {
+  background: rgba(180, 83, 9, 0.14);
+  color: var(--accent-amber);
+}
+
+.al-study-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.al-study-card {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.al-study-card.is-done {
+  border-color: rgba(22, 101, 52, 0.45);
+}
+
+.al-scale-row {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin: 6px 0;
+}
+
+.al-scale-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+
+.al-scale-btn.is-active {
+  background: var(--accent-calm);
+  color: #ffffff;
+  border-color: var(--accent-calm);
+}
+
+.al-inline-note {
+  width: 100%;
+  min-height: 64px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  font-size: 0.88rem;
+  resize: vertical;
+}
+
+@media (max-width: 640px) {
+  .al-didactic-bar {
+    padding: 10px 12px;
+  }
+  .al-tutorial-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+

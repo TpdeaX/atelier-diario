@@ -3,6 +3,7 @@ import { PHRASES_BANK, VOCABULARY_DECK } from '../data/KnowledgeBank';
 import { VAULT_BANK } from '../data/SavedVaultBank';
 import { SINGING_DRILLS, SINGING_SONGS } from '../data/SingingBank';
 import { Icons } from '../icons';
+import { cloudSync } from '../services/CloudSync';
 import { fetchRandomWikiSummary, WikiSummary } from '../services/OnlineApi';
 import {
   ArenaSnapshot,
@@ -15,7 +16,8 @@ import {
 } from '../services/UmbralBridge';
 import { directoryStore } from '../state/DirectoryStore';
 import { lifeStore } from '../state/LifeStore';
-import { DirectoryCategory, HabitKey, ModuleId } from '../types';
+import { DirectoryCategory, HabitKey, ModuleId, PracticeModuleId } from '../types';
+import { difficultyLabel } from '../ui/DidacticBar';
 import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
 
 const HOME_TUTORIALS: Record<'all' | DirectoryCategory, Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
@@ -371,6 +373,13 @@ export class HomeView {
     const dir = directoryStore.get();
     this.lastArenaSnap = loadArenaSnapshot();
     const doneCount = Object.values(profile.todayHabits).filter(Boolean).length;
+    const mastery = lifeStore.getOverallMasterySummary();
+    const syncMeta = cloudSync.getSyncMeta();
+    const tutorialsDoneCount = profile.progress.tutorialsDone.length;
+    const xpRemaining = Math.max(0, mastery.nextLevelXp - mastery.totalXp);
+    const saveStatusLabel = syncMeta.configured
+      ? `Guardado · Nube (${syncMeta.spaceCode})`
+      : 'Guardado local';
 
     const dayIdx = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
     const dailyPhrase = PHRASES_BANK[dayIdx % PHRASES_BANK.length];
@@ -397,6 +406,10 @@ export class HomeView {
       .map((item) => {
         const isPinned = dir.pinnedIds.includes(item.id);
         const isHidden = dir.hiddenIds.includes(item.id);
+        const isPracticeModule = item.route !== undefined && item.route !== 'home';
+        const modKey = isPracticeModule ? (item.route as PracticeModuleId) : null;
+        const modPct = modKey ? (mastery.byModule[modKey] ?? 0) : 0;
+        const modDiff = modKey ? difficultyLabel(lifeStore.getDifficulty(modKey)) : '';
 
         const emblem = `
           <div class="al-diamond-emblem" style="--em-c1: ${item.c1}; --em-c2: ${item.c2}">
@@ -404,6 +417,20 @@ export class HomeView {
             <span class="al-diamond-core">${item.icon(26)}</span>
           </div>
         `;
+
+        const tileProgressHtml = isPracticeModule
+          ? `
+            <div class="al-tile-progress" aria-label="Dominio ${modPct}%, dificultad ${modDiff}">
+              <div class="al-tile-prog-track">
+                <div class="al-tile-prog-fill" style="width:${modPct}%"></div>
+              </div>
+              <div class="al-tile-prog-meta">
+                <span>${modDiff}</span>
+                <strong>${modPct}%</strong>
+              </div>
+            </div>
+          `
+          : '';
 
         const inner = `
           ${isPinned && !this.editMode ? `<span class="al-tile-pin" title="Fijado">${Icons.star(12)}</span>` : ''}
@@ -414,6 +441,7 @@ export class HomeView {
           </div>
           <p class="al-tile-sub">${item.subtitle}</p>
           ${item.badgeText ? `<span class="al-tile-badge">${item.badgeText}</span>` : ''}
+          ${tileProgressHtml}
         `;
 
         const editControls = this.editMode
@@ -520,6 +548,39 @@ export class HomeView {
             : ''
         }
 
+        <section class="al-panel al-global-mastery" aria-label="Progreso global de Atelier Diario">
+          <div class="al-global-mastery-left">
+            <div class="al-level-orb" aria-label="Nivel ${mastery.level}">
+              <small>Nv</small>
+              <span>${mastery.level}</span>
+            </div>
+            <div>
+              <strong style="font-size:0.96rem;">Progreso Global de Atelier</strong>
+              <p class="al-muted" style="margin:2px 0 0; font-size:0.82rem;">
+                ${mastery.totalXp} XP acumulados · Faltan ${xpRemaining} XP para Nivel ${mastery.level + 1}
+              </p>
+            </div>
+          </div>
+
+          <div class="al-didactic-progress" style="max-width:360px;">
+            <div class="al-didactic-prog-head">
+              <span class="al-didactic-label">Avance hacia Nivel ${mastery.level + 1}</span>
+              <strong class="al-didactic-pct">${mastery.levelPct}%</strong>
+            </div>
+            <progress class="al-didactic-meter" value="${mastery.levelPct}" max="100" aria-label="Progreso hacia el siguiente nivel: ${mastery.levelPct}%"></progress>
+            <div class="al-didactic-meta">
+              <span>Guías completadas: ${tutorialsDoneCount}</span>
+              <span>Racha: ${profile.dailyStreak === 1 ? '1 día' : `${profile.dailyStreak} días`}</span>
+            </div>
+          </div>
+
+          <div class="al-tool-group">
+            <button type="button" class="al-save-chip ${syncMeta.configured ? 'is-cloud' : ''}" id="al-home-sync-now" title="Guardar y sincronizar progreso ahora">
+              ${syncMeta.configured ? Icons.cloud(13) : Icons.check(13)}<span>${saveStatusLabel}</span>
+            </button>
+          </div>
+        </section>
+
         <section class="al-dir-grid" aria-label="Directorio de módulos">
           ${tilesHtml || '<div class="al-panel al-muted">No hay módulos visibles en esta categoría. Activa «Personalizar» para mostrar ocultos o agrega un acceso nuevo.</div>'}
         </section>
@@ -588,6 +649,22 @@ export class HomeView {
         </section>
       </div>
     `;
+
+    container.querySelector('#al-home-sync-now')?.addEventListener('click', async (e) => {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const span = btn.querySelector('span');
+      if (span) span.textContent = 'Guardando...';
+      const ok = await lifeStore.pushNow();
+      if (span) {
+        span.textContent = ok
+          ? 'Sincronizado ahora'
+          : cloudSync.isConfigured()
+            ? 'Guardado local (sin red)'
+            : 'Guardado en este dispositivo';
+      }
+      btn.classList.add('is-saved-flash');
+      window.setTimeout(() => btn.classList.remove('is-saved-flash'), 1200);
+    });
 
     container.querySelectorAll<HTMLElement>('[data-nav]').forEach((el) => {
       el.addEventListener('click', () => navigate(el.dataset.nav as ModuleId));

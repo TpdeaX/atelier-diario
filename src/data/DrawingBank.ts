@@ -1628,3 +1628,144 @@ export function evaluateDrawingCoverage(
     strokeCount,
   };
 }
+
+export interface DrawingChallenge {
+  id: string;
+  title: string;
+  difficulty: 'basico' | 'intermedio' | 'avanzado';
+  durationSec: number;
+  prompt: string;
+  steps: string[];
+  recommendedGrid: 'none' | 'grid' | 'perspective1' | 'perspective2';
+  recommendedSymmetry: 'none' | 'vertical' | 'radial4';
+}
+
+export const DRAWING_CHALLENGES: DrawingChallenge[] = [
+  {
+    id: 'ch-taza',
+    title: 'Taza de café en 3 formas básicas',
+    difficulty: 'basico',
+    durationSec: 90,
+    prompt: 'Construye una taza combinando un cilindro vertical, dos elipses paralelas y un asa en C.',
+    steps: ['Traza eje vertical y dos elipses.', 'Une los costados con líneas firmes.', 'Añade el asa y una sombra suave en la base.'],
+    recommendedGrid: 'none',
+    recommendedSymmetry: 'none',
+  },
+  {
+    id: 'ch-hoja',
+    title: 'Hoja botánica simétrica',
+    difficulty: 'basico',
+    durationSec: 75,
+    prompt: 'Dibuja una hoja con nervadura central y venas alternadas usando espejo vertical.',
+    steps: ['Marca el tallo en el centro.', 'Traza el contorno exterior en una sola curva fluida.', 'Agrega nervaduras secundarias finas.'],
+    recommendedGrid: 'none',
+    recommendedSymmetry: 'vertical',
+  },
+  {
+    id: 'ch-puerta',
+    title: 'Arco y puerta arquitectónica',
+    difficulty: 'basico',
+    durationSec: 120,
+    prompt: 'Esboza una puerta con arco de medio punto, marco grueso y tres escalones frontales.',
+    steps: ['Activa la cuadrícula para alinear verticalmente.', 'Dibuja marco exterior e interior.', 'Añade escalones y textura de madera.'],
+    recommendedGrid: 'grid',
+    recommendedSymmetry: 'vertical',
+  },
+  {
+    id: 'ch-mandala-libre',
+    title: 'Rosetón geométrico radial',
+    difficulty: 'basico',
+    durationSec: 120,
+    prompt: 'Crea un rosetón equilibrado desde el centro hacia fuera alternando círculos y pétalos.',
+    steps: ['Marca un núcleo circular.', 'Dibuja pétalos en dos anillos concéntricos.', 'Refuerza los contornos principales.'],
+    recommendedGrid: 'none',
+    recommendedSymmetry: 'radial4',
+  },
+  {
+    id: 'ch-calle-1pt',
+    title: 'Pasillo o calle con 1 punto de fuga',
+    difficulty: 'intermedio',
+    durationSec: 150,
+    prompt: 'Dibuja un corredor con puertas laterales y baldosas convergiendo al punto de fuga central.',
+    steps: ['Coloca la línea de horizonte a media altura.', 'Traza cuatro diagonales desde el punto de fuga.', 'Recorta puertas verticales y faroles decrecientes.'],
+    recommendedGrid: 'perspective1',
+    recommendedSymmetry: 'none',
+  },
+  {
+    id: 'ch-esquina-2pt',
+    title: 'Edificio en esquina a 2 puntos de fuga',
+    difficulty: 'intermedio',
+    durationSec: 180,
+    prompt: 'Construye un edificio en esquina con ventanas alineadas hacia ambos puntos de fuga.',
+    steps: ['Dibuja la arista frontal vertical.', 'Proyecta techo y base hacia F1 y F2.', 'Añade ventanas y sombra proyectada en la calle.'],
+    recommendedGrid: 'perspective2',
+    recommendedSymmetry: 'none',
+  },
+  {
+    id: 'ch-bodegon-luz',
+    title: 'Bodegón esfera + cilindro con luz lateral',
+    difficulty: 'intermedio',
+    durationSec: 150,
+    prompt: 'Dibuja una esfera junto a un vaso cilíndrico definiendo luz izquierda, sombra propia y sombra proyectada.',
+    steps: ['Encaja ambos volúmenes sobre la misma mesa.', 'Marca la línea terminadora de sombra.', 'Aplica achurado cruzado en la zona más oscura.'],
+    recommendedGrid: 'none',
+    recommendedSymmetry: 'none',
+  },
+  {
+    id: 'ch-rostro-34',
+    title: 'Cabeza en tres cuartos (método Loomis)',
+    difficulty: 'intermedio',
+    durationSec: 180,
+    prompt: 'Construye un rostro girado 3/4 a partir de esfera, plano lateral y línea de cejas/nariz/mentón.',
+    steps: ['Dibuja esfera base y recorte lateral.', 'Traza eje curvo central del rostro.', 'Ubica tercios faciales y mandíbula.'],
+    recommendedGrid: 'none',
+    recommendedSymmetry: 'none',
+  },
+  {
+    id: 'ch-mano-gesto',
+    title: 'Mano sosteniendo un lápiz',
+    difficulty: 'avanzado',
+    durationSec: 180,
+    prompt: 'Simplifica la palma en una caja plana y cada dedo en tres cilindros articulados.',
+    steps: ['Encaja la palma como bloque tridimensional.', 'Marca la dirección del lápiz.', 'Construye nudillos y falanges por volumen.'],
+    recommendedGrid: 'none',
+    recommendedSymmetry: 'none',
+  },
+  {
+    id: 'ch-escena-tercios',
+    title: 'Paisaje mínimo en regla de tercios',
+    difficulty: 'avanzado',
+    durationSec: 180,
+    prompt: 'Compón un paisaje con tres planos de profundidad (primer plano oscuro, medio suave y fondo claro).',
+    steps: ['Sitúa el horizonte en el tercio inferior o superior.', 'Coloca el punto focal en una intersección.', 'Diferencia tres valores tonales claros.'],
+    recommendedGrid: 'grid',
+    recommendedSymmetry: 'none',
+  },
+  {
+    id: 'ch-gesto-60',
+    title: 'Figura en movimiento rápido (60 segundos)',
+    difficulty: 'avanzado',
+    durationSec: 60,
+    prompt: 'Captura la línea de acción de una figura corriendo o saltando sin detenerte en detalles.',
+    steps: ['Traza primero la curva de acción de cabeza a pie.', 'Marca inclinación opuesta de hombros y cadera.', 'Sugiere extremidades con líneas sueltas.'],
+    recommendedGrid: 'none',
+    recommendedSymmetry: 'none',
+  },
+  {
+    id: 'ch-interior-2pt',
+    title: 'Escritorio de estudio en perspectiva',
+    difficulty: 'avanzado',
+    durationSec: 210,
+    prompt: 'Dibuja un escritorio con monitor, lámpara y cuaderno respetando dos puntos de fuga.',
+    steps: ['Construye la caja del escritorio hacia F1 y F2.', 'Añade monitor y cuaderno sobre el plano superior.', 'Diferencia planos iluminados y en sombra.'],
+    recommendedGrid: 'perspective2',
+    recommendedSymmetry: 'none',
+  },
+];
+
+export function getLessonDifficulty(lesson: DrawingLesson, indexInBlock: number): 'basico' | 'intermedio' | 'avanzado' {
+  if (lesson.block === 'trazos' && indexInBlock < 6) return 'basico';
+  if (indexInBlock < 4) return 'basico';
+  if (indexInBlock < 8) return 'intermedio';
+  return 'avanzado';
+}

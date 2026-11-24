@@ -1,18 +1,26 @@
 import { cloudSync } from '../services/CloudSync.ts';
 import type {
   BookBookmark,
+  CalmCheckinEntry,
   CalmPatternId,
   DeviceProfile,
+  DifficultyLevel,
   DrawingGridMode,
   DrawingSymmetry,
   FlashcardItem,
   HabitKey,
+  LearningProgress,
   LifeProfile,
   ModulePreferences,
+  OratorySessionEntry,
   PhraseItem,
+  PracticeModuleId,
   ReframeEntry,
+  SavedCalligraphyStroke,
+  SavedCanvasStroke,
   SavedWord,
   ThemeMode,
+  TypingHistoryEntry,
   VaultItem,
   VaultStatus,
 } from '../types.ts';
@@ -117,6 +125,362 @@ export function defaultModulePrefs(): ModulePreferences {
   };
 }
 
+export function defaultLearningProgress(): LearningProgress {
+  return {
+    tutorialsDone: [],
+    tutorialsOpen: {},
+    difficulty: {
+      reader: 'intermedio',
+      studio: 'intermedio',
+      calligraphy: 'basico',
+      drawing: 'basico',
+      typing: 'intermedio',
+      language: 'intermedio',
+      mindset: 'intermedio',
+      vault: 'intermedio',
+      focuslab: 'intermedio',
+      singing: 'basico',
+      calm: 'intermedio',
+    },
+    studio: {
+      mode: 'libre',
+      templateId: 'cornell',
+      templatesApplied: 0,
+      studyChecklist: {},
+    },
+    reader: {
+      mode: 'lectura',
+      readArticles: [],
+      scrollByTitle: {},
+      quizScores: {},
+      readingNotes: {},
+      wordsRead: 0,
+    },
+    calligraphy: {
+      modeExtra: 'trazos',
+      mastery: {},
+      completedTemplates: [],
+      savedStrokes: {},
+    },
+    drawing: {
+      modeExtra: 'lessons',
+      mastery: {},
+      completedLessons: [],
+      completedChallenges: [],
+      activeTool: 'pencil',
+      guideStep: 0,
+      refOpacity: 0.35,
+      refHighContrast: false,
+      refMirror: false,
+      refViewMode: 'side',
+      horizonY: 0.42,
+      vp1X: 0.18,
+      vp2X: 0.82,
+      savedDrafts: {},
+    },
+    typing: {
+      pcExtraMode: 'accents',
+      mobileExtraMode: 'agile',
+      keyErrors: {},
+      completedIds: [],
+      history: [],
+    },
+    language: {
+      topic: 'todos',
+      orthoMode: 'practica',
+      vocabMode: 'tarjetas',
+      masteredOrthoIds: [],
+      missedOrthoIds: [],
+      vocabMastered: [],
+      bestExamScore: 0,
+      wordNotes: {},
+    },
+    mindset: {
+      mode: 'tarjetas',
+      completedActionIds: [],
+      reflections: {},
+      dailyCheckins: 0,
+    },
+    vault: {
+      mode: 'explorar',
+      promotedIds: [],
+      actionPlans: {},
+      dailyGoal: 5,
+      reviewedToday: 0,
+      lastReviewDay: '',
+      showOptionalTabs: false,
+    },
+    focuslab: {
+      promptIdx: 0,
+      drillIdx: 0,
+      schulteMode: 'normal',
+      schulteBestByKey: {},
+      oratoryHistory: [],
+      recallMode: 'repaso',
+      recallDrafts: {},
+      recallMasteredDecks: [],
+    },
+    singing: {
+      activeTab: 'karaoke',
+      selectedSongId: 'ode',
+      transpose: 0,
+      karaokeTempo: 1,
+      playGuideNotes: true,
+      playChordBacking: true,
+      vowelsCompleted: [],
+      jumpsVerified: [],
+      drillsMastered: {},
+      earMode: 'chord',
+      earIntervalMode: 'basic',
+      earCorrect: 0,
+      earTotal: 0,
+      earStreak: 0,
+      warmupCount: 0,
+    },
+    calm: {
+      activeTab: 'reframe',
+      ambientSound: 'off',
+      vibrateOn: true,
+      groundDone: Array.from({ length: 15 }, () => false),
+      pmrStep: 0,
+      cardIdx: 0,
+      checkins: [],
+    },
+  };
+}
+
+const VALID_DIFFICULTIES: readonly DifficultyLevel[] = ['basico', 'intermedio', 'avanzado'];
+
+function normDiff(v: unknown, fb: DifficultyLevel): DifficultyLevel {
+  return VALID_DIFFICULTIES.includes(v as DifficultyLevel) ? (v as DifficultyLevel) : fb;
+}
+
+function normStrArr(v: unknown, max = 500): string[] {
+  if (!Array.isArray(v)) return [];
+  return Array.from(new Set(v.filter((x): x is string => typeof x === 'string' && x.length > 0))).slice(0, max);
+}
+
+function normNumRecord(v: unknown): Record<string, number> {
+  if (!v || typeof v !== 'object') return {};
+  const out: Record<string, number> = {};
+  for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+    if (typeof val === 'number' && Number.isFinite(val)) out[k] = val;
+  }
+  return out;
+}
+
+function normStrRecord(v: unknown): Record<string, string> {
+  if (!v || typeof v !== 'object') return {};
+  const out: Record<string, string> = {};
+  for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+    if (typeof val === 'string') out[k] = val;
+  }
+  return out;
+}
+
+function normBoolRecord(v: unknown): Record<string, boolean> {
+  if (!v || typeof v !== 'object') return {};
+  const out: Record<string, boolean> = {};
+  for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+    if (typeof val === 'boolean') out[k] = val;
+  }
+  return out;
+}
+
+export function normalizeLearningProgress(raw: Partial<LearningProgress> | null | undefined): LearningProgress {
+  const base = defaultLearningProgress();
+  if (!raw || typeof raw !== 'object') return base;
+  const rd = (raw.difficulty ?? {}) as Partial<Record<PracticeModuleId, DifficultyLevel>>;
+  const difficulty: Record<PracticeModuleId, DifficultyLevel> = {
+    reader: normDiff(rd.reader, base.difficulty.reader),
+    studio: normDiff(rd.studio, base.difficulty.studio),
+    calligraphy: normDiff(rd.calligraphy, base.difficulty.calligraphy),
+    drawing: normDiff(rd.drawing, base.difficulty.drawing),
+    typing: normDiff(rd.typing, base.difficulty.typing),
+    language: normDiff(rd.language, base.difficulty.language),
+    mindset: normDiff(rd.mindset, base.difficulty.mindset),
+    vault: normDiff(rd.vault, base.difficulty.vault),
+    focuslab: normDiff(rd.focuslab, base.difficulty.focuslab),
+    singing: normDiff(rd.singing, base.difficulty.singing),
+    calm: normDiff(rd.calm, base.difficulty.calm),
+  };
+
+  const rStudio = (raw.studio ?? {}) as Partial<LearningProgress['studio']>;
+  const rReader = (raw.reader ?? {}) as Partial<LearningProgress['reader']>;
+  const rCal = (raw.calligraphy ?? {}) as Partial<LearningProgress['calligraphy']>;
+  const rDraw = (raw.drawing ?? {}) as Partial<LearningProgress['drawing']>;
+  const rTyp = (raw.typing ?? {}) as Partial<LearningProgress['typing']>;
+  const rLang = (raw.language ?? {}) as Partial<LearningProgress['language']>;
+  const rMind = (raw.mindset ?? {}) as Partial<LearningProgress['mindset']>;
+  const rVault = (raw.vault ?? {}) as Partial<LearningProgress['vault']>;
+  const rFocus = (raw.focuslab ?? {}) as Partial<LearningProgress['focuslab']>;
+  const rSing = (raw.singing ?? {}) as Partial<LearningProgress['singing']>;
+  const rCalm = (raw.calm ?? {}) as Partial<LearningProgress['calm']>;
+
+  const clampNum = (v: unknown, min: number, max: number, fb: number): number =>
+    typeof v === 'number' && Number.isFinite(v) ? Math.min(max, Math.max(min, v)) : fb;
+
+  return {
+    tutorialsDone: normStrArr(raw.tutorialsDone, 200),
+    tutorialsOpen: normBoolRecord(raw.tutorialsOpen),
+    difficulty,
+    studio: {
+      mode:
+        rStudio.mode === 'plantilla' || rStudio.mode === 'repaso' ? rStudio.mode : 'libre',
+      templateId: typeof rStudio.templateId === 'string' && rStudio.templateId ? rStudio.templateId : base.studio.templateId,
+      templatesApplied: clampNum(rStudio.templatesApplied, 0, 100000, 0),
+      studyChecklist: normBoolRecord(rStudio.studyChecklist),
+    },
+    reader: {
+      mode:
+        rReader.mode === 'guiada' || rReader.mode === 'comprension' ? rReader.mode : 'lectura',
+      readArticles: normStrArr(rReader.readArticles, 300),
+      scrollByTitle: normNumRecord(rReader.scrollByTitle),
+      quizScores: normNumRecord(rReader.quizScores),
+      readingNotes: normStrRecord(rReader.readingNotes),
+      wordsRead: clampNum(rReader.wordsRead, 0, 10000000, 0),
+    },
+    calligraphy: {
+      modeExtra: ['trazos', 'imprenta', 'cursiva', 'frase', 'numeros', 'ritmo'].includes(
+        String(rCal.modeExtra)
+      )
+        ? (rCal.modeExtra as LearningProgress['calligraphy']['modeExtra'])
+        : base.calligraphy.modeExtra,
+      mastery: normNumRecord(rCal.mastery),
+      completedTemplates: normStrArr(rCal.completedTemplates, 300),
+      savedStrokes:
+        rCal.savedStrokes && typeof rCal.savedStrokes === 'object'
+          ? { ...(rCal.savedStrokes as Record<string, SavedCalligraphyStroke[]>) }
+          : {},
+    },
+    drawing: {
+      modeExtra:
+        rDraw.modeExtra === 'challenge' || rDraw.modeExtra === 'free' ? rDraw.modeExtra : 'lessons',
+      mastery: normNumRecord(rDraw.mastery),
+      completedLessons: normStrArr(rDraw.completedLessons, 200),
+      completedChallenges: normStrArr(rDraw.completedChallenges, 200),
+      activeTool:
+        rDraw.activeTool === 'ruler' || rDraw.activeTool === 'eraser' ? rDraw.activeTool : 'pencil',
+      guideStep: clampNum(rDraw.guideStep, 0, 20, 0),
+      refOpacity: clampNum(rDraw.refOpacity, 0.1, 0.9, base.drawing.refOpacity),
+      refHighContrast: typeof rDraw.refHighContrast === 'boolean' ? rDraw.refHighContrast : false,
+      refMirror: typeof rDraw.refMirror === 'boolean' ? rDraw.refMirror : false,
+      refViewMode:
+        rDraw.refViewMode === 'trace' || rDraw.refViewMode === 'off' ? rDraw.refViewMode : 'side',
+      horizonY: clampNum(rDraw.horizonY, 0.12, 0.88, base.drawing.horizonY),
+      vp1X: clampNum(rDraw.vp1X, 0.04, 0.96, base.drawing.vp1X),
+      vp2X: clampNum(rDraw.vp2X, 0.04, 0.96, base.drawing.vp2X),
+      savedDrafts:
+        rDraw.savedDrafts && typeof rDraw.savedDrafts === 'object'
+          ? { ...(rDraw.savedDrafts as Record<string, SavedCanvasStroke[]>) }
+          : {},
+    },
+    typing: {
+      pcExtraMode: ['accents', 'speed', 'classic', 'filas', 'codigo', 'adaptativo'].includes(
+        String(rTyp.pcExtraMode)
+      )
+        ? (rTyp.pcExtraMode as LearningProgress['typing']['pcExtraMode'])
+        : base.typing.pcExtraMode,
+      mobileExtraMode: ['agile', 'orthowords', 'sprint30', 'precision', 'frases'].includes(
+        String(rTyp.mobileExtraMode)
+      )
+        ? (rTyp.mobileExtraMode as LearningProgress['typing']['mobileExtraMode'])
+        : base.typing.mobileExtraMode,
+      keyErrors: normNumRecord(rTyp.keyErrors),
+      completedIds: normStrArr(rTyp.completedIds, 300),
+      history: Array.isArray(rTyp.history) ? rTyp.history.slice(0, 40) : [],
+    },
+    language: {
+      topic: ['todos', 'tildes', 'homofonos', 'b_v_g_j', 'puntuacion', 'sintaxis'].includes(
+        String(rLang.topic)
+      )
+        ? (rLang.topic as LearningProgress['language']['topic'])
+        : 'todos',
+      orthoMode:
+        rLang.orthoMode === 'repaso_fallos' || rLang.orthoMode === 'examen'
+          ? rLang.orthoMode
+          : 'practica',
+      vocabMode:
+        rLang.vocabMode === 'quiz' || rLang.vocabMode === 'cloze' ? rLang.vocabMode : 'tarjetas',
+      masteredOrthoIds: normStrArr(rLang.masteredOrthoIds, 400),
+      missedOrthoIds: normStrArr(rLang.missedOrthoIds, 400),
+      vocabMastered: normStrArr(rLang.vocabMastered, 300),
+      bestExamScore: clampNum(rLang.bestExamScore, 0, 100, 0),
+      wordNotes: normStrRecord(rLang.wordNotes),
+    },
+    mindset: {
+      mode:
+        rMind.mode === 'reto_hoy' || rMind.mode === 'reflexion' ? rMind.mode : 'tarjetas',
+      completedActionIds: normStrArr(rMind.completedActionIds, 300),
+      reflections: normStrRecord(rMind.reflections),
+      dailyCheckins: clampNum(rMind.dailyCheckins, 0, 100000, 0),
+    },
+    vault: {
+      mode:
+        rVault.mode === 'estudiar_hoy' || rVault.mode === 'quiz_accion'
+          ? rVault.mode
+          : 'explorar',
+      promotedIds: normStrArr(rVault.promotedIds, 1000),
+      actionPlans: normStrRecord(rVault.actionPlans),
+      dailyGoal: clampNum(rVault.dailyGoal, 1, 50, 5),
+      reviewedToday: clampNum(rVault.reviewedToday, 0, 500, 0),
+      lastReviewDay: typeof rVault.lastReviewDay === 'string' ? rVault.lastReviewDay : '',
+      showOptionalTabs: typeof rVault.showOptionalTabs === 'boolean' ? rVault.showOptionalTabs : false,
+    },
+    focuslab: {
+      promptIdx: clampNum(rFocus.promptIdx, 0, 500, 0),
+      drillIdx: clampNum(rFocus.drillIdx, 0, 500, 0),
+      schulteMode:
+        rFocus.schulteMode === 'inverso' || rFocus.schulteMode === 'doble'
+          ? rFocus.schulteMode
+          : 'normal',
+      schulteBestByKey: normNumRecord(rFocus.schulteBestByKey),
+      oratoryHistory: Array.isArray(rFocus.oratoryHistory) ? rFocus.oratoryHistory.slice(0, 40) : [],
+      recallMode: rFocus.recallMode === 'quiz' ? 'quiz' : 'repaso',
+      recallDrafts: normStrRecord(rFocus.recallDrafts),
+      recallMasteredDecks: normStrArr(rFocus.recallMasteredDecks, 100),
+    },
+    singing: {
+      activeTab:
+        rSing.activeTab === 'routines' || rSing.activeTab === 'ear' ? rSing.activeTab : 'karaoke',
+      selectedSongId:
+        typeof rSing.selectedSongId === 'string' && rSing.selectedSongId
+          ? rSing.selectedSongId
+          : 'ode',
+      transpose: clampNum(rSing.transpose, -12, 12, 0),
+      karaokeTempo: clampNum(rSing.karaokeTempo, 0.6, 1.4, 1),
+      playGuideNotes: typeof rSing.playGuideNotes === 'boolean' ? rSing.playGuideNotes : true,
+      playChordBacking: typeof rSing.playChordBacking === 'boolean' ? rSing.playChordBacking : true,
+      vowelsCompleted: normStrArr(rSing.vowelsCompleted, 10),
+      jumpsVerified: normStrArr(rSing.jumpsVerified, 30),
+      drillsMastered: normNumRecord(rSing.drillsMastered),
+      earMode: ['chord', 'interval', 'scale', 'melody'].includes(String(rSing.earMode))
+        ? (rSing.earMode as LearningProgress['singing']['earMode'])
+        : 'chord',
+      earIntervalMode: rSing.earIntervalMode === 'full' ? 'full' : 'basic',
+      earCorrect: clampNum(rSing.earCorrect, 0, 100000, 0),
+      earTotal: clampNum(rSing.earTotal, 0, 100000, 0),
+      earStreak: clampNum(rSing.earStreak, 0, 100000, 0),
+      warmupCount: clampNum(rSing.warmupCount, 0, 100000, 0),
+    },
+    calm: {
+      activeTab:
+        rCalm.activeTab === 'sos' || rCalm.activeTab === 'checkin' ? rCalm.activeTab : 'reframe',
+      ambientSound: ['off', 'rain', 'pulse', 'drone'].includes(String(rCalm.ambientSound))
+        ? (rCalm.ambientSound as LearningProgress['calm']['ambientSound'])
+        : 'off',
+      vibrateOn: typeof rCalm.vibrateOn === 'boolean' ? rCalm.vibrateOn : true,
+      groundDone:
+        Array.isArray(rCalm.groundDone) && rCalm.groundDone.length === 15
+          ? rCalm.groundDone.map(Boolean)
+          : Array.from({ length: 15 }, () => false),
+      pmrStep: clampNum(rCalm.pmrStep, 0, 12, 0),
+      cardIdx: clampNum(rCalm.cardIdx, 0, 200, 0),
+      checkins: Array.isArray(rCalm.checkins) ? rCalm.checkins.slice(0, 60) : [],
+    },
+  };
+}
+
 function defaultProfile(): LifeProfile {
   return {
     theme: 'day',
@@ -153,6 +517,7 @@ function defaultProfile(): LifeProfile {
       recallReviewed: 0,
     },
     modulePrefs: defaultModulePrefs(),
+    progress: defaultLearningProgress(),
     updatedAt: 0,
   };
 }
@@ -266,6 +631,7 @@ export function normalizeProfile(raw: Partial<LifeProfile> | null | undefined): 
       calm: normalizeCalmPrefs(mp.calm, base.modulePrefs.calm),
       drawing: normalizeDrawingPrefs(mp.drawing, base.modulePrefs.drawing),
     },
+    progress: normalizeLearningProgress(raw.progress),
     updatedAt: Number(raw.updatedAt) || 0,
   };
 }
@@ -740,6 +1106,441 @@ class LifeStore {
     this.profile.customFlashcards = this.profile.customFlashcards.filter((c) => c.id !== id);
     delete this.profile.flashcardProgress[id];
     this.save();
+  }
+
+  /* ==================== UNIFIED DIDACTIC PROGRESS & DIFFICULTY ==================== */
+
+  public getDifficulty(mod: PracticeModuleId): DifficultyLevel {
+    return this.profile.progress.difficulty[mod] ?? 'intermedio';
+  }
+
+  public setDifficulty(mod: PracticeModuleId, level: DifficultyLevel): void {
+    this.profile.progress.difficulty[mod] = level;
+    if (mod === 'singing') {
+      this.profile.modulePrefs.singing.level = level === 'basico' ? 1 : level === 'intermedio' ? 2 : 3;
+    }
+    this.save();
+  }
+
+  public updateProgress<
+    K extends Exclude<keyof LearningProgress, 'tutorialsDone' | 'tutorialsOpen' | 'difficulty'>,
+  >(section: K, patch: Partial<LearningProgress[K]>): void {
+    this.profile.progress[section] = {
+      ...this.profile.progress[section],
+      ...patch,
+    } as LearningProgress[K];
+    this.save();
+  }
+
+  public isTutorialOpen(id: string): boolean {
+    return Boolean(this.profile.progress.tutorialsOpen[id]);
+  }
+
+  public setTutorialOpen(id: string, open: boolean): void {
+    this.profile.progress.tutorialsOpen[id] = open;
+    this.save();
+  }
+
+  public isTutorialDone(id: string): boolean {
+    return this.profile.progress.tutorialsDone.includes(id);
+  }
+
+  public toggleTutorialDone(id: string): boolean {
+    const arr = this.profile.progress.tutorialsDone;
+    const idx = arr.indexOf(id);
+    if (idx >= 0) {
+      arr.splice(idx, 1);
+      this.save();
+      return false;
+    }
+    arr.push(id);
+    this.save();
+    return true;
+  }
+
+  public recordCalligraphyMastery(
+    templateId: string,
+    scorePct: number,
+    strokes?: SavedCalligraphyStroke[]
+  ): void {
+    const clean = Math.max(0, Math.min(100, Math.round(scorePct)));
+    const prev = this.profile.progress.calligraphy.mastery[templateId] ?? 0;
+    if (clean > prev) this.profile.progress.calligraphy.mastery[templateId] = clean;
+    if (clean >= 70 && !this.profile.progress.calligraphy.completedTemplates.includes(templateId)) {
+      this.profile.progress.calligraphy.completedTemplates.push(templateId);
+    }
+    if (strokes) {
+      this.saveCalligraphyStrokes(templateId, strokes);
+      return;
+    }
+    this.recordCalligraphySheet();
+  }
+
+  public saveCalligraphyStrokes(templateId: string, strokes: SavedCalligraphyStroke[]): void {
+    const map = this.profile.progress.calligraphy.savedStrokes;
+    if (strokes.length === 0) {
+      delete map[templateId];
+    } else {
+      map[templateId] = strokes.slice(-60);
+      const keys = Object.keys(map);
+      while (keys.length > 6) {
+        const oldest = keys.shift();
+        if (oldest && oldest !== templateId) delete map[oldest];
+      }
+    }
+    this.save();
+  }
+
+  public recordDrawingMastery(lessonId: string, scorePct: number): void {
+    const clean = Math.max(0, Math.min(100, Math.round(scorePct)));
+    const prev = this.profile.progress.drawing.mastery[lessonId] ?? 0;
+    if (clean > prev) this.profile.progress.drawing.mastery[lessonId] = clean;
+    if (clean >= 65 && !this.profile.progress.drawing.completedLessons.includes(lessonId)) {
+      this.profile.progress.drawing.completedLessons.push(lessonId);
+    }
+    this.recordDrawingSheet();
+  }
+
+  public recordDrawingChallenge(challengeId: string): void {
+    if (!this.profile.progress.drawing.completedChallenges.includes(challengeId)) {
+      this.profile.progress.drawing.completedChallenges.push(challengeId);
+    }
+    this.recordDrawingSheet();
+  }
+
+  public saveDrawingDraft(key: string, strokes: SavedCanvasStroke[]): void {
+    const map = this.profile.progress.drawing.savedDrafts;
+    if (strokes.length === 0) {
+      delete map[key];
+    } else {
+      map[key] = strokes.slice(-120);
+      const keys = Object.keys(map);
+      while (keys.length > 4) {
+        const oldest = keys.shift();
+        if (oldest && oldest !== key) delete map[oldest];
+      }
+    }
+    this.save();
+  }
+
+  public recordTypingSession(
+    device: 'pc' | 'mobile',
+    mode: string,
+    difficulty: DifficultyLevel,
+    wpm: number,
+    acc: number,
+    mistakeChars: Record<string, number>,
+    sampleId?: string
+  ): void {
+    const cleanWpm = Math.max(0, Math.round(wpm));
+    const cleanAcc = Math.max(0, Math.min(100, Math.round(acc)));
+    if (cleanAcc >= 80) {
+      if (device === 'pc' && cleanWpm > this.profile.stats.bestWpmPc) {
+        this.profile.stats.bestWpmPc = cleanWpm;
+      }
+      if (device === 'mobile' && cleanWpm > this.profile.stats.bestWpmMobile) {
+        this.profile.stats.bestWpmMobile = cleanWpm;
+      }
+    }
+    for (const [ch, cnt] of Object.entries(mistakeChars)) {
+      if (!ch || cnt <= 0) continue;
+      this.profile.progress.typing.keyErrors[ch] =
+        (this.profile.progress.typing.keyErrors[ch] ?? 0) + cnt;
+    }
+    if (sampleId && cleanAcc >= 80 && !this.profile.progress.typing.completedIds.includes(sampleId)) {
+      this.profile.progress.typing.completedIds.push(sampleId);
+    }
+    const entry: TypingHistoryEntry = {
+      at: Date.now(),
+      mode,
+      difficulty,
+      wpm: cleanWpm,
+      acc: cleanAcc,
+    };
+    this.profile.progress.typing.history.unshift(entry);
+    this.profile.progress.typing.history = this.profile.progress.typing.history.slice(0, 30);
+    this.markHabit('typing');
+    this.save();
+  }
+
+  public recordOrthoResult(qId: string, correct: boolean): void {
+    const lang = this.profile.progress.language;
+    if (correct) {
+      if (!lang.masteredOrthoIds.includes(qId)) lang.masteredOrthoIds.push(qId);
+      lang.missedOrthoIds = lang.missedOrthoIds.filter((x) => x !== qId);
+    } else {
+      if (!lang.missedOrthoIds.includes(qId)) lang.missedOrthoIds.push(qId);
+    }
+    this.recordOrthography(correct);
+  }
+
+  public recordOrthoExam(scorePct: number): void {
+    const clean = Math.max(0, Math.min(100, Math.round(scorePct)));
+    if (clean > this.profile.progress.language.bestExamScore) {
+      this.profile.progress.language.bestExamScore = clean;
+    }
+    this.markHabit('language');
+    this.save();
+  }
+
+  public recordVocabMastered(word: string): void {
+    const norm = word.trim().toLowerCase();
+    if (!norm) return;
+    if (!this.profile.progress.language.vocabMastered.includes(norm)) {
+      this.profile.progress.language.vocabMastered.push(norm);
+    }
+    this.markHabit('language');
+    this.save();
+  }
+
+  public setWordNote(word: string, note: string): void {
+    const key = word.trim().toLowerCase();
+    if (!key) return;
+    const clean = note.trim();
+    if (!clean) delete this.profile.progress.language.wordNotes[key];
+    else this.profile.progress.language.wordNotes[key] = clean;
+    this.save();
+  }
+
+  public recordReaderArticle(title: string, wordsCount = 0, quizScore?: number): void {
+    const clean = title.trim();
+    if (!clean) return;
+    const r = this.profile.progress.reader;
+    if (!r.readArticles.includes(clean)) r.readArticles.push(clean);
+    if (wordsCount > 0) r.wordsRead += Math.round(wordsCount);
+    if (typeof quizScore === 'number') {
+      const prev = r.quizScores[clean] ?? 0;
+      r.quizScores[clean] = Math.max(prev, Math.round(quizScore));
+    }
+    this.markHabit('read');
+    this.save();
+  }
+
+  public saveReaderScroll(title: string, pct: number): void {
+    if (!title.trim()) return;
+    this.profile.progress.reader.scrollByTitle[title.trim()] = Math.max(
+      0,
+      Math.min(100, Math.round(pct))
+    );
+    this.save();
+  }
+
+  public saveReaderNote(title: string, note: string): void {
+    const key = title.trim();
+    if (!key) return;
+    const clean = note.trim();
+    if (!clean) delete this.profile.progress.reader.readingNotes[key];
+    else this.profile.progress.reader.readingNotes[key] = clean;
+    this.markHabit('read');
+    this.save();
+  }
+
+  public toggleMindsetAction(phraseId: string): boolean {
+    const arr = this.profile.progress.mindset.completedActionIds;
+    const idx = arr.indexOf(phraseId);
+    if (idx >= 0) {
+      arr.splice(idx, 1);
+      this.save();
+      return false;
+    }
+    arr.push(phraseId);
+    this.profile.progress.mindset.dailyCheckins += 1;
+    this.markHabit('mindset');
+    this.save();
+    return true;
+  }
+
+  public saveMindsetReflection(phraseId: string, text: string): void {
+    const clean = text.trim();
+    if (!clean) {
+      delete this.profile.progress.mindset.reflections[phraseId];
+    } else {
+      this.profile.progress.mindset.reflections[phraseId] = clean;
+      this.markHabit('mindset');
+    }
+    this.save();
+  }
+
+  public recordVaultReview(itemId: string): void {
+    const today = todayStamp();
+    const v = this.profile.progress.vault;
+    if (v.lastReviewDay !== today) {
+      v.reviewedToday = 0;
+      v.lastReviewDay = today;
+    }
+    v.reviewedToday += 1;
+    if (!this.profile.vaultStatuses[itemId]) {
+      this.profile.vaultStatuses[itemId] = 'seen';
+    }
+    this.save();
+  }
+
+  public saveVaultActionPlan(itemId: string, plan: string): void {
+    const clean = plan.trim();
+    if (!clean) delete this.profile.progress.vault.actionPlans[itemId];
+    else {
+      this.profile.progress.vault.actionPlans[itemId] = clean;
+      this.profile.vaultStatuses[itemId] = 'applied';
+    }
+    this.save();
+  }
+
+  public markVaultPromoted(itemId: string): void {
+    if (!this.profile.progress.vault.promotedIds.includes(itemId)) {
+      this.profile.progress.vault.promotedIds.push(itemId);
+      this.save();
+    }
+  }
+
+  public recordSchulteRun(mode: 'normal' | 'inverso' | 'doble', size: 4 | 5 | 6, ms: number): void {
+    const cleanMs = Math.max(100, Math.round(ms));
+    const key = `${mode}_${size}x${size}`;
+    const prev = this.profile.progress.focuslab.schulteBestByKey[key];
+    if (prev === undefined || cleanMs < prev) {
+      this.profile.progress.focuslab.schulteBestByKey[key] = cleanMs;
+    }
+    if (mode === 'normal' && size === 5) {
+      this.recordSchulteTime(cleanMs, 5);
+    } else {
+      this.markHabit('focuslab');
+      this.save();
+    }
+  }
+
+  public recordOratoryHistory(entry: Omit<OratorySessionEntry, 'at'>): void {
+    this.profile.progress.focuslab.oratoryHistory.unshift({ ...entry, at: Date.now() });
+    this.profile.progress.focuslab.oratoryHistory =
+      this.profile.progress.focuslab.oratoryHistory.slice(0, 30);
+    this.recordOratorySession();
+  }
+
+  public saveRecallDraft(cardId: string, text: string): void {
+    const clean = text.trim();
+    if (!clean) delete this.profile.progress.focuslab.recallDrafts[cardId];
+    else this.profile.progress.focuslab.recallDrafts[cardId] = clean;
+    this.save();
+  }
+
+  public recordSingingVowel(vowel: string): void {
+    if (!this.profile.progress.singing.vowelsCompleted.includes(vowel)) {
+      this.profile.progress.singing.vowelsCompleted.push(vowel);
+    }
+    this.markHabit('singing');
+    this.save();
+  }
+
+  public recordSingingJump(jumpId: string): void {
+    if (!this.profile.progress.singing.jumpsVerified.includes(jumpId)) {
+      this.profile.progress.singing.jumpsVerified.push(jumpId);
+    }
+    this.markHabit('singing');
+    this.save();
+  }
+
+  public recordSingingDrillMastery(drillId: string, scorePct: number): void {
+    const clean = Math.max(0, Math.min(100, Math.round(scorePct)));
+    const prev = this.profile.progress.singing.drillsMastered[drillId] ?? 0;
+    if (clean > prev) this.profile.progress.singing.drillsMastered[drillId] = clean;
+    this.markHabit('singing');
+    this.save();
+  }
+
+  public recordSingingEar(correct: boolean): void {
+    const s = this.profile.progress.singing;
+    s.earTotal += 1;
+    if (correct) {
+      s.earCorrect += 1;
+      s.earStreak += 1;
+    } else {
+      s.earStreak = 0;
+    }
+    this.markHabit('singing');
+    this.save();
+  }
+
+  public recordSingingWarmup(): void {
+    this.profile.progress.singing.warmupCount += 1;
+    this.markHabit('singing');
+    this.save();
+  }
+
+  public addCalmCheckin(entry: Omit<CalmCheckinEntry, 'at'>): void {
+    this.profile.progress.calm.checkins.unshift({ ...entry, at: Date.now() });
+    this.profile.progress.calm.checkins = this.profile.progress.calm.checkins.slice(0, 60);
+    this.recordCalmSession();
+  }
+
+  public deleteReframe(id: string): void {
+    this.profile.reframeLog = this.profile.reframeLog.filter((r) => r.id !== id);
+    this.save();
+  }
+
+  public getOverallMasterySummary(): {
+    totalXp: number;
+    level: number;
+    nextLevelXp: number;
+    levelPct: number;
+    byModule: Record<PracticeModuleId, number>;
+  } {
+    const p = this.profile;
+    const pr = p.progress;
+    const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
+
+    const byModule: Record<PracticeModuleId, number> = {
+      reader: clamp(
+        (pr.reader.readArticles.length * 10 + p.bookmarks.length * 4 + Object.keys(pr.reader.quizScores).length * 8)
+      ),
+      studio: clamp(
+        pr.studio.templatesApplied * 12 +
+          Object.values(pr.studio.studyChecklist).filter(Boolean).length * 8 +
+          (p.todayHabits.studio ? 15 : 0)
+      ),
+      calligraphy: clamp((pr.calligraphy.completedTemplates.length / 40) * 100),
+      drawing: clamp(((pr.drawing.completedLessons.length + pr.drawing.completedChallenges.length) / 56) * 100),
+      typing: clamp(
+        Math.min(60, (p.stats.bestWpmPc / 80) * 40 + (p.stats.bestWpmMobile / 50) * 20) +
+          Math.min(40, pr.typing.completedIds.length * 2.5)
+      ),
+      language: clamp(
+        (pr.language.masteredOrthoIds.length / 80) * 65 +
+          (pr.language.vocabMastered.length / 36) * 35
+      ),
+      mindset: clamp(
+        (pr.mindset.completedActionIds.length * 4 +
+          Object.keys(pr.mindset.reflections).length * 6 +
+          p.favoritePhraseIds.length * 2)
+      ),
+      vault: clamp(
+        Object.values(p.vaultStatuses).filter((s) => s === 'applied').length * 3 +
+          Object.keys(pr.vault.actionPlans).length * 5
+      ),
+      focuslab: clamp(
+        p.stats.oratorySessions * 6 +
+          Object.keys(pr.focuslab.schulteBestByKey).length * 8 +
+          p.stats.recallReviewed * 1.5
+      ),
+      singing: clamp(
+        Object.keys(p.stats.singingSongBest).length * 4 +
+          Object.keys(pr.singing.drillsMastered).length * 4 +
+          pr.singing.vowelsCompleted.length * 4 +
+          Math.min(24, pr.singing.earCorrect * 1.2)
+      ),
+      calm: clamp(
+        p.stats.calmSessions * 5 + p.reframeLog.length * 5 + pr.calm.checkins.length * 6
+      ),
+    };
+
+    const totalXp = Math.round(
+      Object.values(byModule).reduce((a, b) => a + b * 12, 0) +
+        p.dailyStreak * 30 +
+        pr.tutorialsDone.length * 15
+    );
+    const level = Math.max(1, Math.floor(totalXp / 250) + 1);
+    const curBase = (level - 1) * 250;
+    const nextLevelXp = level * 250;
+    const levelPct = clamp(((totalXp - curBase) / 250) * 100);
+
+    return { totalXp, level, nextLevelXp, levelPct, byModule };
   }
 }
 

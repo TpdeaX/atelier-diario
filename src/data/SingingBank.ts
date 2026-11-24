@@ -1523,3 +1523,52 @@ export const JUMP_VERIFIER_INTERVALS: IntervalDef[] = EAR_INTERVALS_FULL.filter(
 export const CHORD_PRESETS = {
   E_MIN,
 };
+
+export interface EarScaleDef {
+  id: string;
+  label: string;
+  difficulty: 'basico' | 'intermedio' | 'avanzado';
+  semitones: number[];
+  character: string;
+}
+
+export const EAR_SCALES: EarScaleDef[] = [
+  { id: 'major', label: 'Escala Mayor (Jónica)', difficulty: 'basico', semitones: [0, 2, 4, 5, 7, 9, 11, 12], character: 'Luminosa, estable y resuelta.' },
+  { id: 'minor_nat', label: 'Menor Natural (Eólica)', difficulty: 'basico', semitones: [0, 2, 3, 5, 7, 8, 10, 12], character: 'Melancólica e introspectiva.' },
+  { id: 'pent_maj', label: 'Pentatónica Mayor', difficulty: 'basico', semitones: [0, 2, 4, 7, 9, 12], character: 'Abierta, folclórica y sin tensiones.' },
+  { id: 'pent_min', label: 'Pentatónica Menor', difficulty: 'intermedio', semitones: [0, 3, 5, 7, 10, 12], character: 'Expresiva, base del rock, blues y andino.' },
+  { id: 'minor_harm', label: 'Menor Armónica', difficulty: 'intermedio', semitones: [0, 2, 3, 5, 7, 8, 11, 12], character: 'Salto exótico de 2ª aumentada antes de la tónica.' },
+  { id: 'dorian', label: 'Modo Dórico', difficulty: 'avanzado', semitones: [0, 2, 3, 5, 7, 9, 10, 12], character: 'Menor con sexta mayor luminosa y moderna.' },
+  { id: 'mixolydian', label: 'Modo Mixolidio', difficulty: 'avanzado', semitones: [0, 2, 4, 5, 7, 9, 10, 12], character: 'Mayor con séptima menor de carácter festivo.' },
+  { id: 'blues', label: 'Escala de Blues', difficulty: 'avanzado', semitones: [0, 3, 5, 6, 7, 10, 12], character: 'Incluye la nota blue (quinta disminuida).' },
+];
+
+export interface EarMelodyDef {
+  id: string;
+  label: string;
+  difficulty: 'basico' | 'intermedio' | 'avanzado';
+  patternLabel: string;
+  offsets: number[];
+  hint: string;
+}
+
+export const EAR_MELODIES: EarMelodyDef[] = [
+  { id: 'm-sube3', label: 'Grado conjunto ascendente', difficulty: 'basico', patternLabel: 'Do - Re - Mi', offsets: [0, 2, 4], hint: 'Tres pasos seguidos hacia arriba.' },
+  { id: 'm-baja3', label: 'Grado conjunto descendente', difficulty: 'basico', patternLabel: 'Mi - Re - Do', offsets: [4, 2, 0], hint: 'Desciende paso a paso hasta reposar.' },
+  { id: 'm-triada', label: 'Arpegio mayor ascendente', difficulty: 'basico', patternLabel: 'Do - Mi - Sol', offsets: [0, 4, 7], hint: 'Salto alegre en forma de acorde mayor.' },
+  { id: 'm-vaiven', label: 'Vaivén sobre tónica', difficulty: 'basico', patternLabel: 'Do - Re - Do - Sol', offsets: [0, 2, 0, 7], hint: 'Regresa al inicio antes de saltar una quinta.' },
+  { id: 'm-menor', label: 'Arpegio menor completo', difficulty: 'intermedio', patternLabel: 'Do - Mib - Sol - Mib', offsets: [0, 3, 7, 3], hint: 'Tercera menor nostálgica que sube y vuelve.' },
+  { id: 'm-quinta', label: 'Salto de quinta y descenso', difficulty: 'intermedio', patternLabel: 'Do - Sol - Fa - Mi', offsets: [0, 7, 5, 4], hint: 'Salto amplio inicial seguido de descenso suave.' },
+  { id: 'm-cuarta', label: 'Llamada de cuarta justa', difficulty: 'intermedio', patternLabel: 'Do - Fa - Mi - Re', offsets: [0, 5, 4, 2], hint: 'Abre como una marcha y baja gradualmente.' },
+  { id: 'm-sexta', label: 'Arco con sexta mayor', difficulty: 'avanzado', patternLabel: 'Do - La - Sol - Mi', offsets: [0, 9, 7, 4], hint: 'Salto amplio luminoso seguido de reposo en tercera.' },
+  { id: 'm-octava', label: 'Salto a octava y retorno', difficulty: 'avanzado', patternLabel: 'Do - Do5 - Sol - Do', offsets: [0, 12, 7, 0], hint: 'Llega al agudo máximo y cae por la quinta.' },
+  { id: 'm-cromatico', label: 'Bordadura cromática', difficulty: 'avanzado', patternLabel: 'Do - Si - Do - Re', offsets: [0, -1, 0, 2], hint: 'Roza un semitono abajo antes de subir.' },
+];
+
+export function getSongDifficulty(song: GuidedSong): 'basico' | 'intermedio' | 'avanzado' {
+  const midis = song.notes.map((n) => n.midi);
+  const span = Math.max(...midis) - Math.min(...midis);
+  if (song.notes.length <= 20 && span <= 9 && song.bpm <= 108) return 'basico';
+  if (song.notes.length <= 36 && span <= 12) return 'intermedio';
+  return 'avanzado';
+}

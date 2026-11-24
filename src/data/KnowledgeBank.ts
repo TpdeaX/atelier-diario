@@ -141,6 +141,46 @@ export const CLASSIC_WIKISOURCE_SUGGESTIONS = [
     query: 'Escenas matritenses',
     note: 'Cuadros breves de costumbres con observación aguda e ironía fina.',
   },
+  {
+    title: 'Platero y yo (Juan Ramón Jiménez)',
+    query: 'Platero y yo',
+    note: 'Prosa poética luminosa ideal para entrenar ritmo, pausa y sensibilidad léxica.',
+  },
+  {
+    title: 'Cartas a Lucilio (Séneca)',
+    query: 'Epístolas morales a Lucilio',
+    note: 'Cartas cortas sobre dominio propio, tiempo, estudio y serenidad práctica.',
+  },
+  {
+    title: 'Rimas y Leyendas (Gustavo Adolfo Bécquer)',
+    query: 'Rimas Bécquer',
+    note: 'Relatos breves y versos claros para disfrutar musicalidad e imágenes vivas.',
+  },
+  {
+    title: 'Cuentos de amor de locura y de muerte (Quiroga)',
+    query: 'Cuentos de amor de locura y de muerte',
+    note: 'Tensión narrativa impecable y economía verbal en cuentos latinoamericanos.',
+  },
+  {
+    title: 'El arte de la prudencia (Baltasar Gracián)',
+    query: 'Oráculo manual y arte de prudencia',
+    note: 'Aforismos densos que entrenan criterio, síntesis y lectura atenta.',
+  },
+  {
+    title: 'Fábulas morales (Félix María de Samaniego)',
+    query: 'Fábulas Samaniego',
+    note: 'Lectura ágil de nivel básico para practicar entonación y comprensión.',
+  },
+  {
+    title: 'Tradiciones peruanas (Ricardo Palma)',
+    query: 'Tradiciones peruanas',
+    note: 'Crónica histórica con humor criollo, giros idiomáticos y vocabulario rico.',
+  },
+  {
+    title: 'Discurso del método (René Descartes)',
+    query: 'Discurso del método',
+    note: 'Texto filosófico avanzado sobre claridad, duda metódica y orden del pensamiento.',
+  },
 ];
 
 export const ORTHOGRAPHY_BANK: OrthographyQuestion[] = [
@@ -296,6 +336,22 @@ export const ORTHOGRAPHY_BANK: OrthographyQuestion[] = [
   { id: 'o78', sentence: 'Hicieron un análisis ___ antes de publicar la guía.', options: ['exaustivo', 'exhaustivo', 'exahustivo'], correctIndex: 1, rule: '«Exhaustivo» lleva x seguida de h intercalada y termina en «-ivo» con v.' },
   { id: 'o79', sentence: 'El público aplaudió de forma ___ al escuchar el final.', options: ['expontánea', 'espontánea', 'espontanea'], correctIndex: 1, rule: '«Espontánea» comienza con «es-» (no «ex-») y es esdrújula, por lo que lleva tilde en la á.' },
   { id: 'o80', sentence: 'Estábamos ___ hacia la librería cuando empezó a llover.', options: ['llendo', 'yendo', 'hiendo'], correctIndex: 1, rule: 'El gerundio del verbo «ir» es «yendo» (con y inicial, nunca con ll).' },
+  { id: 'o81', sentence: 'Aún no sé ___ ocurrió durante la reunión técnica de ayer.', options: ['que', 'qué', 'quien'], correctIndex: 1, rule: '«Qué» lleva tilde diacrítica en interrogativas indirectas («no sé qué ocurrió»).', difficulty: 'basico', topic: 'tildes', hint: 'Es una pregunta indirecta.' },
+  { id: 'o82', sentence: 'Necesito que me digas ___ de los dos informes está actualizado.', options: ['cual', 'cuál', 'cuales'], correctIndex: 1, rule: '«Cuál» lleva tilde cuando funciona como pronombre interrogativo directo o indirecto.', difficulty: 'basico', topic: 'tildes', hint: 'Equivale a preguntar qué opción.' },
+  { id: 'o83', sentence: 'El informe ___ revisamos ayer ya fue enviado al comité.', options: ['que', 'qué', 'quién'], correctIndex: 0, rule: '«Que» sin tilde funciona como pronombre relativo cuando introduce una subordinada.', difficulty: 'basico', topic: 'tildes', hint: 'Se puede reemplazar por «el cual».' },
+  { id: 'o84', sentence: 'Guardó el expediente en un ___ metálico bajo llave.', options: ['baul', 'baúl', 'vaúl'], correctIndex: 1, rule: '«Baúl» lleva b y tilde en la ú por hiato entre vocal abierta (a) y cerrada tónica (ú).', difficulty: 'basico', topic: 'tildes', hint: 'Separa las sílabas: ba-úl.' },
+  { id: 'o85', sentence: 'No ___ ninguna duda de que la práctica diaria funciona.', options: ['cave', 'cabe', 'cábe'], correctIndex: 1, rule: '«Cabe» (con b) es del verbo caber. «Cave» (con v) viene del verbo cavar.', difficulty: 'basico', topic: 'b_v_g_j', hint: 'Viene del verbo caber.' },
+  { id: 'o86', sentence: 'El jurado decidió ___ la propuesta por falta de sustento.', options: ['revelar', 'rebelar', 'vetar'], correctIndex: 2, rule: '«Vetar» (con v) significa prohibir o rechazar oficialmente una propuesta.', difficulty: 'intermedio', topic: 'b_v_g_j', hint: 'Equivale a rechazar o impedir.' },
+  { id: 'o87', sentence: 'La cámara logró ___ el momento exacto del eclipse solar.', options: ['grabar', 'gravar', 'grábar'], correctIndex: 0, rule: '«Grabar» (con b) es registrar imagen o sonido. «Gravar» (con v) es imponer un impuesto o carga.', difficulty: 'intermedio', topic: 'homofonos', hint: 'Registrar video o audio usa b.' },
+  { id: 'o88', sentence: 'Conviene ___ las fuentes antes de citar una cifra estadística.', options: ['cotejar', 'cotegar', 'cotexar'], correctIndex: 0, rule: '«Cotejar» se escribe con j y significa comparar dos textos o datos para verificar exactitud.', difficulty: 'intermedio', topic: 'b_v_g_j', hint: 'Significa comparar y validar.' },
+  { id: 'o89', sentence: 'Se presentó en el aula ___ nadie lo hubiera convocado.', options: ['sino', 'si no', 'aunque'], correctIndex: 2, rule: '«Aunque» introduce una concesión cuando el hecho ocurre pese a una condición contraria.', difficulty: 'intermedio', topic: 'sintaxis', hint: 'Indica concesión (pese a que).' },
+  { id: 'o90', sentence: 'Estudió el capítulo entero; ___, decidió repasar los ejercicios clave.', options: ['sin embargo', 'sinembargo', 'si embargo'], correctIndex: 0, rule: '«Sin embargo» se escribe siempre en dos palabras y va enmarcado por signos de puntuación.', difficulty: 'intermedio', topic: 'puntuacion', hint: 'Locución adverbial de dos palabras.' },
+  { id: 'o91', sentence: 'La solución no era compleja___ bastaba con ordenar los datos iniciales.', options: [' ,', ':', '; sino'], correctIndex: 1, rule: 'Los dos puntos (:) introducen una explicación o aclaración directa de la oración anterior.', difficulty: 'avanzado', topic: 'puntuacion', hint: 'Conecta una afirmación con su explicación.' },
+  { id: 'o92', sentence: '___ me hubiera avisado antes, habríamos reservado la sala grande.', options: ['Si', 'Sí', 'Sé'], correctIndex: 0, rule: '«Si» condicional nunca lleva tilde; «sí» con tilde es afirmación o pronombre reflexivo.', difficulty: 'basico', topic: 'tildes', hint: 'Introduce una condición.' },
+  { id: 'o93', sentence: 'El equipo revisó la arquitectura ___ de desplegar la nueva versión.', options: ['antes', 'ante', 'antes que'], correctIndex: 0, rule: 'La locución correcta antes de infinitivo es «antes de» (nunca «antes que» seguido de «de»).', difficulty: 'avanzado', topic: 'sintaxis', hint: 'Completa la locución temporal «... de».' },
+  { id: 'o94', sentence: 'El ponente ___ los puntos centrales con notable precisión.', options: ['sintetizó', 'sintetisó', 'cintetizó'], correctIndex: 0, rule: 'Los verbos terminados en «-izar» conservan la z ante o/a y llevan tilde si son agudos en vocal.', difficulty: 'intermedio', topic: 'b_v_g_j', hint: 'Viene de sintetizar.' },
+  { id: 'o95', sentence: 'No te olvides de llevar lo imprescindible___ cuaderno, lápiz y cronómetro.', options: [',', ':', ';'], correctIndex: 1, rule: 'Se usan dos puntos (:) antes de una enumeración explicativa anunciada previamente.', difficulty: 'avanzado', topic: 'puntuacion', hint: 'Anuncia una lista anunciada por «lo imprescindible».' },
+  { id: 'o96', sentence: 'Debía decidir ___ continuar con el prototipo o rediseñar el flujo.', options: ['sí', 'si', 'sino'], correctIndex: 1, rule: '«Si» introduce una interrogativa indirecta total (sin tilde).', difficulty: 'avanzado', topic: 'sintaxis', hint: 'Es una conjunción completiva, no afirmación.' },
 ];
 
 export const VOCABULARY_DECK: VocabPair[] = [
@@ -514,6 +570,90 @@ export const VOCABULARY_DECK: VocabPair[] = [
     meaning: 'Regla o principio guía que orienta la conducta o un oficio.',
     example: 'Su primer precepto al programar es escribir código fácil de leer.',
     replaces: 'regla básica',
+  },
+  {
+    word: 'Lúcido',
+    meaning: 'Que razona y se expresa con claridad mental sobresaliente.',
+    example: 'Hizo un análisis lúcido del cuello de botella en cinco minutos.',
+    replaces: 'muy claro',
+    difficulty: 'basico',
+  },
+  {
+    word: 'Frugal',
+    meaning: 'Moderado y sencillo en el uso de recursos, sin excesos innecesarios.',
+    example: 'Un diseño frugal elimina botones superfluos y resalta lo esencial.',
+    replaces: 'sencillo y económico',
+    difficulty: 'intermedio',
+  },
+  {
+    word: 'Perenne',
+    meaning: 'Continuo, duradero o que permanece vigente a lo largo del tiempo.',
+    example: 'La claridad al escribir es una habilidad perenne en cualquier carrera.',
+    replaces: 'que dura siempre',
+    difficulty: 'intermedio',
+  },
+  {
+    word: 'Asertivo',
+    meaning: 'Que expresa opiniones y límites con firmeza, respeto y sin agresividad.',
+    example: 'Fue asertivo al pedir un plazo realista sin culpar a nadie.',
+    replaces: 'directo pero educado',
+    difficulty: 'basico',
+  },
+  {
+    word: 'Certero',
+    meaning: 'Seguro, preciso y acertado al emitir un juicio, dato o acción.',
+    example: 'Hizo un diagnóstico certero del fallo de red en menos de diez minutos.',
+    replaces: 'muy acertado',
+    difficulty: 'intermedio',
+  },
+  {
+    word: 'Fidedigno',
+    meaning: 'Digno de fe y crédito por apoyarse en fuentes o mediciones verificables.',
+    example: 'Presentó un registro fidedigno de cada cambio guardado en el sistema.',
+    replaces: 'muy confiable',
+    difficulty: 'intermedio',
+  },
+  {
+    word: 'Meticuloso',
+    meaning: 'Que realiza una tarea con gran atención, orden y cuidado en cada detalle.',
+    example: 'Fue meticuloso al revisar las pruebas antes de publicar la actualización.',
+    replaces: 'muy cuidadoso',
+    difficulty: 'avanzado',
+  },
+  {
+    word: 'Soslayar',
+    meaning: 'Pasar por alto o esquivar una dificultad o tema incómodo.',
+    example: 'No podemos soslayar el costo de mantenimiento al elegir tecnología.',
+    replaces: 'evitar o ignorar',
+    difficulty: 'avanzado',
+  },
+  {
+    word: 'Apremiar',
+    meaning: 'Dar prisa o exigir una decisión pronta por urgencia real.',
+    example: 'El cierre del semestre apremia a priorizar las materias troncales.',
+    replaces: 'dar mucha prisa',
+    difficulty: 'intermedio',
+  },
+  {
+    word: 'Perspicaz',
+    meaning: 'Agudo para notar detalles sutiles o comprender causas ocultas.',
+    example: 'Su pregunta perspicaz detectó un fallo en el supuesto inicial.',
+    replaces: 'muy observador',
+    difficulty: 'avanzado',
+  },
+  {
+    word: 'Subsanar',
+    meaning: 'Reparar o corregir un error, defecto o carencia de forma concreta.',
+    example: 'Lograron subsanar la pérdida de estado guardando cada cambio en la nube.',
+    replaces: 'corregir o arreglar',
+    difficulty: 'basico',
+  },
+  {
+    word: 'Cohesión',
+    meaning: 'Unión lógica y sólida entre las partes de un texto, equipo o sistema.',
+    example: 'Los módulos ganaron cohesión al compartir el mismo sistema de progreso.',
+    replaces: 'buena unión',
+    difficulty: 'basico',
   },
 ];
 
@@ -1202,4 +1342,299 @@ export const PHRASES_BANK: PhraseItem[] = [
     whenToUse: 'Entre bloques intensos de estudio o al volver a casa.',
     dailyAction: 'Regálate hoy 5 minutos sin celular ni música, solo observando tu respiración.',
   },
+  {
+    id: 'p37',
+    category: 'mente',
+    quote: 'Lo que se mide con constancia mejora; lo que se improvisa se olvida.',
+    author: 'Disciplina deliberada',
+    meaning: 'Registrar pequeños avances diarios te demuestra progreso real incluso en semanas exigentes.',
+    whenToUse: 'Cuando sientas que avanzas lento en un hábito nuevo.',
+    dailyAction: 'Anota hoy tu resultado en un módulo y compáralo dentro de tres días.',
+    difficulty: 'basico',
+    reflectionPrompt: '¿Qué hábito mejoraría más si registraras 5 minutos diarios esta semana?',
+  },
+  {
+    id: 'p38',
+    category: 'hablar',
+    quote: 'Empieza por la idea central y luego explica el cómo; nadie sigue un mapa sin saber el destino.',
+    author: 'Claridad expositiva',
+    meaning: 'Dar primero la conclusión reduce la carga mental de quien te escucha y capta su interés.',
+    whenToUse: 'Al responder preguntas en clase, reuniones o entrevistas.',
+    dailyAction: 'En tu próxima explicación, di primero el resumen en una sola oración.',
+    difficulty: 'basico',
+    reflectionPrompt: '¿Cómo resumirías tu proyecto actual en una sola frase clara?',
+  },
+  {
+    id: 'p39',
+    category: 'decisiones',
+    quote: 'Una decisión reversible pide velocidad; una irreversible pide pausa y evidencia.',
+    author: 'Criterio estratégico',
+    meaning: 'Diferenciar entre decisiones que se pueden deshacer y las definitivas evita parálisis y errores graves.',
+    whenToUse: 'Cuando dudas demasiado en elegir una herramienta o un paso pequeño.',
+    dailyAction: 'Identifica hoy una decisión reversible que llevas posponiendo y resuélvela en 5 minutos.',
+    difficulty: 'intermedio',
+    reflectionPrompt: '¿Qué decisión actual es reversible y puedes probar hoy mismo?',
+  },
+  {
+    id: 'p40',
+    category: 'calma',
+    quote: 'Respirar lento antes de responder separa tu criterio de tu impulso.',
+    author: 'Autocontrol práctico',
+    meaning: 'Dos segundos de pausa bajan la reactividad emocional y te permiten elegir palabras precisas.',
+    whenToUse: 'Ante un comentario tenso, un imprevisto técnico o prisa ajena.',
+    dailyAction: 'Haz una exhalación larga antes de responder el próximo mensaje urgente.',
+    difficulty: 'basico',
+    reflectionPrompt: '¿En qué momento del día sueles reaccionar demasiado rápido?',
+  },
+  {
+    id: 'p41',
+    category: 'mente',
+    quote: 'Confundir familiaridad con dominio es la trampa más común al releer apuntes.',
+    author: 'Ciencia del aprendizaje',
+    meaning: 'Reconocer un texto al leerlo no significa poder recordarlo ni aplicarlo sin mirar.',
+    whenToUse: 'Al preparar exámenes universitarios o repasar documentación técnica.',
+    dailyAction: 'Cierra los apuntes y escribe tres ideas clave de memoria antes de volver a leer.',
+    difficulty: 'intermedio',
+    reflectionPrompt: '¿Qué tema crees dominar pero todavía no has explicado sin mirar notas?',
+  },
+  {
+    id: 'p42',
+    category: 'hablar',
+    quote: 'Una pausa breve antes del punto clave vale más que subir el volumen.',
+    author: 'Retórica serena',
+    meaning: 'El silencio estratégico ordena tus ideas, elimina muletillas y proyecta seguridad natural.',
+    whenToUse: 'En exposiciones orales y presentaciones de proyecto.',
+    dailyAction: 'Practica hoy una intervención de 45 segundos haciendo dos pausas limpias.',
+    difficulty: 'intermedio',
+    reflectionPrompt: '¿Qué muletilla reemplazas mejor con una pausa de un segundo?',
+  },
+  {
+    id: 'p43',
+    category: 'decisiones',
+    quote: 'Decir que sí a lo secundario es decir que no a lo importante en silencio.',
+    author: 'Foco esencial',
+    meaning: 'Tu tiempo y atención son finitos; aceptar tareas dispersas diluye tus metas principales.',
+    whenToUse: 'Cuando tu agenda se llena de compromisos poco prioritarios.',
+    dailyAction: 'Elige una sola prioridad innegociable para mañana antes de acostarte.',
+    difficulty: 'avanzado',
+    reflectionPrompt: '¿Qué actividad secundaria te está restando foco esta semana?',
+  },
+  {
+    id: 'p44',
+    category: 'calma',
+    quote: 'La tensión en el cuerpo suele avisar antes que la mente que necesitas una pausa breve.',
+    author: 'Conciencia somática',
+    meaning: 'Soltar mandíbula, hombros y manos corta la escalada de estrés antes de agotarte.',
+    whenToUse: 'Tras más de una hora continua frente a la pantalla.',
+    dailyAction: 'Haz hoy una ronda corta de relajación muscular progresiva al terminar tu bloque.',
+    difficulty: 'basico',
+    reflectionPrompt: '¿En qué parte del cuerpo notas primero el cansancio o la tensión?',
+  },
+  {
+    id: 'p45',
+    category: 'mente',
+    quote: 'El error documentado se vuelve activo; el error oculto se vuelve costumbre.',
+    author: 'Mejora continua',
+    meaning: 'Anotar por qué fallaste una pregunta o un trazo acelera el aprendizaje mucho más que evitar fallar.',
+    whenToUse: 'Al fallar en ortografía, mecanografía o una lección de dibujo.',
+    dailyAction: 'Revisa hoy tu cola de errores y convierte dos fallos en aciertos sólidos.',
+    difficulty: 'intermedio',
+    reflectionPrompt: '¿Qué error reciente te enseñó una regla útil para el futuro?',
+  },
+  {
+    id: 'p46',
+    category: 'hablar',
+    quote: 'Escuchar para comprender en lugar de escuchar para contestar transforma cualquier conversación.',
+    author: 'Diálogo efectivo',
+    meaning: 'Parafrasear brevemente lo que entendiste evita malentendidos y eleva la calidad del acuerdo.',
+    whenToUse: 'En reuniones de equipo, tutorías o charlas importantes.',
+    dailyAction: 'Resume en una línea lo que dijo la otra persona antes de aportar tu punto.',
+    difficulty: 'avanzado',
+    reflectionPrompt: '¿Cómo cambia la conversación cuando confirmas que entendiste bien?',
+  },
+  {
+    id: 'p47',
+    category: 'decisiones',
+    quote: 'Diseña tu entorno para que el buen hábito sea el camino de menor fricción.',
+    author: 'Arquitectura de hábitos',
+    meaning: 'Depender solo de la fuerza de voluntad falla; preparar las herramientas con anticipación asegura constancia.',
+    whenToUse: 'Cuando quieres sostener lectura, estudio o práctica diaria.',
+    dailyAction: 'Deja listo hoy el cuaderno, libro o módulo exacto con el que empezarás mañana.',
+    difficulty: 'intermedio',
+    reflectionPrompt: '¿Qué pequeño cambio en tu escritorio o navegador facilitaría tu hábito clave?',
+  },
+  {
+    id: 'p48',
+    category: 'calma',
+    quote: 'Avanzar imperfecto hoy construye más confianza que esperar un día perfecto que no llega.',
+    author: 'Serenidad en acción',
+    meaning: 'El perfeccionismo paraliza; diez minutos reales de práctica superan horas de preocupación.',
+    whenToUse: 'Cuando postergas empezar una tarea porque sientes que debe salir perfecta.',
+    dailyAction: 'Inicia hoy una versión borrador de 10 minutos sin juzgar el resultado inicial.',
+    difficulty: 'avanzado',
+    reflectionPrompt: '¿Qué tarea estás postergando por exigirte perfección desde el minuto uno?',
+  },
 ];
+
+export interface StudioTemplateSpec {
+  id: string;
+  title: string;
+  difficulty: 'basico' | 'intermedio' | 'avanzado';
+  description: string;
+  paper: 'dotted' | 'grid' | 'lined' | 'blank';
+  steps: string[];
+  headings: { x: number; y: number; text: string; fontSize: number }[];
+  lines: { x1: number; y1: number; x2: number; y2: number }[];
+}
+
+export const STUDIO_TEMPLATES: StudioTemplateSpec[] = [
+  {
+    id: 'cornell',
+    title: 'Método Cornell (Estudio activo)',
+    difficulty: 'basico',
+    description: 'Divide la hoja en columna de preguntas clave, notas principales y resumen final.',
+    paper: 'lined',
+    steps: [
+      'Anota el tema y fecha en la cabecera superior.',
+      'Escribe las ideas centrales en la zona derecha durante la clase o lectura.',
+      'Formula preguntas de repaso en la columna izquierda y sintetiza abajo en 3 líneas.',
+    ],
+    headings: [
+      { x: 60, y: 72, text: 'TEMA Y FECHA:', fontSize: 22 },
+      { x: 60, y: 155, text: 'PREGUNTAS CLAVE', fontSize: 16 },
+      { x: 310, y: 155, text: 'NOTAS PRINCIPALES', fontSize: 16 },
+      { x: 60, y: 1125, text: 'RESUMEN EN 3 LÍNEAS:', fontSize: 16 },
+    ],
+    lines: [
+      { x1: 40, y1: 115, x2: 960, y2: 115 },
+      { x1: 285, y1: 115, x2: 285, y2: 1090 },
+      { x1: 40, y1: 1090, x2: 960, y2: 1090 },
+    ],
+  },
+  {
+    id: 'feynman',
+    title: 'Hoja Feynman (Explicar simple)',
+    difficulty: 'intermedio',
+    description: 'Domina un concepto complejo explicándolo con palabras sencillas y detectando lagunas.',
+    paper: 'dotted',
+    steps: [
+      'Define el concepto arriba como si se lo explicaras a alguien de 12 años.',
+      'Dibuja un ejemplo o diagrama en el bloque central.',
+      'Lista abajo las lagunas detectadas y cómo las reforzarás.',
+    ],
+    headings: [
+      { x: 60, y: 74, text: 'CONCEPTO A DOMINAR:', fontSize: 22 },
+      { x: 60, y: 170, text: '1. EXPLICACIÓN SIMPLE (SIN JERGA):', fontSize: 16 },
+      { x: 60, y: 560, text: '2. EJEMPLO CONCRETO / DIAGRAMA:', fontSize: 16 },
+      { x: 60, y: 970, text: '3. LAGUNAS Y SIGUIENTE REPASO:', fontSize: 16 },
+    ],
+    lines: [
+      { x1: 40, y1: 120, x2: 960, y2: 120 },
+      { x1: 40, y1: 520, x2: 960, y2: 520 },
+      { x1: 40, y1: 930, x2: 960, y2: 930 },
+    ],
+  },
+  {
+    id: 'mapa',
+    title: 'Mapa Conceptual Radial',
+    difficulty: 'intermedio',
+    description: 'Conecta un concepto núcleo con 4 ramas principales de causas, ejemplos y aplicaciones.',
+    paper: 'grid',
+    steps: [
+      'Coloca la idea central en el recuadro del medio.',
+      'Conecta 4 subtemas con flechas en cada cuadrante.',
+      'Añade ejemplos concretos en los bordes.',
+    ],
+    headings: [
+      { x: 375, y: 660, text: 'IDEA CENTRAL', fontSize: 20 },
+      { x: 90, y: 140, text: 'RAMA 1: FUNDAMENTOS', fontSize: 15 },
+      { x: 610, y: 140, text: 'RAMA 2: EJEMPLOS', fontSize: 15 },
+      { x: 90, y: 1090, text: 'RAMA 3: ERRORES COMUNES', fontSize: 15 },
+      { x: 610, y: 1090, text: 'RAMA 4: APLICACIÓN', fontSize: 15 },
+    ],
+    lines: [
+      { x1: 340, y1: 600, x2: 660, y2: 600 },
+      { x1: 340, y1: 710, x2: 660, y2: 710 },
+      { x1: 500, y1: 160, x2: 500, y2: 590 },
+      { x1: 500, y1: 720, x2: 500, y2: 1120 },
+    ],
+  },
+  {
+    id: 'plan',
+    title: 'Plan de Bloque y Objetivos',
+    difficulty: 'basico',
+    description: 'Estructura una sesión de estudio con meta medible, 3 tareas y cierre reflexivo.',
+    paper: 'dotted',
+    steps: [
+      'Define una meta concreta de 45 minutos arriba.',
+      'Divide en 3 pasos verificables en el centro.',
+      'Registra al final qué aprendiste y qué queda pendiente.',
+    ],
+    headings: [
+      { x: 60, y: 74, text: 'META DEL BLOQUE (45 MIN):', fontSize: 20 },
+      { x: 60, y: 230, text: 'PASOS CONCRETOS:', fontSize: 16 },
+      { x: 60, y: 760, text: 'NOTAS / ESQUEMAS:', fontSize: 16 },
+      { x: 60, y: 1135, text: 'CIERRE: QUÉ DOMINÉ / QUÉ FALTA:', fontSize: 16 },
+    ],
+    lines: [
+      { x1: 40, y1: 185, x2: 960, y2: 185 },
+      { x1: 40, y1: 715, x2: 960, y2: 715 },
+      { x1: 40, y1: 1095, x2: 960, y2: 1095 },
+    ],
+  },
+  {
+    id: 'comparativa',
+    title: 'Tabla Comparativa (Trade-offs)',
+    difficulty: 'avanzado',
+    description: 'Contrasta dos teorías, algoritmos o soluciones lado a lado con criterios y veredicto.',
+    paper: 'grid',
+    steps: [
+      'Nombra las dos opciones en las columnas A y B.',
+      'Evalúa ventajas, riesgos y casos de uso en filas paralelas.',
+      'Redacta abajo el criterio de decisión final.',
+    ],
+    headings: [
+      { x: 60, y: 74, text: 'COMPARATIVA TÉCNICA / ACADÉMICA:', fontSize: 20 },
+      { x: 110, y: 165, text: 'OPCIÓN A', fontSize: 18 },
+      { x: 560, y: 165, text: 'OPCIÓN B', fontSize: 18 },
+      { x: 60, y: 1120, text: 'VEREDICTO Y CUÁNDO ELEGIR CADA UNA:', fontSize: 16 },
+    ],
+    lines: [
+      { x1: 40, y1: 120, x2: 960, y2: 120 },
+      { x1: 500, y1: 120, x2: 500, y2: 1080 },
+      { x1: 40, y1: 1080, x2: 960, y2: 1080 },
+    ],
+  },
+];
+
+export const READER_COMPREHENSION_PROMPTS: Record<'basico' | 'intermedio' | 'avanzado', string[]> = {
+  basico: [
+    '¿Cuál es la idea principal de este fragmento en una sola oración?',
+    '¿Qué palabra nueva o llamativa encontraste y cómo la usarías hoy?',
+  ],
+  intermedio: [
+    '¿Qué argumento central defiende el autor y qué ejemplo usa para sostenerlo?',
+    '¿Cómo conectarías esta lectura con una situación práctica de tu estudio o trabajo?',
+  ],
+  avanzado: [
+    '¿Qué supuesto implícito tiene el texto y qué contraargumento sólido podría plantearse?',
+    'Sintetiza el texto en tres tesis verificables y una pregunta abierta para investigar.',
+  ],
+};
+
+export function inferOrthoTopic(q: OrthographyQuestion): 'tildes' | 'homofonos' | 'b_v_g_j' | 'puntuacion' | 'sintaxis' {
+  if (q.topic) return q.topic;
+  const r = q.rule.toLowerCase();
+  if (r.includes('tilde') || r.includes('hiato') || r.includes('esdrújula') || r.includes('aguda')) return 'tildes';
+  if (r.includes('dos puntos') || r.includes('coma') || r.includes('puntuación')) return 'puntuacion';
+  if (r.includes('con g') || r.includes('con j') || r.includes('con b') || r.includes('con v') || r.includes('con h') || r.includes('con y')) return 'b_v_g_j';
+  if (r.includes('equivale') || r.includes('preposición') || r.includes('conjunción') || r.includes('verbo')) return 'homofonos';
+  return 'sintaxis';
+}
+
+export function inferOrthoDifficulty(q: OrthographyQuestion, idx: number): 'basico' | 'intermedio' | 'avanzado' {
+  if (q.difficulty) return q.difficulty;
+  if (idx % 3 === 0) return 'basico';
+  if (idx % 3 === 1) return 'intermedio';
+  return 'avanzado';
+}

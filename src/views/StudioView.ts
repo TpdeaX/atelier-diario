@@ -1,3 +1,4 @@
+import { STUDIO_TEMPLATES, StudioTemplateSpec } from '../data/KnowledgeBank';
 import { Icons } from '../icons';
 import { cloudSync } from '../services/CloudSync';
 import {
@@ -25,13 +26,30 @@ import {
 } from '../services/PdfTools';
 import { lifeStore } from '../state/LifeStore';
 import {
+  BoardElement,
   BoardShapeElement,
   BoardStrokeElement,
   BoardTool,
+  DifficultyLevel,
   NotebookDoc,
   PaperStyle,
 } from '../types';
+import { bindDidacticBar, difficultyLabel, renderDidacticBar } from '../ui/DidacticBar';
 import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
+
+const STUDIO_DIFF_HINTS: Record<DifficultyLevel, string> = {
+  basico: 'Prioriza plantillas guiadas (Cornell y Plan de Bloque) con pasos claros.',
+  intermedio: 'Combina método Feynman, mapas conceptuales y subrayado activo.',
+  avanzado: 'Tablas comparativas de trade-offs y síntesis sin releer apuntes.',
+};
+
+const STUDIO_REVIEW_CHECKS = [
+  { id: 'title', label: 'Definí el tema principal y objetivo de esta sesión' },
+  { id: 'highlight', label: 'Resalté solo ideas clave (menos del 25% de la página)' },
+  { id: 'diagram', label: 'Dibujé al menos un esquema, flecha o mapa visual' },
+  { id: 'summary', label: 'Escribí un resumen propio de 3 líneas al pie de la página' },
+  { id: 'questions', label: 'Anoté 2 preguntas de autoevaluación para repasar mañana' },
+];
 
 const STUDIO_TUTORIALS: Record<'notebook' | 'pdf', Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
   notebook: {
@@ -89,6 +107,7 @@ export class StudioView {
   private activeStroke: BoardStrokeElement | null = null;
   private activeShape: BoardShapeElement | null = null;
   private pendingTextPos: { x: number; y: number } | null = null;
+  private redoStack: BoardElement[] = [];
 
   private syncStatusLabel = 'Solo local (IndexedDB)';
   private pushTimer = 0;
@@ -205,6 +224,16 @@ export class StudioView {
   private paintShell(container: HTMLElement): void {
     const doc = this.activeDoc();
     this.currentPage = Math.max(1, Math.min(doc.pageCount, this.currentPage));
+    const prog = lifeStore.get().progress.studio;
+    const diff = lifeStore.getDifficulty('studio');
+    const doneChecks = STUDIO_REVIEW_CHECKS.filter((c) => prog.studyChecklist[`${doc.id}:${c.id}`]).length;
+    const annotatedPages = Object.values(doc.pages).filter((els) => els && els.length > 0).length;
+    const studioPct = Math.min(
+      100,
+      Math.round(prog.templatesApplied * 12 + doneChecks * 10 + annotatedPages * 8)
+    );
+    const activeTpl: StudioTemplateSpec =
+      STUDIO_TEMPLATES.find((t) => t.id === prog.templateId) ?? STUDIO_TEMPLATES[0];
 
     container.innerHTML = `
       <div class="al-page al-studio-page">
@@ -216,7 +245,7 @@ export class StudioView {
             </div>
             <div>
               <h1>Cuaderno Digital y Editor PDF</h1>
-              <p>Dibuja diagramas, subraya libros PDF, busca obras en línea y sincroniza en vivo con Supabase.</p>
+              <p>Aplica plantillas de estudio (Cornell, Feynman, Mapas), subraya libros PDF y sincroniza en vivo con Supabase.</p>
             </div>
           </div>
           <div class="al-tool-group">
@@ -231,6 +260,75 @@ export class StudioView {
             </label>
           </div>
         </div>
+
+        ${renderDidacticBar({
+          moduleId: 'studio',
+          progressLabel: `Avance de apuntes (${annotatedPages}/${doc.pageCount} págs anotadas · ${prog.templatesApplied} plantillas)`,
+          progressPct: studioPct,
+          progressDetail: `Lista de repaso de este documento: ${doneChecks}/${STUDIO_REVIEW_CHECKS.length} pasos cumplidos`,
+          difficultyHints: STUDIO_DIFF_HINTS,
+          extraMetric: `${this.docs.length} docs guardados`,
+        })}
+
+        <div class="al-toolbar">
+          <div class="al-seg-tabs" role="group" aria-label="Modo del cuaderno">
+            <button type="button" class="al-seg-btn ${prog.mode === 'libre' ? 'is-active' : ''}" data-smode="libre">Hoja libre</button>
+            <button type="button" class="al-seg-btn ${prog.mode === 'plantilla' ? 'is-active' : ''}" data-smode="plantilla">Plantillas didácticas (${STUDIO_TEMPLATES.length})</button>
+            <button type="button" class="al-seg-btn ${prog.mode === 'repaso' ? 'is-active' : ''}" data-smode="repaso">Checklist de estudio (${doneChecks}/${STUDIO_REVIEW_CHECKS.length})</button>
+          </div>
+        </div>
+
+        ${
+          prog.mode === 'plantilla'
+            ? `
+          <section class="al-panel" aria-label="Plantillas guiadas de apuntes">
+            <div class="al-step-bar">
+              ${STUDIO_TEMPLATES.map(
+                (t) => `
+                <button type="button" class="al-step-pill ${t.id === activeTpl.id ? 'is-active' : ''}" data-stpl="${t.id}">
+                  ${t.title} · ${difficultyLabel(t.difficulty)}
+                </button>`
+              ).join('')}
+            </div>
+            <div class="al-study-card" style="margin-top:10px">
+              <div class="al-didactic-prog-head">
+                <strong>${activeTpl.title}</strong>
+                <span class="al-mastery-badge">${difficultyLabel(activeTpl.difficulty)}${activeTpl.difficulty === diff ? ' · Recomendada' : ''}</span>
+              </div>
+              <p class="al-muted" style="margin:0">${activeTpl.description}</p>
+              <ol class="al-muted" style="margin:4px 0 6px;padding-left:18px;font-size:0.84rem">
+                ${activeTpl.steps.map((s) => `<li>${s}</li>`).join('')}
+              </ol>
+              <div class="al-tool-group">
+                <button type="button" class="al-btn al-btn-primary" id="al-apply-template">
+                  ${Icons.check(15)}<span>Aplicar estructura en página ${this.currentPage}</span>
+                </button>
+              </div>
+            </div>
+          </section>`
+            : ''
+        }
+
+        ${
+          prog.mode === 'repaso'
+            ? `
+          <section class="al-panel" aria-label="Checklist de estudio activo">
+            <h2 style="margin:0 0 8px;font-size:1rem">Lista didáctica de calidad para «${doc.title}»</h2>
+            <div class="al-study-grid">
+              ${STUDIO_REVIEW_CHECKS.map((item) => {
+                const checked = Boolean(prog.studyChecklist[`${doc.id}:${item.id}`]);
+                return `
+                  <button type="button" class="al-study-card ${checked ? 'is-done' : ''}" data-scheck="${item.id}" style="text-align:left">
+                    <div class="al-didactic-prog-head">
+                      <span>${item.label}</span>
+                      <span class="al-mastery-badge">${checked ? 'Listo' : 'Pendiente'}</span>
+                    </div>
+                  </button>`;
+              }).join('')}
+            </div>
+          </section>`
+            : ''
+        }
 
         <div class="al-doc-strip" id="al-doc-strip">
           ${this.docs
@@ -307,6 +405,7 @@ export class StudioView {
                   : ''
               }
               <button type="button" class="al-btn" id="al-board-undo">${Icons.undo(14)}<span>Deshacer</span></button>
+              <button type="button" class="al-btn" id="al-board-redo" ${this.redoStack.length === 0 ? 'disabled' : ''}><span>Rehacer</span></button>
               <button type="button" class="al-btn" id="al-board-clear">${Icons.trash(14)}<span>Limpiar</span></button>
               <button type="button" class="al-btn" id="al-export-json" title="Respaldo rápido de este cuaderno">${Icons.download(14)}<span>.json</span></button>
               <button type="button" class="al-btn al-btn-primary" id="al-export-pdf">${Icons.download(15)}<span>Exportar PDF</span></button>
@@ -335,6 +434,7 @@ export class StudioView {
     this.fgCtx = this.fgCanvas.getContext('2d')!;
 
     this.bindEvents(container);
+    bindDidacticBar(container, 'studio', () => this.paintShell(container));
     bindTutorialBanners(container);
     void this.renderAllLayers();
 
@@ -777,14 +877,94 @@ export class StudioView {
       this.paintShell(container);
     });
 
+    container.querySelectorAll<HTMLButtonElement>('[data-smode]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.smode as 'libre' | 'plantilla' | 'repaso';
+        lifeStore.updateProgress('studio', { mode });
+        this.paintShell(container);
+      });
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-stpl]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        lifeStore.updateProgress('studio', { templateId: btn.dataset.stpl! });
+        this.paintShell(container);
+      });
+    });
+
+    container.querySelector('#al-apply-template')?.addEventListener('click', () => {
+      const prog = lifeStore.get().progress.studio;
+      const tpl = STUDIO_TEMPLATES.find((t) => t.id === prog.templateId) ?? STUDIO_TEMPLATES[0];
+      const doc = this.activeDoc();
+      if (!doc.pages[this.currentPage]) doc.pages[this.currentPage] = [];
+      if (doc.kind === 'notebook') {
+        doc.paper = tpl.paper;
+      }
+      const now = Date.now();
+      for (let i = 0; i < tpl.lines.length; i++) {
+        const l = tpl.lines[i];
+        doc.pages[this.currentPage].push({
+          id: `tpl-l-${now}-${i}`,
+          type: 'stroke',
+          tool: 'pen',
+          points: [
+            [l.x1, l.y1],
+            [l.x2, l.y2],
+          ],
+          color: '#2A4359',
+          width: 2.4,
+          alpha: 0.65,
+        });
+      }
+      for (let i = 0; i < tpl.headings.length; i++) {
+        const h = tpl.headings[i];
+        doc.pages[this.currentPage].push({
+          id: `tpl-t-${now}-${i}`,
+          type: 'text',
+          x: h.x,
+          y: h.y,
+          text: h.text,
+          color: '#166534',
+          fontSize: h.fontSize,
+        });
+      }
+      this.redoStack = [];
+      lifeStore.updateProgress('studio', { templatesApplied: prog.templatesApplied + 1 });
+      this.persistActiveDoc();
+      this.paintShell(container);
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-scheck]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const doc = this.activeDoc();
+        const prog = lifeStore.get().progress.studio;
+        const key = `${doc.id}:${btn.dataset.scheck!}`;
+        const nextMap = { ...prog.studyChecklist, [key]: !prog.studyChecklist[key] };
+        lifeStore.updateProgress('studio', { studyChecklist: nextMap });
+        lifeStore.markHabit('studio');
+        this.paintShell(container);
+      });
+    });
+
     container.querySelector('#al-board-undo')?.addEventListener('click', () => {
       const doc = this.activeDoc();
       const arr = doc.pages[this.currentPage] ?? [];
       if (arr.length > 0) {
-        arr.pop();
+        const popped = arr.pop();
+        if (popped) this.redoStack.push(popped);
         this.persistActiveDoc();
-        this.redrawFg();
+        this.paintShell(container);
       }
+    });
+
+    container.querySelector('#al-board-redo')?.addEventListener('click', () => {
+      const next = this.redoStack.pop();
+      if (!next) return;
+      const doc = this.activeDoc();
+      if (!doc.pages[this.currentPage]) doc.pages[this.currentPage] = [];
+      doc.pages[this.currentPage].push(next);
+      this.persistActiveDoc();
+      this.paintShell(container);
     });
 
     container.querySelector('#al-board-clear')?.addEventListener('click', () => {

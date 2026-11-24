@@ -135,6 +135,8 @@ export const PMR_STEPS: PmrStep[] = [
   { group: 'Frente', action: 'Arruga la frente y los ojos', tip: 'Alisa la frente y deja los ojos pesados.', tenseSec: 4, releaseSec: 8 },
   { group: 'Abdomen', action: 'Endurece la barriga', tip: 'Suelta y deja que el aire la infle sola.', tenseSec: 4, releaseSec: 8 },
   { group: 'Piernas', action: 'Estira las piernas y aprieta los muslos', tip: 'Afloja todo y siente el apoyo del suelo.', tenseSec: 4, releaseSec: 8 },
+  { group: 'Cuello y nuca', action: 'Inclina suave la barbilla al pecho sin forzar', tip: 'Vuelve al centro y deja el cuello largo y libre.', tenseSec: 4, releaseSec: 8 },
+  { group: 'Pies y pantorrillas', action: 'Recoge los dedos de los pies hacia abajo', tip: 'Suelta por completo y nota la temperatura del piso.', tenseSec: 4, releaseSec: 8 },
 ];
 
 export const PANIC_TRUTH_CARDS: string[] = [
@@ -158,6 +160,51 @@ export const PANIC_TRUTH_CARDS: string[] = [
   'Lo incómodo no es necesariamente peligroso. Esto también pasará.',
   'Traer mi atención a cinco objetos reales me devuelve al presente.',
   'Merezco tratarme con paciencia mientras mi cuerpo recupera el equilibrio.',
+  'Respirar profundo envía una señal física directa de seguridad al cerebro.',
+  'No tengo que creer todo lo que pienso cuando estoy agotado o tenso.',
+  'Una sola tarea pequeña ahora vale más que preocuparme por diez.',
+  'Siento el respaldo de la silla y el peso estable de mi cuerpo.',
+  'La calma vuelve por capas; cada ciclo de aire suma un poco más.',
+  'Pedir una pausa breve es una señal de autocuidado, no de debilidad.',
+];
+
+export interface ReframeExample {
+  id: string;
+  label: string;
+  worry: string;
+  control: string;
+  nextStep: string;
+}
+
+export const REFRAME_EXAMPLES: ReframeExample[] = [
+  {
+    id: 'ex-exam',
+    label: 'Sobrecarga de exámenes',
+    worry: 'Siento que no voy a terminar todos los cursos a tiempo y voy a fallar.',
+    control: 'Puedo elegir el tema de mayor peso y estudiarlo en bloques de 25 minutos.',
+    nextStep: 'Hacer 10 fichas de Evocación Activa del curso más urgente ahora.',
+  },
+  {
+    id: 'ex-expo',
+    label: 'Nervios antes de exponer',
+    worry: 'Me voy a trabar al hablar delante de todos y me quedaré en blanco.',
+    control: 'Puedo practicar mi apertura de 30 segundos y apoyarme en pausas lentas.',
+    nextStep: 'Respirar 3 ciclos 3-6 y ensayar la primera frase dos veces en voz alta.',
+  },
+  {
+    id: 'ex-bug',
+    label: 'Bloqueo en proyecto técnico',
+    worry: 'Llevo horas en este error y siento que no avanzo nada.',
+    control: 'Puedo aislar un caso mínimo reproducible y descansar 5 minutos para ver claro.',
+    nextStep: 'Tomar agua, anotar dos hipótesis en el cuaderno y probar la más simple.',
+  },
+  {
+    id: 'ex-night',
+    label: 'Mente acelerada de noche',
+    worry: 'No dejo de pensar en pendientes de mañana y no puedo relajarme.',
+    control: 'No puedo resolver mañana a medianoche, pero sí puedo descargarlo en papel.',
+    nextStep: 'Escribir los 3 pendientes en lista, cerrar pantallas y hacer 4 ciclos 4-7-8.',
+  },
 ];
 
 /** BPM del pulso calmante: baja linealmente de `startBpm` a `endBpm` en `durationSec` y se queda ahi. */

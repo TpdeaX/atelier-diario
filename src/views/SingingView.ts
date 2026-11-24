@@ -7,6 +7,11 @@ import {
 import {
   EAR_INTERVALS,
   EAR_INTERVALS_FULL,
+  EAR_MELODIES,
+  EAR_SCALES,
+  EarMelodyDef,
+  EarScaleDef,
+  getSongDifficulty,
   IntervalDef,
   JUMP_VERIFIER_INTERVALS,
   midiToNoteEs,
@@ -14,16 +19,19 @@ import {
   PIANO_KEYS_2OCT,
   SINGING_DRILLS,
   SINGING_SONGS,
+  SingingDrill,
   suggestTransposeFromRange,
   VOWEL_DRILLS,
   WARMUP_CHAIN_STEPS,
 } from '../data/SingingBank';
 import { Icons } from '../icons';
 import { lifeStore } from '../state/LifeStore';
-import { SingingTimbre } from '../types';
+import { DifficultyLevel, SingingTimbre } from '../types';
+import { bindDidacticBar, difficultyLabel, renderDidacticBar } from '../ui/DidacticBar';
 import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
 
 type SingingTab = 'karaoke' | 'routines' | 'ear';
+type EarMode = 'chord' | 'interval' | 'scale' | 'melody';
 
 const SINGING_TUTORIALS: Record<SingingTab, Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
   karaoke: {
@@ -49,14 +57,14 @@ const SINGING_TUTORIALS: Record<SingingTab, Omit<SectionTutorialSpec, 'id' | 'mo
     tip: 'Calentar 5 minutos con zumbido «Mmmm» y trino «Brrr» evita fatiga y mejora tu afinación al instante.',
   },
   ear: {
-    sectionName: 'Oído y Acordes',
-    summary: 'Entrena el reconocimiento auditivo de acordes (Mayor, Menor, 7ª) e intervalos de 1 a 12 semitonos.',
+    sectionName: 'Oído, Acordes, Escalas y Dictado',
+    summary: 'Entrena el reconocimiento auditivo de acordes, intervalos, escalas musicales y dictado melódico según tu dificultad.',
     steps: [
-      'Elige entre modo Acordes o Intervalos (Básico de 3 o Completo de 12 semitonos).',
-      'Pulsa Escuchar para repetir el ejemplo las veces que necesites y elige la respuesta correcta.',
-      'Lee la explicación armónica tras cada intento y usa el piano inferior para comparar el sonido.',
+      'Elige entre Acordes, Intervalos (3 o 12 semitonos), Escalas o Dictado melódico.',
+      'Pulsa Escuchar para repetir el patrón las veces que necesites y elige la respuesta correcta.',
+      'Tu puntaje acumulado y racha se guardan automáticamente; usa el piano inferior para comparar.',
     ],
-    tip: 'Asocia cada intervalo con el inicio de una canción conocida (ej. 5ª justa con Estrellita).',
+    tip: 'Asocia cada intervalo o escala con una emoción o melodía conocida (ej. 5ª justa con Estrellita).',
   },
 };
 type ChordQuality = 'major' | 'minor' | 'seventh';
@@ -93,6 +101,30 @@ interface EarIntervalChallenge {
   answeredId: string | null;
 }
 
+interface EarScaleChallenge {
+  kind: 'scale';
+  rootMidi: number;
+  scale: EarScaleDef;
+  answeredId: string | null;
+}
+
+interface EarMelodyChallenge {
+  kind: 'melody';
+  rootMidi: number;
+  melody: EarMelodyDef;
+  answeredId: string | null;
+}
+
+interface ActiveDrillEval {
+  drill: SingingDrill;
+  startedAtMs: number;
+  stepDurationMs: number;
+  lastPlayedIdx: number;
+  hits: number;
+  total: number;
+  lastResultPct: number | null;
+}
+
 interface JumpChallenge {
   baseMidi: number;
   targetMidi: number;
@@ -112,6 +144,7 @@ function fmtSec(sec: number): string {
 }
 
 export class SingingView {
+  private hydrated = false;
   private containerRef: HTMLElement | null = null;
   private activeTab: SingingTab = 'karaoke';
   private micError = '';
@@ -161,7 +194,10 @@ export class SingingView {
 
   // Sung interval jump verifier
   private jumpChallenge: JumpChallenge | null = null;
-  private jumpsVerified = 0;
+
+  // Interactive drill evaluator
+  private activeDrillEval: ActiveDrillEval | null = null;
+  private lastDrillFeedback = '';
 
   // Breathing 4-4-6 state
   private breathRunning = false;
@@ -175,26 +211,77 @@ export class SingingView {
   private rangeStatusMsg = '';
 
   // Ear training state
-  private earMode: 'chord' | 'interval' = 'chord';
+  private earMode: EarMode = 'chord';
   private earIntervalMode: 'basic' | 'full' = 'basic';
   private earChord: EarChordChallenge | null = null;
   private earInterval: EarIntervalChallenge | null = null;
-  private earScore = { correct: 0, total: 0 };
+  private earScale: EarScaleChallenge | null = null;
+  private earMelody: EarMelodyChallenge | null = null;
+
+  private hydrateFromStore(): void {
+    const s = lifeStore.get().progress.singing;
+    if (!this.hydrated) {
+      this.hydrated = true;
+      this.activeTab = s.activeTab || 'karaoke';
+      this.selectedSongId =
+        SINGING_SONGS.some((song) => song.id === s.selectedSongId)
+          ? s.selectedSongId
+          : SINGING_SONGS[0].id;
+      this.transpose = s.transpose === -12 || s.transpose === 12 ? s.transpose : 0;
+      this.karaokeTempo =
+        s.karaokeTempo === 0.75 || s.karaokeTempo === 1.15 ? s.karaokeTempo : 1;
+      this.playGuideNotes = s.playGuideNotes !== false;
+      this.playChordBacking = s.playChordBacking !== false;
+      this.earMode = s.earMode || 'chord';
+      this.earIntervalMode = s.earIntervalMode || 'basic';
+    }
+    this.vowelsCompleted = new Set(s.vowelsCompleted);
+  }
+
+  private getToleranceCents(): number {
+    const diff = lifeStore.getDifficulty('singing');
+    return diff === 'basico' ? 35 : diff === 'intermedio' ? 25 : 15;
+  }
+
+  private getScalesForDifficulty(diff: DifficultyLevel): EarScaleDef[] {
+    if (diff === 'basico') return EAR_SCALES.filter((sc) => sc.difficulty === 'basico');
+    if (diff === 'intermedio') {
+      return EAR_SCALES.filter((sc) => sc.difficulty === 'basico' || sc.difficulty === 'intermedio');
+    }
+    return EAR_SCALES;
+  }
+
+  private getMelodiesForDifficulty(diff: DifficultyLevel): EarMelodyDef[] {
+    if (diff === 'basico') return EAR_MELODIES.filter((m) => m.difficulty === 'basico');
+    if (diff === 'intermedio') {
+      return EAR_MELODIES.filter((m) => m.difficulty === 'basico' || m.difficulty === 'intermedio');
+    }
+    return EAR_MELODIES;
+  }
 
   public render(container: HTMLElement): void {
     this.containerRef = container;
+    this.hydrateFromStore();
     const isMicOn = voiceStudio.isMicActive();
     const profile = lifeStore.get();
-    const level = profile.modulePrefs.singing.level;
+    const sProg = profile.progress.singing;
+    const diff = lifeStore.getDifficulty('singing');
+    const level: 1 | 2 | 3 = diff === 'basico' ? 1 : diff === 'intermedio' ? 2 : 3;
+    const tolCents = this.getToleranceCents();
     const timbre = profile.modulePrefs.singing.timbre;
     const lastDrillId = profile.modulePrefs.singing.lastDrillId;
     const suggestedTranspose = suggestTransposeFromRange(
       profile.stats.vocalRangeLow,
       profile.stats.vocalRangeHigh
     );
+    const summary = lifeStore.getOverallMasterySummary();
+    const songsDone = Object.keys(profile.stats.singingSongBest).length;
+    const drillsDone = Object.keys(sProg.drillsMastered).length;
 
     if (!this.earChord) this.nextChordChallenge(false);
     if (!this.earInterval) this.nextIntervalChallenge(false);
+    if (!this.earScale) this.nextScaleChallenge(false);
+    if (!this.earMelody) this.nextMelodyChallenge(false);
     if (!this.jumpChallenge) this.nextJumpChallenge(false);
 
     container.innerHTML = `
@@ -207,7 +294,7 @@ export class SingingView {
             </div>
             <div>
               <h1>Estudio de Canto y Piano</h1>
-              <p>Calentamiento guiado de 5 min, ${SINGING_SONGS.length} canciones con acompañamiento de acordes, vocales, saltos cantados, oído completo y piano Do3–Do5.</p>
+              <p>Calentamiento guiado de 5 min, ${SINGING_SONGS.length} canciones con acordes, vocales, saltos cantados, oído completo y piano Do3–Do5.</p>
             </div>
           </div>
           <div class="al-singing-hero-right">
@@ -217,6 +304,19 @@ export class SingingView {
             </button>
           </div>
         </div>
+
+        ${renderDidacticBar({
+          moduleId: 'singing',
+          progressLabel: 'Dominio Vocal y Auditivo',
+          progressPct: summary.byModule.singing,
+          progressDetail: `Canciones: ${songsDone}/${SINGING_SONGS.length} · Rutinas: ${drillsDone}/${SINGING_DRILLS.length} · Vocales: ${sProg.vowelsCompleted.length}/5 · Oído: ${sProg.earCorrect}/${sProg.earTotal}`,
+          extraMetric: `Tolerancia: ±${tolCents}c · Racha oído: ${sProg.earStreak}`,
+          difficultyHints: {
+            basico: 'Nivel 1 · Tolerancia ±35 cents, escalas y dictados melódicos iniciales.',
+            intermedio: 'Nivel 2 · Tolerancia ±25 cents, repertorio medio y escalas armónicas.',
+            avanzado: 'Nivel 3 · Tolerancia ±15 cents, modos avanzados y máxima precisión vocal.',
+          },
+        })}
 
         ${this.micError ? `<p class="al-warn-text">${this.micError}</p>` : ''}
 
@@ -228,7 +328,7 @@ export class SingingView {
             ${Icons.wind(15)}<span>Calentamiento 5 min y Rutinas (${SINGING_DRILLS.length})</span>
           </button>
           <button type="button" role="tab" aria-selected="${this.activeTab === 'ear'}" class="al-seg-btn ${this.activeTab === 'ear' ? 'is-active' : ''}" data-sing-tab="ear">
-            ${Icons.volume(15)}<span>Oído y Acordes</span>
+            ${Icons.volume(15)}<span>Oído, Escalas y Dictado</span>
           </button>
         </div>
 
@@ -288,6 +388,11 @@ export class SingingView {
       </div>
     `;
 
+    bindDidacticBar(container, 'singing', () => {
+      this.earScale = null;
+      this.earMelody = null;
+      this.render(container);
+    });
     this.bindEvents(container);
     bindTutorialBanners(container);
     this.attachKeyboardListeners();
@@ -297,7 +402,7 @@ export class SingingView {
     if (this.activeTab === 'routines') {
       this.syncWarmupUI();
     }
-    if (isMicOn || this.karaokeRunning) {
+    if (isMicOn || this.karaokeRunning || this.activeDrillEval) {
       this.startLoop();
     }
   }
@@ -305,8 +410,9 @@ export class SingingView {
   private renderKaraokeTab(level: 1 | 2 | 3): string {
     const profile = lifeStore.get();
     const song = SINGING_SONGS.find((s) => s.id === this.selectedSongId) ?? SINGING_SONGS[0];
+    const songDiff = getSongDifficulty(song);
     const bestPct = profile.stats.singingSongBest[song.id];
-    const tolerance = level === 3 ? 35 : 50;
+    const tolerance = this.getToleranceCents();
     const suggested = suggestTransposeFromRange(
       profile.stats.vocalRangeLow,
       profile.stats.vocalRangeHigh
@@ -347,17 +453,21 @@ export class SingingView {
               <h2>Karaoke vocal guiado</h2>
               <p class="al-muted">${song.description} Tolerancia nivel ${level}: ±${tolerance} cents.</p>
             </div>
-            <span class="al-mono-pill">${bestPct !== undefined ? `Mejor: ${bestPct}%` : 'Sin marca'}</span>
+            <div class="al-tool-group">
+              <span class="al-mastery-badge ${songDiff === 'avanzado' ? 'is-warn' : ''}">${difficultyLabel(songDiff)}</span>
+              <span class="al-mastery-badge">${bestPct !== undefined ? `Mejor: ${bestPct}%` : 'Sin marca'}</span>
+            </div>
           </div>
 
           <div class="al-karaoke-controls">
             <label class="al-karaoke-select">
               <span>Canción (${SINGING_SONGS.length})</span>
               <select id="al-song-select">
-                ${SINGING_SONGS.map(
-                  (s) =>
-                    `<option value="${s.id}" ${s.id === song.id ? 'selected' : ''}>${s.title} (${s.bpm} BPM)</option>`
-                ).join('')}
+                ${SINGING_SONGS.map((s) => {
+                  const dLbl = difficultyLabel(getSongDifficulty(s));
+                  const b = profile.stats.singingSongBest[s.id];
+                  return `<option value="${s.id}" ${s.id === song.id ? 'selected' : ''}>${s.title} · ${dLbl} · ${s.bpm} BPM${b !== undefined ? ` · ${b}%` : ''}</option>`;
+                }).join('')}
               </select>
             </label>
 
@@ -430,6 +540,7 @@ export class SingingView {
     suggestedTranspose: -12 | 0 | 12
   ): string {
     const profile = lifeStore.get();
+    const sProg = profile.progress.singing;
     const filtered = SINGING_DRILLS.filter((d) => d.level === level);
     const low = profile.stats.vocalRangeLow;
     const high = profile.stats.vocalRangeHigh;
@@ -437,6 +548,8 @@ export class SingingView {
     const vowel = VOWEL_DRILLS[this.vowelIdx];
     const jump = this.jumpChallenge!;
     const isMicOn = voiceStudio.isMicActive();
+    const tolCents = this.getToleranceCents();
+    const masteredInLevel = filtered.filter((d) => sProg.drillsMastered[d.id] !== undefined).length;
 
     return `
       <section class="al-panel al-warmup-panel" aria-label="Calentamiento guiado de 5 minutos">
@@ -446,6 +559,7 @@ export class SingingView {
             <p class="al-muted">Encadena 5 pasos con reloj y tonos guía para preparar tu voz sin forzarla.</p>
           </div>
           <div class="al-tool-group">
+            <span class="al-mastery-badge">Completados: ${sProg.warmupCount}</span>
             <span class="al-mono-pill" id="al-warmup-live-pitch">
               ${isMicOn ? 'Afinador activo' : 'Micrófono opcional'}
             </span>
@@ -470,7 +584,7 @@ export class SingingView {
           <div>
             <strong id="al-warmup-title">${this.warmupFinished ? 'Calentamiento completado (5 min)' : step.title}</strong>
             <p id="al-warmup-instr">${this.warmupFinished ? 'Tu voz ya está preparada. Puedes pasar al Karaoke o a las vocales.' : step.instruction}</p>
-            <small class="al-muted" id="al-warmup-cue">${this.warmupFinished ? 'Hábito de canto registrado hoy.' : step.cue}</small>
+            <small class="al-muted" id="al-warmup-cue">${this.warmupFinished ? `Calentamiento registrado (${sProg.warmupCount} acumulados).` : step.cue}</small>
           </div>
           <div class="al-warmup-clock" id="al-warmup-step-clock">${this.warmupFinished ? '00:00' : fmtSec(this.warmupStepRemSec)}</div>
         </div>
@@ -495,9 +609,9 @@ export class SingingView {
         <section class="al-panel">
           <div class="al-card-head">
             <h2>Estabilidad de vocales (A-E-I-O-U)</h2>
-            <span class="al-mono-pill">Logradas: ${this.vowelsCompleted.size}/5</span>
+            <span class="al-mastery-badge">Logradas: ${sProg.vowelsCompleted.length}/5</span>
           </div>
-          <p class="al-muted">Elige una vocal, escucha su tono y sostenla afinada (±35 cents) durante 2 segundos con el micrófono.</p>
+          <p class="al-muted">Elige una vocal, escucha su tono y sostenla afinada (±${tolCents} cents) durante 2 segundos con el micrófono.</p>
 
           <div class="al-tool-group" role="group" aria-label="Elegir vocal">
             ${VOWEL_DRILLS.map(
@@ -523,9 +637,18 @@ export class SingingView {
         <section class="al-panel">
           <div class="al-card-head">
             <h2>Saltos cantados (verificador en vivo)</h2>
-            <span class="al-mono-pill">Logrados: ${this.jumpsVerified}</span>
+            <span class="al-mastery-badge">Dominados: ${sProg.jumpsVerified.length}/${JUMP_VERIFIER_INTERVALS.length}</span>
           </div>
-          <p class="al-muted">Escucha las dos notas y cántalas en orden dentro de ±50 cents.</p>
+          <p class="al-muted">Escucha las dos notas y cántalas en orden dentro de ±${Math.max(30, tolCents + 15)} cents.</p>
+
+          <div class="al-step-bar" style="margin:4px 0 8px;">
+            ${JUMP_VERIFIER_INTERVALS.map(
+              (ji) => `
+              <span class="al-step-pill ${sProg.jumpsVerified.includes(ji.id) ? 'is-done' : ''}">
+                ${sProg.jumpsVerified.includes(ji.id) ? Icons.check(11) : ''} ${ji.label}
+              </span>`
+            ).join('')}
+          </div>
 
           <div class="al-jump-display">
             <span class="al-jump-node ${jump.stage !== 'base' ? 'is-hit' : 'is-active'}" id="al-jump-n1">
@@ -541,7 +664,7 @@ export class SingingView {
           <p class="al-muted" id="al-jump-status">
             ${
               jump.stage === 'done'
-                ? `¡Salto de ${jump.interval.label} afinado! Pulsa Nuevo salto para continuar.`
+                ? `Salto de ${jump.interval.label} afinado y guardado. Pulsa Nuevo salto para continuar.`
                 : !isMicOn
                   ? 'Pulsa Escuchar salto y activa el micrófono para verificar tu voz.'
                   : jump.stage === 'base'
@@ -565,6 +688,7 @@ export class SingingView {
         <section class="al-panel">
           <div class="al-card-head">
             <h2>Rutinas por nivel (${filtered.length} de ${SINGING_DRILLS.length})</h2>
+            <span class="al-mastery-badge">Dominadas nivel ${level}: ${masteredInLevel}/${filtered.length}</span>
           </div>
 
           <div class="al-seg-tabs" role="group" aria-label="Nivel de rutina">
@@ -572,24 +696,61 @@ export class SingingView {
               .map(
                 (lv) => `
               <button type="button" class="al-seg-btn ${level === lv ? 'is-active' : ''}" aria-pressed="${level === lv}" data-sing-level="${lv}">
-                ${lv === 1 ? 'Nivel 1 · Inicial' : lv === 2 ? 'Nivel 2 · Intermedio' : 'Nivel 3 · Avanzado'}
+                ${lv === 1 ? 'Nivel 1 · Básico' : lv === 2 ? 'Nivel 2 · Intermedio' : 'Nivel 3 · Avanzado'}
               </button>`
               )
               .join('')}
           </div>
 
+          ${
+            this.activeDrillEval
+              ? `
+            <div class="al-study-card is-done" style="margin-top:12px;">
+              <div class="al-card-head">
+                <strong>Evaluando en vivo: ${this.activeDrillEval.drill.title}</strong>
+                <button type="button" class="al-btn al-btn-sm al-btn-danger" id="al-drill-eval-stop">Detener</button>
+              </div>
+              <div class="al-warmup-bar-track">
+                <div class="al-warmup-bar-fill is-violet" id="al-drill-eval-bar" style="width:0%"></div>
+              </div>
+              <p class="al-muted" id="al-drill-eval-status" style="margin:4px 0 0;">
+                Sigue cada nota guía con tu voz (tolerancia ±${tolCents} cents)...
+              </p>
+            </div>`
+              : this.lastDrillFeedback
+                ? `<p class="al-muted" style="margin:10px 0 0;">${this.lastDrillFeedback}</p>`
+                : ''
+          }
+
           <div class="al-drills-list" style="margin-top:12px;">
             ${filtered
-              .map(
-                (d) => `
+              .map((d) => {
+                const best = sProg.drillsMastered[d.id];
+                const isEvaluating = this.activeDrillEval?.drill.id === d.id;
+                return `
               <div class="al-drill-item ${lastDrillId === d.id ? 'is-selected' : ''}">
                 <div>
-                  <strong>${d.title}</strong>
+                  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <strong>${d.title}</strong>
+                    ${
+                      best !== undefined
+                        ? `<span class="al-mastery-badge">${Icons.check(12)} Dominada · ${best}%</span>`
+                        : ''
+                    }
+                  </div>
                   <p>${d.tip}</p>
                 </div>
-                <button type="button" class="al-btn" data-drill="${d.id}">${Icons.volume(16)}<span>Escuchar guía</span></button>
-              </div>`
-              )
+                <div class="al-tool-group">
+                  <button type="button" class="al-btn al-btn-sm" data-drill="${d.id}">${Icons.volume(15)}<span>Guía</span></button>
+                  <button type="button" class="al-btn al-btn-sm ${isEvaluating ? 'al-btn-danger' : 'al-btn-primary'}" data-drill-eval="${d.id}">
+                    ${Icons.mic(14)}<span>${isEvaluating ? 'Detener' : 'Evaluar'}</span>
+                  </button>
+                  <button type="button" class="al-btn al-btn-sm" data-drill-complete="${d.id}" title="Marcar rutina completada sin micrófono">
+                    ${Icons.check(14)}<span>Dominada</span>
+                  </button>
+                </div>
+              </div>`;
+              })
               .join('')}
           </div>
         </section>
@@ -640,11 +801,16 @@ export class SingingView {
   }
 
   private renderEarTab(): string {
-    const isChord = this.earMode === 'chord';
+    const sProg = lifeStore.get().progress.singing;
+    const diff = lifeStore.getDifficulty('singing');
     const c = this.earChord!;
     const iv = this.earInterval!;
+    const sc = this.earScale!;
+    const mel = this.earMelody!;
     const activeIntervals =
       this.earIntervalMode === 'full' ? EAR_INTERVALS_FULL : EAR_INTERVALS;
+    const activeScales = this.getScalesForDifficulty(diff);
+    const activeMelodies = this.getMelodiesForDifficulty(diff);
 
     const chordExplanation =
       c.quality === 'major'
@@ -656,24 +822,38 @@ export class SingingView {
     const chordName =
       c.quality === 'major' ? 'Mayor' : c.quality === 'minor' ? 'menor' : 'de Séptima (7)';
 
+    const playBtnLabel =
+      this.earMode === 'chord'
+        ? 'Escuchar acorde'
+        : this.earMode === 'interval'
+          ? 'Escuchar intervalo'
+          : this.earMode === 'scale'
+            ? 'Escuchar escala'
+            : 'Escuchar melodía';
+
     return `
       <section class="al-panel al-ear-panel">
         <div class="al-card-head">
           <div>
-            <h2>Entrenamiento de oído y acordes</h2>
-            <p class="al-muted">Escucha con atención y elige la cualidad del acorde o el intervalo correcto.</p>
+            <h2>Entrenamiento auditivo completo</h2>
+            <p class="al-muted">Reconoce acordes, intervalos, escalas musicales y dictado melódico adaptados a dificultad <strong>${difficultyLabel(diff)}</strong>.</p>
           </div>
-          <span class="al-mono-pill">Aciertos: ${this.earScore.correct}/${this.earScore.total}</span>
+          <div class="al-tool-group">
+            <span class="al-mastery-badge">Aciertos: ${sProg.earCorrect}/${sProg.earTotal}</span>
+            <span class="al-mono-pill">Racha: ${sProg.earStreak}</span>
+          </div>
         </div>
 
-        <div class="al-tool-group" style="justify-content: space-between;">
+        <div class="al-tool-group" style="justify-content: space-between; flex-wrap:wrap;">
           <div class="al-seg-tabs" role="group" aria-label="Modo de entrenamiento auditivo">
-            <button type="button" class="al-seg-btn ${isChord ? 'is-active' : ''}" data-ear-mode="chord">Acordes (Mayor / Menor / 7ª)</button>
-            <button type="button" class="al-seg-btn ${!isChord ? 'is-active' : ''}" data-ear-mode="interval">Intervalos</button>
+            <button type="button" class="al-seg-btn ${this.earMode === 'chord' ? 'is-active' : ''}" data-ear-mode="chord">Acordes</button>
+            <button type="button" class="al-seg-btn ${this.earMode === 'interval' ? 'is-active' : ''}" data-ear-mode="interval">Intervalos</button>
+            <button type="button" class="al-seg-btn ${this.earMode === 'scale' ? 'is-active' : ''}" data-ear-mode="scale">Escalas (${activeScales.length})</button>
+            <button type="button" class="al-seg-btn ${this.earMode === 'melody' ? 'is-active' : ''}" data-ear-mode="melody">Dictado melódico (${activeMelodies.length})</button>
           </div>
 
           ${
-            !isChord
+            this.earMode === 'interval'
               ? `
             <div class="al-seg-tabs" role="group" aria-label="Dificultad de intervalos">
               <button type="button" class="al-seg-btn ${this.earIntervalMode === 'basic' ? 'is-active' : ''}" data-ear-iv-mode="basic">Básico (3)</button>
@@ -686,7 +866,7 @@ export class SingingView {
         <div class="al-ear-stage">
           <div class="al-ear-actions">
             <button type="button" class="al-btn al-btn-primary" id="al-ear-replay">
-              ${Icons.volume(16)}<span>${isChord ? 'Escuchar acorde' : 'Escuchar intervalo'}</span>
+              ${Icons.volume(16)}<span>${playBtnLabel}</span>
             </button>
             <button type="button" class="al-btn" id="al-ear-next">
               ${Icons.refresh(16)}<span>Siguiente ejercicio</span>
@@ -694,7 +874,7 @@ export class SingingView {
           </div>
 
           ${
-            isChord
+            this.earMode === 'chord'
               ? `
             <div class="al-ear-options">
               <button type="button" class="al-btn al-ear-opt ${c.answered === 'major' ? (c.quality === 'major' ? 'is-good' : 'is-bad') : ''}" data-ear-chord="major" ${c.answered ? 'disabled' : ''}>
@@ -715,7 +895,8 @@ export class SingingView {
                   </p>`
                 : ''
             }`
-              : `
+              : this.earMode === 'interval'
+                ? `
             <div class="al-ear-options ${this.earIntervalMode === 'full' ? 'is-full-grid' : ''}">
               ${activeIntervals
                 .map(
@@ -731,6 +912,45 @@ export class SingingView {
                 ? `<p class="al-ear-feedback">
                     <strong>${iv.answeredId === iv.interval.id ? 'Correcto.' : 'Casi.'}</strong>
                     Era una ${iv.interval.label} (${midiToNoteEs(iv.rootMidi)} → ${midiToNoteEs(iv.rootMidi + iv.interval.semitones)}). ${iv.interval.explanation}
+                  </p>`
+                : ''
+            }`
+                : this.earMode === 'scale'
+                  ? `
+            <div class="al-ear-options is-full-grid">
+              ${activeScales
+                .map(
+                  (opt) => `
+                <button type="button" class="al-btn al-ear-opt ${sc.answeredId === opt.id ? (sc.scale.id === opt.id ? 'is-good' : 'is-bad') : ''}" data-ear-scale="${opt.id}" ${sc.answeredId ? 'disabled' : ''}>
+                  ${opt.label}
+                </button>`
+                )
+                .join('')}
+            </div>
+            ${
+              sc.answeredId
+                ? `<p class="al-ear-feedback">
+                    <strong>${sc.answeredId === sc.scale.id ? 'Correcto.' : 'Casi.'}</strong>
+                    Era ${sc.scale.label} desde ${midiToNoteEs(sc.rootMidi)} (${sc.scale.semitones.map((st) => midiToNoteEs(sc.rootMidi + st)).join(' - ')}). ${sc.scale.character}
+                  </p>`
+                : ''
+            }`
+                  : `
+            <div class="al-ear-options is-full-grid">
+              ${activeMelodies
+                .map(
+                  (opt) => `
+                <button type="button" class="al-btn al-ear-opt ${mel.answeredId === opt.id ? (mel.melody.id === opt.id ? 'is-good' : 'is-bad') : ''}" data-ear-melody="${opt.id}" ${mel.answeredId ? 'disabled' : ''}>
+                  ${opt.label} (${opt.patternLabel})
+                </button>`
+                )
+                .join('')}
+            </div>
+            ${
+              mel.answeredId
+                ? `<p class="al-ear-feedback">
+                    <strong>${mel.answeredId === mel.melody.id ? 'Correcto.' : 'Casi.'}</strong>
+                    Era ${mel.melody.label} (${mel.melody.offsets.map((off) => midiToNoteEs(mel.rootMidi + off)).join(' → ')}). ${mel.melody.hint}
                   </p>`
                 : ''
             }`
@@ -766,6 +986,7 @@ export class SingingView {
     container.querySelectorAll<HTMLButtonElement>('[data-sing-tab]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.activeTab = btn.dataset.singTab as SingingTab;
+        lifeStore.updateProgress('singing', { activeTab: this.activeTab });
         this.render(container);
       });
     });
@@ -803,6 +1024,7 @@ export class SingingView {
     // Karaoke controls
     container.querySelector('#al-song-select')?.addEventListener('change', (e) => {
       this.selectedSongId = (e.target as HTMLSelectElement).value;
+      lifeStore.updateProgress('singing', { selectedSongId: this.selectedSongId });
       this.stopKaraoke(false);
       this.render(container);
     });
@@ -810,6 +1032,7 @@ export class SingingView {
     container.querySelectorAll<HTMLButtonElement>('[data-transpose]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.transpose = parseInt(btn.dataset.transpose!, 10) as -12 | 0 | 12;
+        lifeStore.updateProgress('singing', { transpose: this.transpose });
         if (this.karaokeRunning) this.stopKaraoke(false);
         this.render(container);
       });
@@ -818,6 +1041,7 @@ export class SingingView {
     container.querySelectorAll<HTMLButtonElement>('[data-tempo]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.karaokeTempo = parseFloat(btn.dataset.tempo!) as KaraokeTempo;
+        lifeStore.updateProgress('singing', { karaokeTempo: this.karaokeTempo });
         if (this.karaokeRunning) this.stopKaraoke(false);
         this.render(container);
       });
@@ -825,10 +1049,12 @@ export class SingingView {
 
     container.querySelector('#al-karaoke-guide')?.addEventListener('change', (e) => {
       this.playGuideNotes = (e.target as HTMLInputElement).checked;
+      lifeStore.updateProgress('singing', { playGuideNotes: this.playGuideNotes });
     });
 
     container.querySelector('#al-karaoke-chords')?.addEventListener('change', (e) => {
       this.playChordBacking = (e.target as HTMLInputElement).checked;
+      lifeStore.updateProgress('singing', { playChordBacking: this.playChordBacking });
     });
 
     container.querySelector('#al-karaoke-toggle')?.addEventListener('click', async () => {
@@ -902,7 +1128,10 @@ export class SingingView {
     container.querySelectorAll<HTMLButtonElement>('[data-sing-level]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const level = parseInt(btn.dataset.singLevel!, 10) as 1 | 2 | 3;
-        lifeStore.updateModulePrefs('singing', { level });
+        const nextDiff: DifficultyLevel = level === 1 ? 'basico' : level === 2 ? 'intermedio' : 'avanzado';
+        lifeStore.setDifficulty('singing', nextDiff);
+        this.earScale = null;
+        this.earMelody = null;
         this.render(container);
       });
     });
@@ -915,8 +1144,56 @@ export class SingingView {
         lifeStore.updateModulePrefs('singing', { lastDrillId: drill.id });
         lifeStore.markHabit('singing');
         drill.notes.forEach((midi, idx) => {
-          voiceStudio.playMidiNote(midi, 0.55, timbre, idx * 0.62);
+          voiceStudio.playMidiNote(midi + this.transpose, 0.55, timbre, idx * 0.62);
         });
+        this.render(container);
+      });
+    });
+
+    container.querySelector('#al-drill-eval-stop')?.addEventListener('click', () => {
+      this.finishDrillEvaluation(false);
+      this.render(container);
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-drill-eval]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const drill = SINGING_DRILLS.find((d) => d.id === btn.dataset.drillEval);
+        if (!drill) return;
+        if (this.activeDrillEval?.drill.id === drill.id) {
+          this.finishDrillEvaluation(false);
+          this.render(container);
+          return;
+        }
+        lifeStore.updateModulePrefs('singing', { lastDrillId: drill.id });
+        if (!voiceStudio.isMicActive()) {
+          try {
+            await voiceStudio.startMic();
+            this.micError = '';
+          } catch {
+            this.lastDrillFeedback =
+              'Sin micrófono activo: escucha la guía y pulsa «Dominada» para registrar tu autoevaluación.';
+            const timbre = lifeStore.get().modulePrefs.singing.timbre;
+            drill.notes.forEach((midi, idx) => {
+              voiceStudio.playMidiNote(midi + this.transpose, 0.55, timbre, idx * 0.62);
+            });
+            this.render(container);
+            return;
+          }
+        }
+        this.startDrillEvaluation(drill);
+        this.render(container);
+      });
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-drill-complete]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const drill = SINGING_DRILLS.find((d) => d.id === btn.dataset.drillComplete);
+        if (!drill) return;
+        lifeStore.updateModulePrefs('singing', { lastDrillId: drill.id });
+        const prev = lifeStore.get().progress.singing.drillsMastered[drill.id] ?? 0;
+        const pct = Math.max(prev, 85);
+        lifeStore.recordSingingDrillMastery(drill.id, pct);
+        this.lastDrillFeedback = `Rutina «${drill.title}» guardada como dominada (${pct}%).`;
         this.render(container);
       });
     });
@@ -966,7 +1243,8 @@ export class SingingView {
     // Ear training
     container.querySelectorAll<HTMLButtonElement>('[data-ear-mode]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        this.earMode = btn.dataset.earMode as 'chord' | 'interval';
+        this.earMode = btn.dataset.earMode as EarMode;
+        lifeStore.updateProgress('singing', { earMode: this.earMode });
         this.render(container);
       });
     });
@@ -976,6 +1254,7 @@ export class SingingView {
         const nextMode = btn.dataset.earIvMode as 'basic' | 'full';
         if (nextMode === this.earIntervalMode) return;
         this.earIntervalMode = nextMode;
+        lifeStore.updateProgress('singing', { earIntervalMode: nextMode });
         this.nextIntervalChallenge(false);
         this.render(container);
       });
@@ -987,7 +1266,9 @@ export class SingingView {
 
     container.querySelector('#al-ear-next')?.addEventListener('click', () => {
       if (this.earMode === 'chord') this.nextChordChallenge(true);
-      else this.nextIntervalChallenge(true);
+      else if (this.earMode === 'interval') this.nextIntervalChallenge(true);
+      else if (this.earMode === 'scale') this.nextScaleChallenge(true);
+      else this.nextMelodyChallenge(true);
       this.render(container);
     });
 
@@ -996,9 +1277,7 @@ export class SingingView {
         if (!this.earChord || this.earChord.answered) return;
         const choice = btn.dataset.earChord as ChordQuality;
         this.earChord.answered = choice;
-        this.earScore.total += 1;
-        if (choice === this.earChord.quality) this.earScore.correct += 1;
-        lifeStore.markHabit('singing');
+        lifeStore.recordSingingEar(choice === this.earChord.quality);
         this.render(container);
       });
     });
@@ -1008,9 +1287,27 @@ export class SingingView {
         if (!this.earInterval || this.earInterval.answeredId) return;
         const choice = btn.dataset.earInterval!;
         this.earInterval.answeredId = choice;
-        this.earScore.total += 1;
-        if (choice === this.earInterval.interval.id) this.earScore.correct += 1;
-        lifeStore.markHabit('singing');
+        lifeStore.recordSingingEar(choice === this.earInterval.interval.id);
+        this.render(container);
+      });
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-ear-scale]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (!this.earScale || this.earScale.answeredId) return;
+        const choice = btn.dataset.earScale!;
+        this.earScale.answeredId = choice;
+        lifeStore.recordSingingEar(choice === this.earScale.scale.id);
+        this.render(container);
+      });
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-ear-melody]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (!this.earMelody || this.earMelody.answeredId) return;
+        const choice = btn.dataset.earMelody!;
+        this.earMelody.answeredId = choice;
+        lifeStore.recordSingingEar(choice === this.earMelody.melody.id);
         this.render(container);
       });
     });
@@ -1136,7 +1433,7 @@ export class SingingView {
       this.pauseWarmup();
       this.warmupFinished = true;
       this.warmupStepRemSec = 0;
-      lifeStore.markHabit('singing');
+      lifeStore.recordSingingWarmup();
     }
   }
 
@@ -1203,8 +1500,38 @@ export class SingingView {
     lifeStore.markHabit('singing');
   }
 
+  private startDrillEvaluation(drill: SingingDrill): void {
+    this.activeDrillEval = {
+      drill,
+      startedAtMs: performance.now(),
+      stepDurationMs: 900,
+      lastPlayedIdx: -1,
+      hits: 0,
+      total: 0,
+      lastResultPct: null,
+    };
+    this.lastDrillFeedback = '';
+    lifeStore.markHabit('singing');
+  }
+
+  private finishDrillEvaluation(record: boolean): void {
+    if (!this.activeDrillEval) return;
+    const ev = this.activeDrillEval;
+    this.activeDrillEval = null;
+    if (record) {
+      const pct = ev.total > 0 ? Math.round((ev.hits / ev.total) * 100) : 70;
+      lifeStore.recordSingingDrillMastery(ev.drill.id, pct);
+      this.lastDrillFeedback =
+        ev.total > 0
+          ? `Rutina «${ev.drill.title}» evaluada: ${pct}% de precisión vocal guardada.`
+          : `Rutina «${ev.drill.title}» completada (${pct}%). Activa el micrófono más cerca para medir afinación.`;
+    }
+  }
+
   private updateRoutineVoiceChecks(reading: PitchReading | null, dtMs: number): void {
     if (!this.containerRef) return;
+    const tolCents = this.getToleranceCents();
+    const tolSemis = tolCents / 100;
     const livePill = this.containerRef.querySelector<HTMLElement>('#al-warmup-live-pitch');
     if (livePill) {
       livePill.textContent = reading
@@ -1214,14 +1541,52 @@ export class SingingView {
           : 'Micrófono opcional';
     }
 
+    // 0. Evaluación interactiva de rutina activa
+    if (this.activeDrillEval) {
+      const ev = this.activeDrillEval;
+      const elapsed = performance.now() - ev.startedAtMs;
+      const notes = ev.drill.notes;
+      const totalMs = notes.length * ev.stepDurationMs;
+      const idx = Math.floor(elapsed / ev.stepDurationMs);
+
+      if (idx >= notes.length) {
+        this.finishDrillEvaluation(true);
+        this.render(this.containerRef);
+        return;
+      }
+
+      const targetMidi = notes[idx] + this.transpose;
+      if (idx > ev.lastPlayedIdx) {
+        ev.lastPlayedIdx = idx;
+        const timbre = lifeStore.get().modulePrefs.singing.timbre;
+        voiceStudio.playMidiNote(targetMidi, 0.55, timbre, 0, 0.18);
+      }
+
+      if (reading) {
+        ev.total += 1;
+        if (Math.abs(reading.midiFloat - targetMidi) <= tolSemis) {
+          ev.hits += 1;
+        }
+      }
+
+      const bar = this.containerRef.querySelector<HTMLElement>('#al-drill-eval-bar');
+      const status = this.containerRef.querySelector<HTMLElement>('#al-drill-eval-status');
+      const progPct = Math.min(100, Math.round((elapsed / totalMs) * 100));
+      if (bar) bar.style.width = `${progPct}%`;
+      if (status) {
+        const liveAcc = ev.total > 0 ? `${Math.round((ev.hits / ev.total) * 100)}%` : '--';
+        status.textContent = `Nota ${idx + 1}/${notes.length}: canta ${midiToNoteEs(targetMidi)} · Acierto en vivo: ${liveAcc}`;
+      }
+    }
+
     // 1. Estabilidad de vocales (A-E-I-O-U)
     const vowel = VOWEL_DRILLS[this.vowelIdx];
     const targetVowelMidi = vowel.targetMidi + this.transpose;
-    if (reading && Math.abs(reading.midiFloat - targetVowelMidi) <= 0.35) {
+    if (reading && Math.abs(reading.midiFloat - targetVowelMidi) <= tolSemis) {
       this.vowelHoldMs = Math.min(2000, this.vowelHoldMs + dtMs);
       if (this.vowelHoldMs >= 2000 && !this.vowelsCompleted.has(vowel.vowel)) {
         this.vowelsCompleted.add(vowel.vowel);
-        lifeStore.markHabit('singing');
+        lifeStore.recordSingingVowel(vowel.vowel);
         this.render(this.containerRef);
         return;
       }
@@ -1235,18 +1600,19 @@ export class SingingView {
     if (vStatus && reading) {
       const diffCents = Math.round((reading.midiFloat - targetVowelMidi) * 100);
       vStatus.textContent =
-        Math.abs(diffCents) <= 35
-          ? `¡Estable en «${vowel.vowel}»! ${pct}% completado`
+        Math.abs(diffCents) <= tolCents
+          ? `Estable en «${vowel.vowel}»: ${pct}% completado`
           : diffCents < 0
             ? `Sube un poco hacia ${midiToNoteEs(targetVowelMidi)} (${diffCents} cents)`
             : `Baja un poco hacia ${midiToNoteEs(targetVowelMidi)} (+${diffCents} cents)`;
     }
 
-    // 2. Verificador de saltos cantados (±50 cents)
+    // 2. Verificador de saltos cantados
     const j = this.jumpChallenge;
     if (!j || j.stage === 'done' || !reading) return;
     const expectedMidi = j.stage === 'base' ? j.baseMidi : j.targetMidi;
-    const within = Math.abs(reading.midiFloat - expectedMidi) <= 0.5;
+    const jumpTol = Math.max(0.3, (tolCents + 15) / 100);
+    const within = Math.abs(reading.midiFloat - expectedMidi) <= jumpTol;
     if (within) {
       j.holdMs += dtMs;
       if (j.holdMs >= 350) {
@@ -1259,11 +1625,10 @@ export class SingingView {
           n1?.classList.remove('is-active');
           n1?.classList.add('is-hit');
           n2?.classList.add('is-active');
-          if (st) st.textContent = `¡Nota base captada! Ahora salta a ${midiToNoteEs(j.targetMidi)}.`;
+          if (st) st.textContent = `Nota base captada. Ahora salta a ${midiToNoteEs(j.targetMidi)}.`;
         } else {
           j.stage = 'done';
-          this.jumpsVerified += 1;
-          lifeStore.markHabit('singing');
+          lifeStore.recordSingingJump(j.interval.id);
           this.render(this.containerRef);
         }
       }
@@ -1405,6 +1770,34 @@ export class SingingView {
     if (playAudio) this.playCurrentEarPrompt();
   }
 
+  private nextScaleChallenge(playAudio: boolean): void {
+    const diff = lifeStore.getDifficulty('singing');
+    const pool = this.getScalesForDifficulty(diff);
+    const scale = pool[Math.floor(Math.random() * pool.length)];
+    const rootMidi = 57 + Math.floor(Math.random() * 6); // La3..Re4
+    this.earScale = {
+      kind: 'scale',
+      rootMidi,
+      scale,
+      answeredId: null,
+    };
+    if (playAudio) this.playCurrentEarPrompt();
+  }
+
+  private nextMelodyChallenge(playAudio: boolean): void {
+    const diff = lifeStore.getDifficulty('singing');
+    const pool = this.getMelodiesForDifficulty(diff);
+    const melody = pool[Math.floor(Math.random() * pool.length)];
+    const rootMidi = 60 + Math.floor(Math.random() * 5); // Do4..Mi4
+    this.earMelody = {
+      kind: 'melody',
+      rootMidi,
+      melody,
+      answeredId: null,
+    };
+    if (playAudio) this.playCurrentEarPrompt();
+  }
+
   private playCurrentEarPrompt(): void {
     const timbre = lifeStore.get().modulePrefs.singing.timbre;
     if (this.earMode === 'chord' && this.earChord) {
@@ -1417,6 +1810,14 @@ export class SingingView {
         timbre,
         0.55
       );
+    } else if (this.earMode === 'scale' && this.earScale) {
+      this.earScale.scale.semitones.forEach((st, idx) => {
+        voiceStudio.playMidiNote(this.earScale!.rootMidi + st, 0.4, timbre, idx * 0.34, 0.2);
+      });
+    } else if (this.earMode === 'melody' && this.earMelody) {
+      this.earMelody.melody.offsets.forEach((off, idx) => {
+        voiceStudio.playMidiNote(this.earMelody!.rootMidi + off, 0.48, timbre, idx * 0.48, 0.2);
+      });
     }
   }
 
@@ -1424,7 +1825,7 @@ export class SingingView {
     cancelAnimationFrame(this.rafId);
     this.lastRafMs = performance.now();
     const tick = () => {
-      if (!this.containerRef || (!voiceStudio.isMicActive() && !this.karaokeRunning)) return;
+      if (!this.containerRef || (!voiceStudio.isMicActive() && !this.karaokeRunning && !this.activeDrillEval)) return;
       const now = performance.now();
       const dtMs = Math.min(100, Math.max(0, now - this.lastRafMs));
       this.lastRafMs = now;
@@ -1476,8 +1877,7 @@ export class SingingView {
     if (!this.karaokeRunning) return;
     const elapsedSec = (performance.now() - this.karaokeStartMs) / 1000;
     const timbre = lifeStore.get().modulePrefs.singing.timbre;
-    const level = lifeStore.get().modulePrefs.singing.level;
-    const toleranceSemitones = level === 3 ? 0.35 : 0.5;
+    const toleranceSemitones = this.getToleranceCents() / 100;
 
     // Conteo previo visual 3 · 2 · 1 · ¡Canta!
     const countEl = this.containerRef?.querySelector<HTMLElement>('#al-karaoke-countdown');
@@ -1768,6 +2168,7 @@ export class SingingView {
     this.pauseWarmup();
     this.stopBreathing();
     this.stopKaraoke(false);
+    this.activeDrillEval = null;
     this.detachKeyboardListeners();
     this.activeMidis.clear();
     voiceStudio.stopAllNotes();

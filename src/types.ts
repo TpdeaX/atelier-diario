@@ -32,6 +32,157 @@ export type DrawingGridMode = 'none' | 'grid' | 'perspective1' | 'perspective2';
 
 export type ThemeMode = 'day' | 'night';
 
+export type DifficultyLevel = 'basico' | 'intermedio' | 'avanzado';
+
+export type PracticeModuleId = Exclude<ModuleId, 'home'>;
+
+export interface TypingHistoryEntry {
+  at: number;
+  mode: string;
+  difficulty: DifficultyLevel;
+  wpm: number;
+  acc: number;
+}
+
+export interface OratorySessionEntry {
+  at: number;
+  promptId: string;
+  title: string;
+  durationSec: number;
+  fillers: number;
+  rubricScore: number;
+}
+
+export interface CalmCheckinEntry {
+  at: number;
+  before: number;
+  after: number;
+  technique: string;
+  note: string;
+}
+
+export interface SavedCanvasStroke {
+  color: string;
+  size: number;
+  opacity: number;
+  eraser: boolean;
+  points: [number, number, number][];
+}
+
+export interface SavedCalligraphyStroke {
+  points: [number, number, number][];
+}
+
+export interface LearningProgress {
+  tutorialsDone: string[];
+  tutorialsOpen: Record<string, boolean>;
+  difficulty: Record<PracticeModuleId, DifficultyLevel>;
+  studio: {
+    mode: 'libre' | 'plantilla' | 'repaso';
+    templateId: string;
+    templatesApplied: number;
+    studyChecklist: Record<string, boolean>;
+  };
+  reader: {
+    mode: 'lectura' | 'guiada' | 'comprension';
+    readArticles: string[];
+    scrollByTitle: Record<string, number>;
+    quizScores: Record<string, number>;
+    readingNotes: Record<string, string>;
+    wordsRead: number;
+  };
+  calligraphy: {
+    modeExtra: 'trazos' | 'imprenta' | 'cursiva' | 'frase' | 'numeros' | 'ritmo';
+    mastery: Record<string, number>;
+    completedTemplates: string[];
+    savedStrokes: Record<string, SavedCalligraphyStroke[]>;
+  };
+  drawing: {
+    modeExtra: 'lessons' | 'challenge' | 'free';
+    mastery: Record<string, number>;
+    completedLessons: string[];
+    completedChallenges: string[];
+    activeTool: 'pencil' | 'ruler' | 'eraser';
+    guideStep: number;
+    refOpacity: number;
+    refHighContrast: boolean;
+    refMirror: boolean;
+    refViewMode: 'side' | 'trace' | 'off';
+    horizonY: number;
+    vp1X: number;
+    vp2X: number;
+    savedDrafts: Record<string, SavedCanvasStroke[]>;
+  };
+  typing: {
+    pcExtraMode: 'accents' | 'speed' | 'classic' | 'filas' | 'codigo' | 'adaptativo';
+    mobileExtraMode: 'agile' | 'orthowords' | 'sprint30' | 'precision' | 'frases';
+    keyErrors: Record<string, number>;
+    completedIds: string[];
+    history: TypingHistoryEntry[];
+  };
+  language: {
+    topic: 'todos' | 'tildes' | 'homofonos' | 'b_v_g_j' | 'puntuacion' | 'sintaxis';
+    orthoMode: 'practica' | 'repaso_fallos' | 'examen';
+    vocabMode: 'tarjetas' | 'quiz' | 'cloze';
+    masteredOrthoIds: string[];
+    missedOrthoIds: string[];
+    vocabMastered: string[];
+    bestExamScore: number;
+    wordNotes: Record<string, string>;
+  };
+  mindset: {
+    mode: 'tarjetas' | 'reto_hoy' | 'reflexion';
+    completedActionIds: string[];
+    reflections: Record<string, string>;
+    dailyCheckins: number;
+  };
+  vault: {
+    mode: 'explorar' | 'estudiar_hoy' | 'quiz_accion';
+    promotedIds: string[];
+    actionPlans: Record<string, string>;
+    dailyGoal: number;
+    reviewedToday: number;
+    lastReviewDay: string;
+    showOptionalTabs: boolean;
+  };
+  focuslab: {
+    promptIdx: number;
+    drillIdx: number;
+    schulteMode: 'normal' | 'inverso' | 'doble';
+    schulteBestByKey: Record<string, number>;
+    oratoryHistory: OratorySessionEntry[];
+    recallMode: 'repaso' | 'quiz';
+    recallDrafts: Record<string, string>;
+    recallMasteredDecks: string[];
+  };
+  singing: {
+    activeTab: 'karaoke' | 'routines' | 'ear';
+    selectedSongId: string;
+    transpose: number;
+    karaokeTempo: number;
+    playGuideNotes: boolean;
+    playChordBacking: boolean;
+    vowelsCompleted: string[];
+    jumpsVerified: string[];
+    drillsMastered: Record<string, number>;
+    earMode: 'chord' | 'interval' | 'scale' | 'melody';
+    earIntervalMode: 'basic' | 'full';
+    earCorrect: number;
+    earTotal: number;
+    earStreak: number;
+    warmupCount: number;
+  };
+  calm: {
+    activeTab: 'reframe' | 'sos' | 'checkin';
+    ambientSound: 'off' | 'rain' | 'pulse' | 'drone';
+    vibrateOn: boolean;
+    groundDone: boolean[];
+    pmrStep: number;
+    cardIdx: number;
+    checkins: CalmCheckinEntry[];
+  };
+}
+
 const MODULE_IDS: readonly ModuleId[] = [
   'home',
   'reader',
@@ -98,6 +249,8 @@ export interface PhraseItem {
   meaning: string;
   whenToUse: string;
   dailyAction: string;
+  difficulty?: DifficultyLevel;
+  reflectionPrompt?: string;
   sourceUrl?: string;
   isCustom?: boolean;
 }
@@ -252,8 +405,11 @@ export interface LifeProfile {
     recallReviewed: number;
   };
   modulePrefs: ModulePreferences;
+  progress: LearningProgress;
   updatedAt: number;
 }
+
+export type OrthographyTopic = 'tildes' | 'homofonos' | 'b_v_g_j' | 'puntuacion' | 'sintaxis';
 
 export interface OrthographyQuestion {
   id: string;
@@ -261,6 +417,9 @@ export interface OrthographyQuestion {
   options: string[];
   correctIndex: number;
   rule: string;
+  difficulty?: DifficultyLevel;
+  topic?: OrthographyTopic;
+  hint?: string;
 }
 
 export interface VocabPair {
@@ -268,6 +427,7 @@ export interface VocabPair {
   meaning: string;
   example: string;
   replaces?: string;
+  difficulty?: DifficultyLevel;
 }
 
 export interface BoardStrokeElement {

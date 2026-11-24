@@ -1,4 +1,4 @@
-import { CLASSIC_WIKISOURCE_SUGGESTIONS } from '../data/KnowledgeBank';
+import { CLASSIC_WIKISOURCE_SUGGESTIONS, READER_COMPREHENSION_PROMPTS } from '../data/KnowledgeBank';
 import { Icons } from '../icons';
 import { cloudSync } from '../services/CloudSync';
 import { saveNotebook, savePdfBytes } from '../services/NotebookStore';
@@ -15,7 +15,8 @@ import {
 } from '../services/OnlineApi';
 import { buildBookPdf } from '../services/PdfTools';
 import { lifeStore } from '../state/LifeStore';
-import { NotebookDoc } from '../types';
+import { DifficultyLevel, NotebookDoc } from '../types';
+import { bindDidacticBar, renderDidacticBar } from '../ui/DidacticBar';
 import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
 
 const READER_TUTORIALS: Record<'wikisource' | 'wikipedia' | 'openlibrary', Omit<SectionTutorialSpec, 'id' | 'moduleName'>> = {
@@ -24,9 +25,9 @@ const READER_TUTORIALS: Record<'wikisource' | 'wikipedia' | 'openlibrary', Omit<
     summary: 'Lee clásicos en español de dominio público, define palabras al doble clic y expórtalos a PDF.',
     steps: [
       'Elige una obra de Clásicos sugeridos en la barra lateral o busca cualquier título/autor arriba.',
+      'Alterna entre Lectura completa, Lectura guiada por bloques o Comprensión activa para guardar tus notas.',
       'Haz doble clic sobre cualquier palabra del texto para consultar su definición en Wikcionario.',
-      'Pulsa Guardar marcador para retomar después o Pasar a Cuaderno PDF para subrayar a mano.',
-      'Ajusta el tamaño de letra (A- / A+) y marca tu lectura de hoy.',
+      'Pulsa Guardar avance o Pasar a Cuaderno PDF para subrayar a mano; todo queda sincronizado.',
     ],
     tip: 'Si una portada es índice de obra, elige cualquiera de los capítulos mostrados arriba del texto.',
   },
@@ -35,10 +36,10 @@ const READER_TUTORIALS: Record<'wikisource' | 'wikipedia' | 'openlibrary', Omit<
     summary: 'Explora resúmenes culturales al instante para ampliar criterio y vocabulario.',
     steps: [
       'Al activar Wikipedia se carga un resumen aleatorio en español listo para leer.',
+      'Activa Comprensión activa para sintetizar la idea clave y guardarla en tu historial.',
       'Haz doble clic sobre términos desconocidos para guardarlos en tu glosario personal.',
-      'Guarda un marcador si deseas conservar la referencia en tu lista lateral.',
     ],
-    tip: 'Leer un artículo breve de 3 minutos y resumirlo mentalmente ejercita comprensión rápida.',
+    tip: 'Leer un artículo breve de 3 minutos y resumirlo con tus palabras consolida comprensión.',
   },
   openlibrary: {
     sectionName: 'Open Library (Catálogo)',
@@ -50,6 +51,12 @@ const READER_TUTORIALS: Record<'wikisource' | 'wikipedia' | 'openlibrary', Omit<
     ],
     tip: 'Si buscas subrayar el texto dentro de Atelier, cambia a Wikisource o usa Buscar libro en Cuaderno PDF.',
   },
+};
+
+const READER_DIFF_HINTS: Record<DifficultyLevel, string> = {
+  basico: 'Bloques de 2 párrafos en lectura guiada y preguntas de idea principal.',
+  intermedio: 'Bloques de 4 párrafos con notas de conexión práctica.',
+  avanzado: 'Bloques de 6 párrafos y análisis crítico de argumentos y tesis.',
 };
 
 export interface ReaderRenderOpts {
@@ -65,22 +72,34 @@ export class ReaderView {
   private statusText = 'Elige un clásico o busca cualquier libro o tema en español.';
   private pdfBusy = false;
   private autoLoadedLast = false;
+  private guidedChunkIdx = 0;
+
+  private chunkSizeFor(diff: DifficultyLevel): number {
+    return diff === 'basico' ? 2 : diff === 'intermedio' ? 4 : 6;
+  }
 
   public render(container: HTMLElement, opts?: ReaderRenderOpts): void {
     const profile = lifeStore.get();
     const prefs = profile.modulePrefs.reader;
+    const prog = profile.progress.reader;
+    const diff = lifeStore.getDifficulty('reader');
 
     if (!this.autoLoadedLast && !this.activeArticle && prefs.lastArticleTitle && prefs.sourceTab === 'wikisource') {
       this.autoLoadedLast = true;
       void this.openWikisource(prefs.lastArticleTitle, container, opts);
     }
 
+    const masteryPct = Math.min(
+      100,
+      Math.round((prog.readArticles.length / Math.max(12, CLASSIC_WIKISOURCE_SUGGESTIONS.length * 0.5)) * 100)
+    );
+
     const bookmarksHtml = profile.bookmarks
-      .slice(0, 6)
-      .map(
-        (b) =>
-          `<button type="button" class="al-chip-btn" data-open-ws="${b.title.replace(/"/g, '&quot;')}">${Icons.bookmark(13)}<span>${b.title}</span></button>`
-      )
+      .slice(0, 8)
+      .map((b) => {
+        const pct = prog.scrollByTitle[b.title];
+        return `<button type="button" class="al-chip-btn" data-open-ws="${b.title.replace(/"/g, '&quot;')}">${Icons.bookmark(13)}<span>${b.title}${typeof pct === 'number' ? ` (${pct}%)` : ''}</span></button>`;
+      })
       .join('');
 
     container.innerHTML = `
@@ -93,7 +112,7 @@ export class ReaderView {
             </div>
             <div>
               <h1>Biblioteca y Lector Online</h1>
-              <p>Lee textos completos en español desde Wikisource, explora Wikipedia y consulta palabras al doble clic.</p>
+              <p>Lee textos completos en español, entrena comprensión activa y guarda tu avance párrafo a párrafo.</p>
             </div>
           </div>
           <div class="al-reader-controls">
@@ -103,6 +122,15 @@ export class ReaderView {
             <button type="button" class="al-btn al-btn-primary" id="al-mark-read">${Icons.check(16)}<span>Marcar lectura de hoy</span></button>
           </div>
         </div>
+
+        ${renderDidacticBar({
+          moduleId: 'reader',
+          progressLabel: `Progreso lector (${prog.readArticles.length} textos completados)`,
+          progressPct: masteryPct,
+          progressDetail: `${prog.wordsRead.toLocaleString('es-PE')} palabras registradas · ${Object.keys(prog.readingNotes).length} notas guardadas`,
+          difficultyHints: READER_DIFF_HINTS,
+          extraMetric: `${profile.bookmarks.length} marcadores`,
+        })}
 
         <div class="al-search-bar-row">
           <div class="al-seg-tabs">
@@ -116,6 +144,15 @@ export class ReaderView {
           </form>
         </div>
 
+        <div class="al-toolbar">
+          <div class="al-seg-tabs" role="group" aria-label="Modo de estudio lector">
+            <button type="button" class="al-seg-btn ${prog.mode === 'lectura' ? 'is-active' : ''}" data-rmode="lectura">Lectura completa</button>
+            <button type="button" class="al-seg-btn ${prog.mode === 'guiada' ? 'is-active' : ''}" data-rmode="guiada">Lectura guiada por bloques</button>
+            <button type="button" class="al-seg-btn ${prog.mode === 'comprension' ? 'is-active' : ''}" data-rmode="comprension">Comprensión y notas</button>
+          </div>
+          <span class="al-muted">Modo actual: <strong>${prog.mode === 'lectura' ? 'Texto continuo' : prog.mode === 'guiada' ? `Bloques de ${this.chunkSizeFor(diff)} párrafos` : 'Guía de síntesis guardada'}</strong></span>
+        </div>
+
         ${renderTutorialBanner({
           id: `reader:${prefs.sourceTab}`,
           moduleName: 'Biblioteca y Lector',
@@ -127,13 +164,16 @@ export class ReaderView {
             <div class="al-panel">
               <h2>Clásicos sugeridos (${CLASSIC_WIKISOURCE_SUGGESTIONS.length})</h2>
               <div class="al-stack-list">
-                ${CLASSIC_WIKISOURCE_SUGGESTIONS.map(
-                  (c) => `
+                ${CLASSIC_WIKISOURCE_SUGGESTIONS.map((c) => {
+                  const isDone = prog.readArticles.some(
+                    (a) => a.toLowerCase().includes(c.query.toLowerCase()) || c.title.toLowerCase().includes(a.toLowerCase())
+                  );
+                  return `
                   <button type="button" class="al-list-btn" data-suggest="${c.query}">
-                    <strong>${c.title}</strong>
+                    <strong>${c.title} ${isDone ? '<span class="al-mastery-badge">Leído</span>' : ''}</strong>
                     <span>${c.note}</span>
-                  </button>`
-                ).join('')}
+                  </button>`;
+                }).join('')}
               </div>
             </div>
 
@@ -166,6 +206,7 @@ export class ReaderView {
     `;
 
     this.bindEvents(container, opts);
+    bindDidacticBar(container, 'reader', () => this.render(container, opts));
     bindTutorialBanners(container);
     this.renderResultsStrip(container, opts);
   }
@@ -190,7 +231,11 @@ export class ReaderView {
   }
 
   private renderArticleHtml(): string {
-    const sourceTab = lifeStore.get().modulePrefs.reader.sourceTab;
+    const profile = lifeStore.get();
+    const sourceTab = profile.modulePrefs.reader.sourceTab;
+    const prog = profile.progress.reader;
+    const diff = lifeStore.getDifficulty('reader');
+
     if (!this.activeArticle) {
       return `
         <div class="al-empty-reader">
@@ -199,6 +244,12 @@ export class ReaderView {
         </div>
       `;
     }
+
+    const totalParas = this.activeArticle.paragraphs.length;
+    const totalWords = this.activeArticle.paragraphs.join(' ').split(/\s+/).filter(Boolean).length;
+    const savedPct = prog.scrollByTitle[this.activeArticle.title] ?? 0;
+    const isCompleted = prog.readArticles.includes(this.activeArticle.title);
+    const savedNote = prog.readingNotes[this.activeArticle.title] ?? '';
 
     const subHtml = this.activeArticle.subpages.length
       ? `
@@ -213,24 +264,71 @@ export class ReaderView {
       </div>`
       : '';
 
-    const bodyHtml = this.activeArticle.paragraphs.length
-      ? this.activeArticle.paragraphs.map((p) => `<p>${p}</p>`).join('')
-      : '<p class="al-muted">Esta portada es un índice de obra. Elige uno de los capítulos arriba para comenzar a leer.</p>';
+    let bodyHtml = '';
+    if (totalParas === 0) {
+      bodyHtml = '<p class="al-muted">Esta portada es un índice de obra. Elige uno de los capítulos arriba para comenzar a leer.</p>';
+    } else if (prog.mode === 'guiada') {
+      const size = this.chunkSizeFor(diff);
+      const totalChunks = Math.max(1, Math.ceil(totalParas / size));
+      const idx = Math.max(0, Math.min(totalChunks - 1, this.guidedChunkIdx));
+      this.guidedChunkIdx = idx;
+      const slice = this.activeArticle.paragraphs.slice(idx * size, (idx + 1) * size);
+      const chunkPct = Math.round(((idx + 1) / totalChunks) * 100);
+      bodyHtml = `
+        <div class="al-study-card">
+          <div class="al-didactic-prog-head">
+            <strong>Bloque guiado ${idx + 1} de ${totalChunks}</strong>
+            <span class="al-mastery-badge">${chunkPct}% del texto</span>
+          </div>
+          <progress class="al-didactic-meter" value="${chunkPct}" max="100"></progress>
+          <div class="al-tool-group">
+            <button type="button" class="al-btn al-btn-sm" id="al-chunk-prev" ${idx === 0 ? 'disabled' : ''}>Bloque anterior</button>
+            <button type="button" class="al-btn al-btn-sm al-btn-primary" id="al-chunk-next">${idx + 1 < totalChunks ? 'Siguiente bloque y guardar' : 'Finalizar texto y guardar'}</button>
+          </div>
+        </div>
+        ${slice.map((p) => `<p>${p}</p>`).join('')}
+      `;
+    } else {
+      bodyHtml = this.activeArticle.paragraphs.map((p) => `<p>${p}</p>`).join('');
+    }
+
+    const prompts = READER_COMPREHENSION_PROMPTS[diff];
+    const comprehensionHtml =
+      prog.mode === 'comprension'
+        ? `
+        <div class="al-study-card" style="margin-top:16px">
+          <h3>Guía de comprensión (${diff === 'basico' ? 'Básico' : diff === 'intermedio' ? 'Intermedio' : 'Avanzado'})</h3>
+          <ul class="al-muted" style="margin:0;padding-left:18px">
+            ${prompts.map((pr) => `<li>${pr}</li>`).join('')}
+          </ul>
+          <label for="al-reader-note-input" style="font-size:0.85rem;font-weight:600">Tu síntesis y notas personales (se guardan por obra):</label>
+          <textarea id="al-reader-note-input" class="al-inline-note" placeholder="Escribe con tus palabras qué entendiste y cómo lo aplicarás...">${savedNote.replace(/</g, '&lt;')}</textarea>
+          <div class="al-tool-group">
+            <button type="button" class="al-btn al-btn-primary" id="al-save-reader-note">${Icons.check(15)}<span>Guardar síntesis y completar</span></button>
+          </div>
+        </div>
+      `
+        : '';
 
     return `
       <div class="al-article-top">
-        <h2>${this.activeArticle.title}</h2>
+        <div>
+          <h2>${this.activeArticle.title}</h2>
+          <span class="al-muted">${totalWords} palabras · Avance guardado: ${savedPct}% ${isCompleted ? '· Completado' : ''}</span>
+        </div>
         <div class="al-tool-group">
           ${
             sourceTab === 'wikisource'
               ? `<button type="button" class="al-btn" id="al-send-to-studio" ${this.pdfBusy ? 'disabled' : ''}>${Icons.tablet(15)}<span>${this.pdfBusy ? 'Generando PDF...' : 'Pasar a Cuaderno PDF'}</span></button>`
               : ''
           }
+          <button type="button" class="al-btn" id="al-complete-article">${Icons.check(15)}<span>${isCompleted ? 'Texto completado' : 'Marcar completado'}</span></button>
           <button type="button" class="al-btn al-btn-primary" id="al-save-bookmark">${Icons.bookmark(15)}<span>Guardar marcador</span></button>
         </div>
       </div>
       ${subHtml}
       <div class="al-article-body">${bodyHtml}</div>
+      ${comprehensionHtml}
     `;
   }
 
@@ -286,6 +384,10 @@ export class ReaderView {
     if (paper) paper.innerHTML = `<p class="al-muted">${this.statusText}</p>`;
     try {
       this.activeArticle = await fetchWikisourcePage(title);
+      const savedPct = lifeStore.get().progress.reader.scrollByTitle[this.activeArticle.title] ?? 0;
+      const diff = lifeStore.getDifficulty('reader');
+      const totalChunks = Math.max(1, Math.ceil(this.activeArticle.paragraphs.length / this.chunkSizeFor(diff)));
+      this.guidedChunkIdx = Math.min(totalChunks - 1, Math.floor((savedPct / 100) * totalChunks));
       lifeStore.updateModulePrefs('reader', { sourceTab: 'wikisource', lastArticleTitle: this.activeArticle.title });
       lifeStore.markHabit('read');
       this.render(container, opts);
@@ -329,9 +431,63 @@ export class ReaderView {
       this.render(container, opts);
     });
     container.querySelector('#al-mark-read')?.addEventListener('click', () => {
-      lifeStore.markHabit('read');
-      const btn = container.querySelector('#al-mark-read span');
-      if (btn) btn.textContent = 'Lectura registrada hoy';
+      if (this.activeArticle) {
+        const words = this.activeArticle.paragraphs.join(' ').split(/\s+/).filter(Boolean).length;
+        lifeStore.recordReaderArticle(this.activeArticle.title, words);
+      } else {
+        lifeStore.markHabit('read');
+      }
+      this.render(container, opts);
+    });
+
+    container.querySelectorAll<HTMLButtonElement>('[data-rmode]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.rmode as 'lectura' | 'guiada' | 'comprension';
+        lifeStore.updateProgress('reader', { mode });
+        this.render(container, opts);
+      });
+    });
+
+    container.querySelector('#al-chunk-prev')?.addEventListener('click', () => {
+      if (!this.activeArticle) return;
+      this.guidedChunkIdx = Math.max(0, this.guidedChunkIdx - 1);
+      const diff = lifeStore.getDifficulty('reader');
+      const totalChunks = Math.max(1, Math.ceil(this.activeArticle.paragraphs.length / this.chunkSizeFor(diff)));
+      lifeStore.saveReaderScroll(this.activeArticle.title, ((this.guidedChunkIdx + 1) / totalChunks) * 100);
+      this.render(container, opts);
+    });
+
+    container.querySelector('#al-chunk-next')?.addEventListener('click', () => {
+      if (!this.activeArticle) return;
+      const diff = lifeStore.getDifficulty('reader');
+      const totalChunks = Math.max(1, Math.ceil(this.activeArticle.paragraphs.length / this.chunkSizeFor(diff)));
+      if (this.guidedChunkIdx + 1 < totalChunks) {
+        this.guidedChunkIdx += 1;
+        lifeStore.saveReaderScroll(this.activeArticle.title, ((this.guidedChunkIdx + 1) / totalChunks) * 100);
+      } else {
+        const words = this.activeArticle.paragraphs.join(' ').split(/\s+/).filter(Boolean).length;
+        lifeStore.saveReaderScroll(this.activeArticle.title, 100);
+        lifeStore.recordReaderArticle(this.activeArticle.title, words);
+      }
+      this.render(container, opts);
+    });
+
+    container.querySelector('#al-complete-article')?.addEventListener('click', () => {
+      if (!this.activeArticle) return;
+      const words = this.activeArticle.paragraphs.join(' ').split(/\s+/).filter(Boolean).length;
+      lifeStore.saveReaderScroll(this.activeArticle.title, 100);
+      lifeStore.recordReaderArticle(this.activeArticle.title, words);
+      this.render(container, opts);
+    });
+
+    container.querySelector('#al-save-reader-note')?.addEventListener('click', () => {
+      if (!this.activeArticle) return;
+      const note = container.querySelector<HTMLTextAreaElement>('#al-reader-note-input')?.value ?? '';
+      lifeStore.saveReaderNote(this.activeArticle.title, note);
+      const words = this.activeArticle.paragraphs.join(' ').split(/\s+/).filter(Boolean).length;
+      const score = note.trim().length >= 40 ? 100 : note.trim().length >= 15 ? 80 : 60;
+      lifeStore.recordReaderArticle(this.activeArticle.title, words, score);
+      this.render(container, opts);
     });
 
     container.querySelectorAll<HTMLButtonElement>('[data-src]').forEach((btn) => {
@@ -349,6 +505,7 @@ export class ReaderView {
               paragraphs: [sum.extract],
               subpages: [],
             };
+            this.guidedChunkIdx = 0;
             lifeStore.markHabit('read');
           } catch {
             this.statusText = 'No se pudo consultar Wikipedia ahora.';

@@ -1,12 +1,15 @@
 import {
   DRAWING_BLOCKS,
+  DRAWING_CHALLENGES,
   DRAWING_LESSONS,
   DRAWING_SWATCHES,
   DRAWING_TOPIC_CHIPS,
   evaluateDrawingCoverage,
+  getLessonDifficulty,
   mirrorStrokePoints,
   parseNormalizedPathCommands,
   type DrawingBlockId,
+  type DrawingChallenge,
   type DrawingLesson,
   type DrawingPoint,
 } from '../data/DrawingBank';
@@ -18,8 +21,15 @@ import {
   type DrawingRefSourceFilter,
 } from '../services/OnlineApi';
 import { lifeStore } from '../state/LifeStore';
-import type { DrawingGridMode, DrawingSymmetry } from '../types';
+import type { DifficultyLevel, DrawingGridMode, DrawingSymmetry, SavedCanvasStroke } from '../types';
+import { bindDidacticBar, difficultyLabel, renderDidacticBar } from '../ui/DidacticBar';
 import { bindTutorialBanners, renderTutorialBanner, type SectionTutorialSpec } from '../ui/TutorialBanner';
+
+const DRAWING_DIFF_HINTS: Record<DifficultyLevel, string> = {
+  basico: 'Guía clara con puntos de referencia visibles y pasos guiados.',
+  intermedio: 'Guía moderada para afinar proporción sin depender del calco.',
+  avanzado: 'Guía muy tenue sin puntos visibles; exige ojo y pulso propios.',
+};
 
 type DrawingTool = 'pencil' | 'ruler' | 'eraser';
 type RefViewMode = 'side' | 'trace' | 'off';
@@ -102,22 +112,116 @@ export class DrawingView {
   private uploadedFile: File | null = null;
 
   private feedbackMsg =
-    'Elige una lámina guiada o pasa a Lienzo Libre. Toca y arrastra con ratón, dedo o lápiz stylus.';
+    'Elige una lámina guiada, un reto cronometrado o Lienzo Libre. Tus trazos y progreso se guardan automáticamente.';
   private keyHandler: ((e: KeyboardEvent) => void) | null = null;
   private resizeHandler: (() => void) | null = null;
+  private hydrated = false;
+  private loadedDraftKey = '';
+  private activeChallengeId = DRAWING_CHALLENGES[0].id;
+  private challengeTimerId = 0;
+  private challengeRemainingSec = 0;
+
+  private getActiveMode(): 'lessons' | 'challenge' | 'free' {
+    return lifeStore.get().progress.drawing.modeExtra ?? lifeStore.get().modulePrefs.drawing.mode;
+  }
+
+  private getCurrentDraftKey(): string {
+    const mode = this.getActiveMode();
+    if (mode === 'lessons') return `lesson:${lifeStore.get().modulePrefs.drawing.lessonId}`;
+    if (mode === 'challenge') return `challenge:${this.activeChallengeId}`;
+    return 'free:canvas';
+  }
+
+  private hydrateFromProgress(): void {
+    const prog = lifeStore.get().progress.drawing;
+    if (!this.hydrated) {
+      this.hydrated = true;
+      this.tool = prog.activeTool;
+      this.horizonY = prog.horizonY;
+      this.vp1X = prog.vp1X;
+      this.vp2X = prog.vp2X;
+      this.refOpacity = prog.refOpacity;
+      this.refHighContrast = prog.refHighContrast;
+      this.refMirror = prog.refMirror;
+      this.refViewMode = prog.refViewMode;
+    }
+    const key = this.getCurrentDraftKey();
+    if (this.loadedDraftKey !== key) {
+      this.loadedDraftKey = key;
+      const saved = prog.savedDrafts[key];
+      if (saved && saved.length > 0) {
+        this.strokes = saved.map((s) => ({
+          tool: s.eraser ? 'eraser' : 'pencil',
+          color: s.color,
+          size: s.size,
+          opacity: s.opacity,
+          symmetry: 'none',
+          points: s.points.map(([nx, ny, pr]) => ({ x: nx * this.width, y: ny * this.height, pressure: pr })),
+          usePressure: false,
+        }));
+      } else {
+        this.strokes = [];
+      }
+      this.undoStack = [];
+      this.redoStack = [];
+    }
+  }
+
+  private persistDraft(): void {
+    const key = this.getCurrentDraftKey();
+    const w = Math.max(1, this.width);
+    const h = Math.max(1, this.height);
+    const compact: SavedCanvasStroke[] = this.strokes.map((s) => ({
+      color: s.color,
+      size: s.size,
+      opacity: s.opacity,
+      eraser: s.tool === 'eraser',
+      points: s.points
+        .filter((_, idx) => idx % 2 === 0 || idx === s.points.length - 1)
+        .map((p) => [
+          Math.round((p.x / w) * 1000) / 1000,
+          Math.round((p.y / h) * 1000) / 1000,
+          Math.round((p.pressure ?? 0.5) * 100) / 100,
+        ]),
+    }));
+    lifeStore.saveDrawingDraft(key, compact);
+  }
+
+  private stopChallengeTimer(): void {
+    if (this.challengeTimerId) {
+      window.clearInterval(this.challengeTimerId);
+      this.challengeTimerId = 0;
+    }
+  }
+
+  private getActiveChallenge(): DrawingChallenge {
+    return DRAWING_CHALLENGES.find((c) => c.id === this.activeChallengeId) ?? DRAWING_CHALLENGES[0];
+  }
 
   public render(container: HTMLElement): void {
     this.container = container;
     this.restoreLocalUploadUrlIfNeeded();
+    this.hydrateFromProgress();
 
     const profile = lifeStore.get();
     const prefs = profile.modulePrefs.drawing;
+    const prog = profile.progress.drawing;
+    const diff = lifeStore.getDifficulty('drawing');
+    const activeMode = this.getActiveMode();
     const activeLesson = this.getActiveLesson(prefs.lessonId);
     const activeBlock = activeLesson.block;
     const blockLessons = DRAWING_LESSONS.filter((l) => l.block === activeBlock);
     const lessonIndex = DRAWING_LESSONS.findIndex((l) => l.id === activeLesson.id);
-    const isLessons = prefs.mode === 'lessons';
+    const isLessons = activeMode === 'lessons';
+    const isChallenge = activeMode === 'challenge';
     const totalLessons = DRAWING_LESSONS.length;
+    const completedLessons = prog.completedLessons.length;
+    const completedChallenges = prog.completedChallenges.length;
+    const masteryPct = Math.min(100, Math.round(((completedLessons + completedChallenges) / (totalLessons + DRAWING_CHALLENGES.length)) * 100));
+    const currentBest = prog.mastery[activeLesson.id] ?? 0;
+    const totalGuideSteps = Math.max(1, activeLesson.guideSvgPaths.length);
+    const activeGuideStep = prog.guideStep > totalGuideSteps ? 0 : prog.guideStep;
+    const activeChallenge = this.getActiveChallenge();
 
     const showSideRef = Boolean(this.activeRef && this.refViewMode === 'side');
     const showTraceRef = Boolean(this.activeRef && this.refViewMode === 'trace');
@@ -136,11 +240,20 @@ export class DrawingView {
             </div>
             <div>
               <h1>Taller de Dibujo Guiado</h1>
-              <p>${totalLessons} láminas paso a paso de trazo, perspectiva, luz y figura, más referencias de Internet para estudiar o calcar.</p>
+              <p>${totalLessons} láminas paso a paso, ${DRAWING_CHALLENGES.length} retos creativos cronometrados y calco con borrador guardado.</p>
             </div>
           </div>
           <div class="al-mono-pill">Láminas guardadas: ${profile.stats.drawingSheets}</div>
         </div>
+
+        ${renderDidacticBar({
+          moduleId: 'drawing',
+          progressLabel: `Dominio de dibujo (${completedLessons}/${totalLessons} láminas · ${completedChallenges}/${DRAWING_CHALLENGES.length} retos)`,
+          progressPct: masteryPct,
+          progressDetail: isLessons && currentBest > 0 ? `Mejor cobertura en esta lámina: ${currentBest}%` : 'Tus trazos, herramientas y puntos de fuga se guardan automáticamente.',
+          difficultyHints: DRAWING_DIFF_HINTS,
+          extraMetric: `${this.strokes.length} trazos`,
+        })}
 
         ${renderTutorialBanner(tutorialSpec)}
 
@@ -148,7 +261,10 @@ export class DrawingView {
           <button type="button" role="tab" aria-selected="${isLessons}" class="al-seg-btn ${isLessons ? 'is-active' : ''}" data-draw-mode="lessons">
             ${Icons.layers(16)}<span>Lecciones Guiadas (${totalLessons})</span>
           </button>
-          <button type="button" role="tab" aria-selected="${!isLessons}" class="al-seg-btn ${!isLessons ? 'is-active' : ''}" data-draw-mode="free">
+          <button type="button" role="tab" aria-selected="${isChallenge}" class="al-seg-btn ${isChallenge ? 'is-active' : ''}" data-draw-mode="challenge">
+            ${Icons.check(16)}<span>Retos Creativos (${DRAWING_CHALLENGES.length})</span>
+          </button>
+          <button type="button" role="tab" aria-selected="${activeMode === 'free'}" class="al-seg-btn ${activeMode === 'free' ? 'is-active' : ''}" data-draw-mode="free">
             ${Icons.palette(16)}<span>Lienzo Libre</span>
           </button>
         </div>
@@ -168,11 +284,14 @@ export class DrawingView {
 
             <div class="al-drawing-lesson-pills" role="group" aria-label="Láminas del bloque">
               ${blockLessons
-                .map((l) => {
+                .map((l, idxInBlock) => {
                   const globalNum = DRAWING_LESSONS.findIndex((item) => item.id === l.id) + 1;
+                  const score = prog.mastery[l.id] ?? 0;
+                  const lDiff = getLessonDifficulty(l, idxInBlock);
                   return `
                   <button type="button" class="al-btn al-btn-sm ${l.id === activeLesson.id ? 'is-toggled' : ''}" data-draw-lesson="${l.id}">
                     <span>${globalNum}. ${esc(l.title)}</span>
+                    ${score > 0 ? `<span class="al-mastery-badge">${score}%</span>` : lDiff === diff ? `<span class="al-mastery-badge is-warn">${difficultyLabel(lDiff)}</span>` : ''}
                   </button>`;
                 })
                 .join('')}
@@ -180,12 +299,55 @@ export class DrawingView {
 
             <div class="al-drawing-tip-banner">
               <div>
-                <strong>Lámina ${lessonIndex + 1}/${totalLessons} · ${esc(activeLesson.title)}</strong>
+                <strong>Lámina ${lessonIndex + 1}/${totalLessons} · ${esc(activeLesson.title)} ${currentBest > 0 ? `(Mejor: ${currentBest}%)` : ''}</strong>
                 <p>${esc(activeLesson.tip)}</p>
+                <div class="al-step-bar" aria-label="Revelado progresivo de guía">
+                  <span class="al-muted" style="font-size:0.76rem">Guía paso a paso:</span>
+                  <button type="button" class="al-step-pill ${activeGuideStep === 0 ? 'is-active' : ''}" data-guide-step="0">Completa (${totalGuideSteps})</button>
+                  ${activeLesson.guideSvgPaths
+                    .map(
+                      (_, sIdx) =>
+                        `<button type="button" class="al-step-pill ${activeGuideStep === sIdx + 1 ? 'is-active' : ''}" data-guide-step="${sIdx + 1}">Paso ${sIdx + 1}</button>`
+                    )
+                    .join('')}
+                </div>
               </div>
               <button type="button" class="al-btn al-btn-sm" id="al-draw-next-lesson">
                 ${Icons.skip(15)}<span>Siguiente lámina</span>
               </button>
+            </div>
+          </section>`
+            : ''
+        }
+
+        ${
+          isChallenge
+            ? `
+          <section class="al-panel al-drawing-lessons-bar" aria-label="Retos creativos guiados">
+            <div class="al-step-bar">
+              ${DRAWING_CHALLENGES.map((ch) => {
+                const done = prog.completedChallenges.includes(ch.id);
+                const cls = ch.id === activeChallenge.id ? 'is-active' : done ? 'is-done' : '';
+                return `<button type="button" class="al-step-pill ${cls}" data-draw-challenge="${ch.id}">${esc(ch.title)} · ${difficultyLabel(ch.difficulty)}${done ? ' · OK' : ''}</button>`;
+              }).join('')}
+            </div>
+            <div class="al-study-card" style="margin-top:10px">
+              <div class="al-didactic-prog-head">
+                <strong>${esc(activeChallenge.title)} (${activeChallenge.durationSec}s)</strong>
+                <span class="al-mastery-badge">${difficultyLabel(activeChallenge.difficulty)}${prog.completedChallenges.includes(activeChallenge.id) ? ' · Completado' : ''}</span>
+              </div>
+              <p class="al-muted" style="margin:0">${esc(activeChallenge.prompt)}</p>
+              <ol class="al-muted" style="margin:4px 0 6px;padding-left:18px;font-size:0.84rem">
+                ${activeChallenge.steps.map((s) => `<li>${esc(s)}</li>`).join('')}
+              </ol>
+              <div class="al-tool-group">
+                <button type="button" class="al-btn al-btn-sm al-btn-primary" id="al-draw-ch-timer">
+                  <span>${this.challengeTimerId ? `Tiempo: ${this.challengeRemainingSec}s (Pausar)` : `Iniciar cronómetro (${activeChallenge.durationSec}s)`}</span>
+                </button>
+                <button type="button" class="al-btn al-btn-sm" id="al-draw-ch-done">
+                  ${Icons.check(14)}<span>Marcar reto completado</span>
+                </button>
+              </div>
             </div>
           </section>`
             : ''
@@ -501,11 +663,13 @@ export class DrawingView {
     this.redraw();
     this.bindEvents(container);
     this.bindActiveRefImageEvents(container);
+    bindDidacticBar(container, 'drawing', () => this.render(container));
     bindTutorialBanners(container);
     this.attachWindowListeners();
   }
 
   public unmount(): void {
+    this.stopChallengeTimer();
     this.detachWindowListeners();
     this.revokeObjectUrlOnly();
     this.activeStroke = null;
@@ -875,6 +1039,7 @@ export class DrawingView {
       this.redoStack.shift();
     }
     this.strokes = prev;
+    this.persistDraft();
     this.redraw();
     this.syncHistoryButtons();
   }
@@ -892,6 +1057,7 @@ export class DrawingView {
       this.undoStack.shift();
     }
     this.strokes = next;
+    this.persistDraft();
     this.redraw();
     this.syncHistoryButtons();
   }
@@ -934,7 +1100,7 @@ export class DrawingView {
     this.drawSymmetryAxes(g, prefs.symmetry, isNight);
 
     // 4. Plantilla fantasma (se suprime cuando hay calco activo listo para no encimar líneas)
-    if (prefs.mode === 'lessons' && prefs.showGuide && !tracingReady) {
+    if (this.getActiveMode() === 'lessons' && prefs.showGuide && !tracingReady) {
       const lesson = this.getActiveLesson(prefs.lessonId);
       this.drawLessonGuide(g, lesson, isNight);
     }
@@ -1082,14 +1248,29 @@ export class DrawingView {
   ): void {
     const w = this.width;
     const h = this.height;
+    const diff = lifeStore.getDifficulty('drawing');
+    const stepLimit = lifeStore.get().progress.drawing.guideStep;
+    const visiblePaths =
+      stepLimit > 0 && stepLimit < lesson.guideSvgPaths.length
+        ? lesson.guideSvgPaths.slice(0, stepLimit)
+        : lesson.guideSvgPaths;
+    const alpha = diff === 'basico' ? 0.36 : diff === 'intermedio' ? 0.22 : 0.09;
+
     g.save();
-    g.strokeStyle = isNight ? 'rgba(148, 163, 184, 0.34)' : 'rgba(30, 41, 59, 0.24)';
+    g.strokeStyle = isNight
+      ? `rgba(148, 163, 184, ${alpha})`
+      : `rgba(30, 41, 59, ${alpha})`;
     g.lineWidth = 2;
     g.lineCap = 'round';
     g.lineJoin = 'round';
     g.setLineDash([7, 6]);
 
-    for (const pathStr of lesson.guideSvgPaths) {
+    for (let idx = 0; idx < visiblePaths.length; idx++) {
+      const pathStr = visiblePaths[idx];
+      if (stepLimit > 0 && idx === visiblePaths.length - 1) {
+        g.strokeStyle = isNight ? 'rgba(245, 158, 11, 0.72)' : 'rgba(180, 83, 9, 0.65)';
+        g.lineWidth = 2.6;
+      }
       const cmds = parseNormalizedPathCommands(pathStr);
       if (cmds.length === 0) continue;
       g.beginPath();
@@ -1114,12 +1295,14 @@ export class DrawingView {
       g.stroke();
     }
 
-    g.setLineDash([]);
-    g.fillStyle = isNight ? 'rgba(245, 158, 11, 0.35)' : 'rgba(180, 83, 9, 0.28)';
-    for (const [nx, ny] of lesson.targetCheckpoints) {
-      g.beginPath();
-      g.arc(nx * w, ny * h, 3.2, 0, Math.PI * 2);
-      g.fill();
+    if (diff !== 'avanzado') {
+      g.setLineDash([]);
+      g.fillStyle = isNight ? 'rgba(245, 158, 11, 0.38)' : 'rgba(180, 83, 9, 0.32)';
+      for (const [nx, ny] of lesson.targetCheckpoints) {
+        g.beginPath();
+        g.arc(nx * w, ny * h, 3.2, 0, Math.PI * 2);
+        g.fill();
+      }
     }
     g.restore();
   }
@@ -1231,7 +1414,11 @@ export class DrawingView {
     if (this.activeRef) {
       lifeStore.recordDrawingSheet();
       this.feedbackMsg = `Estudio con referencia guardado (${inkStrokes.length} trazos · total ${lifeStore.get().stats.drawingSheets} láminas).`;
-    } else if (prefs.mode === 'lessons') {
+    } else if (this.getActiveMode() === 'challenge') {
+      const ch = this.getActiveChallenge();
+      lifeStore.recordDrawingChallenge(ch.id);
+      this.feedbackMsg = `Reto «${ch.title}» completado y guardado (${inkStrokes.length} trazos).`;
+    } else if (this.getActiveMode() === 'lessons') {
       const lesson = this.getActiveLesson(prefs.lessonId);
       const res = evaluateDrawingCoverage(
         allMirrored,
@@ -1239,18 +1426,19 @@ export class DrawingView {
         this.width,
         this.height
       );
-      lifeStore.recordDrawingSheet();
+      lifeStore.recordDrawingMastery(lesson.id, res.coveragePct);
       const tone =
         res.coveragePct >= 80
           ? 'Excelente seguimiento de guía.'
-          : res.coveragePct >= 50
-            ? 'Buen avance: puedes afinar los puntos restantes o pasar a la siguiente lámina.'
-            : 'Guardada como práctica libre: intenta acercar tus trazos a los puntos guía.';
+          : res.coveragePct >= 65
+            ? 'Lámina dominada. Puedes afinar o pasar a la siguiente.'
+            : 'Guardada como práctica: acerca tus trazos a los puntos guía o usa Paso a paso.';
       this.feedbackMsg = `Lámina guardada (${inkStrokes.length} trazos · ${res.coveragePct}% de cobertura guía). ${tone}`;
     } else {
       lifeStore.recordDrawingSheet();
       this.feedbackMsg = `Boceto libre guardado en tu progreso (${inkStrokes.length} trazos · total ${lifeStore.get().stats.drawingSheets} láminas).`;
     }
+    this.persistDraft();
 
     if (this.container) this.render(this.container);
   }
@@ -1291,7 +1479,7 @@ export class DrawingView {
   private selectLesson(lessonId: string): void {
     const lesson = this.getActiveLesson(lessonId);
     const prev = lifeStore.get().modulePrefs.drawing;
-    this.strokes = [];
+    this.loadedDraftKey = '';
     this.undoStack = [];
     this.redoStack = [];
     this.horizonY = lesson.id === 'persp-building-2pt' ? 0.48 : 0.30;
@@ -1303,6 +1491,13 @@ export class DrawingView {
       grid: lesson.recommendedGrid,
       symmetry: lesson.recommendedSymmetry ?? 'none',
       showGuide: prev.showGuide,
+    });
+    lifeStore.updateProgress('drawing', {
+      modeExtra: 'lessons',
+      guideStep: 0,
+      horizonY: this.horizonY,
+      vp1X: this.vp1X,
+      vp2X: this.vp2X,
     });
     this.feedbackMsg = `Lámina cargada: ${lesson.title}.`;
     if (this.container) this.render(this.container);
@@ -1389,12 +1584,18 @@ export class DrawingView {
         if (this.draggingVp) {
           this.draggingVp = null;
           canvas.style.cursor = 'crosshair';
+          lifeStore.updateProgress('drawing', {
+            horizonY: this.horizonY,
+            vp1X: this.vp1X,
+            vp2X: this.vp2X,
+          });
           return;
         }
         if (this.activeStroke) {
           this.pushUndoSnapshot();
           this.strokes.push(this.activeStroke);
           this.activeStroke = null;
+          this.persistDraft();
           this.redraw();
           this.syncHistoryButtons();
         }
@@ -1527,6 +1728,7 @@ export class DrawingView {
         const nextMode = btn.dataset.refView as RefViewMode;
         if (this.refViewMode === nextMode) return;
         this.refViewMode = nextMode;
+        lifeStore.updateProgress('drawing', { refViewMode: nextMode });
         if (this.activeRef && nextMode !== 'off' && this.refImgStatus === 'idle') {
           this.refImgStatus = 'loading';
         }
@@ -1546,31 +1748,95 @@ export class DrawingView {
     container.querySelector<HTMLInputElement>('#al-draw-ref-opacity')?.addEventListener('input', (e) => {
       const val = parseFloat((e.target as HTMLInputElement).value);
       this.refOpacity = Number.isFinite(val) ? Math.max(0.1, Math.min(0.9, val)) : 0.38;
+      lifeStore.updateProgress('drawing', { refOpacity: this.refOpacity });
       this.syncActiveRefStyles(container);
     });
 
     container.querySelector('#al-draw-ref-contrast')?.addEventListener('click', () => {
       this.refHighContrast = !this.refHighContrast;
+      lifeStore.updateProgress('drawing', { refHighContrast: this.refHighContrast });
       this.syncActiveRefStyles(container);
     });
 
     container.querySelector('#al-draw-ref-mirror')?.addEventListener('click', () => {
       this.refMirror = !this.refMirror;
+      lifeStore.updateProgress('drawing', { refMirror: this.refMirror });
       this.syncActiveRefStyles(container);
     });
 
-    // Tabs modo (Lecciones / Lienzo Libre)
+    // Tabs modo (Lecciones / Retos / Lienzo Libre)
     container.querySelectorAll<HTMLButtonElement>('[data-draw-mode]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const mode = btn.dataset.drawMode as 'lessons' | 'free';
-        if (lifeStore.get().modulePrefs.drawing.mode === mode) return;
-        lifeStore.updateModulePrefs('drawing', { mode });
+        const mode = btn.dataset.drawMode as 'lessons' | 'challenge' | 'free';
+        if (this.getActiveMode() === mode) return;
+        this.stopChallengeTimer();
+        this.loadedDraftKey = '';
+        lifeStore.updateProgress('drawing', { modeExtra: mode });
+        lifeStore.updateModulePrefs('drawing', { mode: mode === 'free' ? 'free' : 'lessons' });
         this.feedbackMsg =
           mode === 'free'
             ? 'Lienzo libre activo: experimenta con simetría, cuadrícula o puntos de fuga arrastrables.'
-            : 'Modo Lecciones Guiadas activo.';
+            : mode === 'challenge'
+              ? 'Modo Retos Creativos activo: elige un reto y pon a prueba tu trazo.'
+              : 'Modo Lecciones Guiadas activo.';
         this.render(container);
       });
+    });
+
+    // Paso a paso en guía de lección
+    container.querySelectorAll<HTMLButtonElement>('[data-guide-step]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const step = parseInt(btn.dataset.guideStep!, 10) || 0;
+        lifeStore.updateProgress('drawing', { guideStep: step });
+        this.render(container);
+      });
+    });
+
+    // Retos creativos
+    container.querySelectorAll<HTMLButtonElement>('[data-draw-challenge]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.stopChallengeTimer();
+        this.activeChallengeId = btn.dataset.drawChallenge!;
+        this.loadedDraftKey = '';
+        const ch = this.getActiveChallenge();
+        lifeStore.updateModulePrefs('drawing', {
+          grid: ch.recommendedGrid,
+          symmetry: ch.recommendedSymmetry,
+        });
+        this.feedbackMsg = `Reto cargado: ${ch.title}.`;
+        this.render(container);
+      });
+    });
+
+    container.querySelector('#al-draw-ch-timer')?.addEventListener('click', () => {
+      const ch = this.getActiveChallenge();
+      if (this.challengeTimerId) {
+        this.stopChallengeTimer();
+        this.render(container);
+        return;
+      }
+      this.challengeRemainingSec = ch.durationSec;
+      this.challengeTimerId = window.setInterval(() => {
+        this.challengeRemainingSec -= 1;
+        const btn = this.container?.querySelector('#al-draw-ch-timer span');
+        if (this.challengeRemainingSec <= 0) {
+          this.stopChallengeTimer();
+          this.feedbackMsg = `Tiempo completado en «${ch.title}». Evalúa o guarda tu progreso.`;
+          if (this.container) this.render(this.container);
+        } else if (btn) {
+          btn.textContent = `Tiempo: ${this.challengeRemainingSec}s (Pausar)`;
+        }
+      }, 1000);
+      this.render(container);
+    });
+
+    container.querySelector('#al-draw-ch-done')?.addEventListener('click', () => {
+      const ch = this.getActiveChallenge();
+      this.stopChallengeTimer();
+      lifeStore.recordDrawingChallenge(ch.id);
+      this.persistDraft();
+      this.feedbackMsg = `Reto «${ch.title}» guardado como completado.`;
+      this.render(container);
     });
 
     // Bloques
@@ -1598,6 +1864,7 @@ export class DrawingView {
     container.querySelectorAll<HTMLButtonElement>('[data-draw-tool]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.tool = btn.dataset.drawTool as DrawingTool;
+        lifeStore.updateProgress('drawing', { activeTool: this.tool });
         this.render(container);
       });
     });
@@ -1666,6 +1933,7 @@ export class DrawingView {
       if (this.strokes.length === 0) return;
       this.pushUndoSnapshot();
       this.strokes = [];
+      this.persistDraft();
       this.redraw();
       this.feedbackMsg = 'Lienzo limpio. Puedes usar Deshacer si quieres recuperar el dibujo.';
       this.updateFeedback();
