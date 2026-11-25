@@ -149,6 +149,7 @@ export class CalligraphyView {
   private strokes: StrokePt[][] = [];
   private activeStroke: StrokePt[] | null = null;
   private loadedKey = '';
+  private savedKey = '';
   private feedbackMsg = 'Dibuja despacio siguiendo la pauta guía. Tus trazos y progreso se guardan automáticamente.';
 
   private canvas!: HTMLCanvasElement;
@@ -169,6 +170,7 @@ export class CalligraphyView {
   private hydrateStrokes(key: string): void {
     if (this.loadedKey === key) return;
     this.loadedKey = key;
+    this.savedKey = '';
     const saved = lifeStore.get().progress.calligraphy.savedStrokes[key];
     if (saved && saved.length > 0) {
       this.strokes = saved.map((s) => s.points.map(([x, y, t]) => ({ x, y, t })));
@@ -204,6 +206,7 @@ export class CalligraphyView {
     const currentText = list[sampleIdx];
     const currentBest = prog.mastery[key] ?? 0;
     const modeTut = MODE_TUTORIALS[mode];
+    const justSaved = this.savedKey === key;
 
     container.innerHTML = `
       <div class="al-page al-calligraphy-page">
@@ -242,7 +245,7 @@ export class CalligraphyView {
 
           <div class="al-tool-group">
             <button type="button" class="al-btn" id="al-cal-prev">Anterior</button>
-            <button type="button" class="al-btn" id="al-cal-next">Siguiente muestra</button>
+            <button type="button" class="al-btn" id="al-cal-next" data-cal-next>Siguiente muestra</button>
             <button type="button" class="al-btn ${prefs.showGuidelines ? 'is-toggled' : ''}" id="al-cal-guides">Renglones</button>
             <button type="button" class="al-btn ${prefs.showSlant ? 'is-toggled' : ''}" id="al-cal-slant">Inclinación 55°</button>
             <div class="al-tool-group" aria-label="Color de tinta">
@@ -273,7 +276,13 @@ export class CalligraphyView {
             <div class="al-tool-group">
               <button type="button" class="al-btn" id="al-cal-undo">${Icons.undo(15)}<span>Deshacer</span></button>
               <button type="button" class="al-btn" id="al-cal-clear">${Icons.trash(15)}<span>Limpiar</span></button>
-              <button type="button" class="al-btn al-btn-primary" id="al-cal-save">${Icons.check(15)}<span>Evaluar y guardar hoja</span></button>
+              <button type="button" class="al-btn ${justSaved ? '' : 'al-btn-primary'}" id="al-cal-save">${Icons.check(15)}<span>Evaluar y guardar hoja</span></button>
+              ${
+                justSaved
+                  ? `<span class="al-muted">Muestra ${sampleIdx + 1}/${list.length}</span>
+              <button type="button" class="al-btn al-btn-primary" data-cal-next>${Icons.skip(15)}<span>Siguiente muestra →</span></button>`
+                  : ''
+              }
             </div>
           </div>
 
@@ -510,11 +519,13 @@ export class CalligraphyView {
       this.render(container);
     });
 
-    container.querySelector('#al-cal-next')?.addEventListener('click', () => {
-      const prefs = lifeStore.get().modulePrefs.calligraphy;
-      lifeStore.updateModulePrefs('calligraphy', { sampleIdx: (prefs.sampleIdx + 1) % listLen });
-      this.loadedKey = '';
-      this.render(container);
+    container.querySelectorAll('[data-cal-next]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const prefs = lifeStore.get().modulePrefs.calligraphy;
+        lifeStore.updateModulePrefs('calligraphy', { sampleIdx: (prefs.sampleIdx + 1) % listLen });
+        this.loadedKey = '';
+        this.render(container);
+      });
     });
 
     container.querySelectorAll<HTMLButtonElement>('[data-cal-jump]').forEach((btn) => {
@@ -565,6 +576,7 @@ export class CalligraphyView {
 
     container.querySelector('#al-cal-save')?.addEventListener('click', () => {
       this.feedbackMsg = this.evaluatePractice(key);
+      if (this.strokes.length > 0) this.savedKey = key;
       this.render(container);
     });
   }

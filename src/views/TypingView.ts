@@ -14,7 +14,7 @@ const PC_MODE_LABELS: Record<PcMode, string> = {
   speed: 'Velocidad pura',
   classic: 'Párrafo clásico',
   filas: 'Filas guía',
-  codigo: 'Código TS/SQL',
+  codigo: 'Código JS/TS/Angular/SQL',
   adaptativo: 'Adaptativo',
 };
 
@@ -82,12 +82,12 @@ const TYPING_TUTORIALS: Record<string, Omit<SectionTutorialSpec, 'id' | 'moduleN
     tip: 'Cinco minutos de filas puras corrigen más vicios que media hora tecleando rápido.',
   },
   'pc:codigo': {
-    sectionName: 'PC · Código TypeScript, SQL y HTML',
-    summary: 'Practica símbolos, llaves, etiquetas y sintaxis técnica sin perder precisión.',
+    sectionName: 'PC · Código JavaScript, Angular, SQL y HTML',
+    summary: 'Practica símbolos, llaves, etiquetas y sintaxis de JavaScript, Angular, TypeScript y SQL sin perder precisión.',
     steps: [
       'Anticipa signos como paréntesis, puntos y comas, operadores y etiquetas.',
       'Mantén los meñiques relajados al alcanzar llaves, comillas y guiones.',
-      'Rota entre fragmentos de TypeScript, SQL y HTML con Otro texto.',
+      'Rota entre fragmentos de JavaScript, Angular, TypeScript, SQL y HTML con Otro texto.',
     ],
     tip: 'En código vale más la precisión exacta que la prisa: cada símbolo cuenta.',
   },
@@ -241,6 +241,18 @@ const PC_TEXTS: Record<Exclude<PcMode, 'adaptativo'>, string[]> = {
     'SELECT fecha, AVG(wpm) AS promedio_ppm FROM typing_log WHERE acc >= 90 GROUP BY fecha ORDER BY fecha DESC;',
     'type Result<T> = { ok: true; data: T } | { ok: false; error: string };',
     'const unique = Array.from(new Set(tags.map((t) => t.trim().toLowerCase()).filter(Boolean)));',
+    "const [first, ...rest] = names.map((n) => n.trim()).filter((n) => n.length > 0);",
+    "const { id, title = 'Sin titulo', tags = [] } = course; console.log(id, title, tags.length);",
+    "async function getUser(id) { const res = await fetch('/api/users/' + id); return res.json(); }",
+    "const counts = new Map(); for (const p of people) { counts.set(p.team, (counts.get(p.team) ?? 0) + 1); }",
+    "const seen = new Set(); const dups = list.filter((x) => seen.has(x) || !seen.add(x));",
+    "const top3 = [...users].sort((a, b) => b.score - a.score).slice(0, 3).map((u) => u.name);",
+    "@Component({ standalone: true, selector: 'app-hi', template: '<p>{{ msg }}</p>' }) export class Hi { msg = 'Hola'; }",
+    "export class Counter { n = signal(0); dbl = computed(() => this.n() * 2); inc() { this.n.update((v) => v + 1); } }",
+    "export class Api { http = inject(HttpClient); names = this.http.get<User[]>('/u').pipe(map((u) => u.map((x) => x.name))); }",
+    "const tpl = '@if (user()) { <p>Hola {{ user().name }}</p> } @else { <p>Inicia sesion</p> }';",
+    "const list = '@for (item of items(); track item.id) { <li>{{ item.name }}</li> } @empty { <li>Sin datos</li> }';",
+    "const form = new FormGroup({ email: new FormControl('', Validators.required), age: new FormControl(18) });",
   ],
 };
 
@@ -613,7 +625,7 @@ export class TypingView {
           <button type="button" class="al-seg-btn ${pcMode === 'speed' ? 'is-active' : ''}" data-pcmode="speed">Velocidad pura (${PC_TEXTS.speed.length})</button>
           <button type="button" class="al-seg-btn ${pcMode === 'classic' ? 'is-active' : ''}" data-pcmode="classic">Párrafo clásico (${PC_TEXTS.classic.length})</button>
           <button type="button" class="al-seg-btn ${pcMode === 'filas' ? 'is-active' : ''}" data-pcmode="filas">Filas guía (${PC_TEXTS.filas.length})</button>
-          <button type="button" class="al-seg-btn ${pcMode === 'codigo' ? 'is-active' : ''}" data-pcmode="codigo">Código TS/SQL (${PC_TEXTS.codigo.length})</button>
+          <button type="button" class="al-seg-btn ${pcMode === 'codigo' ? 'is-active' : ''}" data-pcmode="codigo">Código JS/TS/Angular/SQL (${PC_TEXTS.codigo.length})</button>
           <button type="button" class="al-seg-btn ${pcMode === 'adaptativo' ? 'is-active' : ''}" data-pcmode="adaptativo">Adaptativo (${weakKeys.length})</button>
         </div>`
         : `

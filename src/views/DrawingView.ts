@@ -118,6 +118,7 @@ export class DrawingView {
   private resizeHandler: (() => void) | null = null;
   private hydrated = false;
   private loadedDraftKey = '';
+  private savedLessonId = '';
   private activeChallengeId = DRAWING_CHALLENGES[0].id;
   private challengeTimerId = 0;
   private challengeRemainingSec = 0;
@@ -223,6 +224,7 @@ export class DrawingView {
     const totalGuideSteps = Math.max(1, activeLesson.guideSvgPaths.length);
     const activeGuideStep = prog.guideStep > totalGuideSteps ? 0 : prog.guideStep;
     const activeChallenge = this.getActiveChallenge();
+    const lessonSaved = isLessons && this.savedLessonId === activeLesson.id;
 
     const showSideRef = Boolean(this.activeRef && this.refViewMode === 'side');
     const showTraceRef = Boolean(this.activeRef && this.refViewMode === 'trace');
@@ -313,7 +315,7 @@ export class DrawingView {
                     .join('')}
                 </div>
               </div>
-              <button type="button" class="al-btn al-btn-sm" id="al-draw-next-lesson">
+              <button type="button" class="al-btn al-btn-sm" id="al-draw-next-lesson" data-draw-next-lesson>
                 ${Icons.skip(15)}<span>Siguiente lámina</span>
               </button>
             </div>
@@ -646,9 +648,16 @@ export class DrawingView {
               <button type="button" class="al-btn al-btn-sm" id="al-draw-download">
                 ${Icons.download(15)}<span>Descargar PNG</span>
               </button>
-              <button type="button" class="al-btn al-btn-primary" id="al-draw-evaluate">
+              <button type="button" class="al-btn ${lessonSaved ? '' : 'al-btn-primary'}" id="al-draw-evaluate">
                 ${Icons.check(15)}<span>Evaluar y guardar</span>
               </button>
+              ${
+                lessonSaved
+                  ? `<button type="button" class="al-btn al-btn-primary" data-draw-next-lesson>
+                ${Icons.skip(15)}<span>Siguiente lámina →</span>
+              </button>`
+                  : ''
+              }
             </div>
           </div>
         </section>
@@ -1430,6 +1439,7 @@ export class DrawingView {
         this.height
       );
       lifeStore.recordDrawingMastery(lesson.id, res.coveragePct);
+      this.savedLessonId = lesson.id;
       const tone =
         res.coveragePct >= 80
           ? 'Excelente seguimiento de guía.'
@@ -1483,6 +1493,7 @@ export class DrawingView {
     const lesson = this.getActiveLesson(lessonId);
     const prev = lifeStore.get().modulePrefs.drawing;
     this.loadedDraftKey = '';
+    this.savedLessonId = '';
     this.undoStack = [];
     this.redoStack = [];
     this.horizonY = lesson.id === 'persp-building-2pt' ? 0.48 : 0.30;
@@ -1856,11 +1867,13 @@ export class DrawingView {
       btn.addEventListener('click', () => this.selectLesson(btn.dataset.drawLesson!));
     });
 
-    container.querySelector('#al-draw-next-lesson')?.addEventListener('click', () => {
-      const curId = lifeStore.get().modulePrefs.drawing.lessonId;
-      const idx = DRAWING_LESSONS.findIndex((l) => l.id === curId);
-      const next = DRAWING_LESSONS[(idx + 1) % DRAWING_LESSONS.length];
-      this.selectLesson(next.id);
+    container.querySelectorAll('[data-draw-next-lesson]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const curId = lifeStore.get().modulePrefs.drawing.lessonId;
+        const idx = DRAWING_LESSONS.findIndex((l) => l.id === curId);
+        const next = DRAWING_LESSONS[(idx + 1) % DRAWING_LESSONS.length];
+        this.selectLesson(next.id);
+      });
     });
 
     // Herramientas

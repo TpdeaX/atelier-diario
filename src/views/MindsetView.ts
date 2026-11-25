@@ -3,6 +3,7 @@ import { Icons } from '../icons';
 import { lifeStore } from '../state/LifeStore';
 import { DifficultyLevel, PhraseItem } from '../types';
 import { bindDidacticBar, difficultyLabel, renderDidacticBar } from '../ui/DidacticBar';
+import { shuffleBySeed } from '../ui/shuffle';
 import { bindTutorialBanners, renderTutorialBanner, SectionTutorialSpec } from '../ui/TutorialBanner';
 
 type MindsetMode = 'tarjetas' | 'reto_hoy' | 'reflexion' | 'creatividad';
@@ -174,6 +175,7 @@ function daySeed(): number {
 export class MindsetView {
   private addFormOpen = false;
   private missionOffset = 0;
+  private shuffleNonce = 0;
   private onlyWithReflection = false;
   private openInlineReflectionId: string | null = null;
   private saveTimers = new Map<string, number>();
@@ -237,7 +239,9 @@ export class MindsetView {
     const prefs = profile.modulePrefs.mindset;
     const q = prefs.searchQuery.trim().toLowerCase();
 
-    const filtered = entries.filter(({ phrase: p, diff: pDiff }) => {
+    // Orden por defecto: barajado con la fecha (cambia cada día) y, si pulsa Barajar, con un nonce extra.
+    const shuffled = shuffleBySeed(entries, daySeed() + this.shuffleNonce * 7919, (x) => x.phrase.id);
+    const filtered = shuffled.filter(({ phrase: p, diff: pDiff }) => {
       if (prefs.category === 'favs' && !profile.favoritePhraseIds.includes(p.id)) return false;
       if (prefs.category !== 'all' && prefs.category !== 'favs' && p.category !== prefs.category) return false;
       if (diff === 'basico' && !q && prefs.category === 'all' && !p.isCustom && pDiff !== 'basico') {
@@ -304,7 +308,7 @@ export class MindsetView {
             </div>
             <div>
               <h1>Frases, Criterio y Modelos Mentales</h1>
-              <p>Convierte ideas en micro-acciones cumplidas, misiones diarias y reflexiones escritas que perduran.</p>
+              <p>Convierte ideas en micro-acciones cumplidas, misiones diarias y reflexiones escritas que perduran. Criterio es juzgar bien antes de decidir: aquí entrenas a pensar con claridad, separar lo importante de lo urgente y elegir con calma.</p>
             </div>
           </div>
           <div class="al-tool-group">
@@ -363,7 +367,8 @@ export class MindsetView {
           </div>
           ${
             mode !== 'reto_hoy' && mode !== 'creatividad'
-              ? `<input type="search" id="al-phrase-search" class="al-filter-input" value="${esc(prefs.searchQuery)}" placeholder="Filtrar ideas o autores..." />`
+              ? `<input type="search" id="al-phrase-search" class="al-filter-input" value="${esc(prefs.searchQuery)}" placeholder="Filtrar ideas o autores..." />
+                <button type="button" class="al-btn al-btn-sm" id="al-mind-shuffle">${Icons.refresh(14)}<span>Barajar</span></button>`
               : mode === 'reto_hoy'
                 ? `<button type="button" class="al-btn al-btn-sm" id="al-mind-rotate-mission">${Icons.refresh(14)}<span>Rotar 3 ideas</span></button>`
                 : ''
@@ -785,6 +790,11 @@ export class MindsetView {
 
     container.querySelector('#al-mind-rotate-mission')?.addEventListener('click', () => {
       this.missionOffset += 1;
+      this.render(container);
+    });
+
+    container.querySelector('#al-mind-shuffle')?.addEventListener('click', () => {
+      this.shuffleNonce += 1;
       this.render(container);
     });
 
